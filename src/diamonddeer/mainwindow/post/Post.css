@@ -9,13 +9,13 @@ and open the template in the editor.
 */
 
 #upvoteButton {
-    -fx-background-image: url("Icons/upvote.png");
+    -fx-background-image: url("icons/upvote.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #downvoteButton {
-    -fx-background-image: url("Icons/downvote.png");
+    -fx-background-image: url("icons/downvote.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }

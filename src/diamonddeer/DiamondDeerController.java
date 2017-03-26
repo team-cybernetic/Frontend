@@ -1,19 +1,3 @@
-/* 
- * Copyright (C) 2017 Tootoot222
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package diamonddeer;
 
 import beryloctopus.BerylOctopus;
@@ -47,7 +31,7 @@ public class DiamondDeerController implements PostLoader {
 
     private Parent loadMainWindow() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("MainWindow/MainWindow.fxml"));
+        loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
         mainWindowController.setup(model, this, settingsManager);
@@ -68,7 +52,7 @@ public class DiamondDeerController implements PostLoader {
     @Override
     public PostUI loadEmptyPost() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("MainWindow/Post/Post.fxml"));
+        loader.setLocation(getClass().getResource("mainwindow/post/Post.fxml"));
         Pane layout = loader.load();
         PostController controller = loader.getController();
         return (new PostUI(layout, controller));

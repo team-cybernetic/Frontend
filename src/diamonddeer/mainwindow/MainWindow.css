@@ -10,39 +10,39 @@ and open the template in the editor.
 
 #optionsButton {
     /*
-    -fx-graphic: url("Icons/settings-small.png");
+    -fx-graphic: url("icons/settings-small.png");
     */
-    -fx-background-image: url("Icons/settings-small.png");
+    -fx-background-image: url("icons/settings-small.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #homeButton {
-    -fx-background-image: url("Icons/home-small.png");
+    -fx-background-image: url("icons/home-small.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #reloadButton {
-    -fx-background-image: url("Icons/reload-small2.png");
+    -fx-background-image: url("icons/reload-small2.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #bookmarksToggle {
-    -fx-background-image: url("Icons/bookmarks-small.png");
+    -fx-background-image: url("icons/bookmarks-small.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #backButton {
-    -fx-background-image: url("Icons/back-small.png");
+    -fx-background-image: url("icons/back-small.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
 
 #forwardButton {
-    -fx-background-image: url("Icons/forward-small.png");
+    -fx-background-image: url("icons/forward-small.png");
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
