@@ -17,11 +17,11 @@
 package diamonddeer;
 
 import beryloctopus.BerylOctopus;
-import diamonddeer.MainWindow.MainWindowController;
-import diamonddeer.MainWindow.Post.PostUI;
-import diamonddeer.MainWindow.Post.PostController;
-import diamonddeer.MainWindow.Post.PostLoader;
-import diamonddeer.Settings.SettingsManager;
+import diamonddeer.mainwindow.MainWindowController;
+import diamonddeer.mainwindow.post.PostUI;
+import diamonddeer.mainwindow.post.PostController;
+import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.settings.SettingsManager;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

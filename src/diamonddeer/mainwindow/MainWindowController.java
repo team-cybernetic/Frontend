@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.MainWindow;
+package diamonddeer.mainwindow;
 
 import beryloctopus.BerylOctopus;
-import diamonddeer.MainWindow.Post.PostUI;
-import diamonddeer.MainWindow.Post.PostController;
-import diamonddeer.MainWindow.Post.PostLoader;
-import diamonddeer.Settings.PostSettings;
+import diamonddeer.mainwindow.post.PostUI;
+import diamonddeer.mainwindow.post.PostController;
+import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
 import java.io.IOException;
 import java.net.URL;

@@ -18,7 +18,7 @@ package diamonddeer;
 
 import beryloctopus.BerylOctopus;
 import beryloctopus.BerylOctopusDummy1;
-import diamonddeer.Settings.SettingsManager;
+import diamonddeer.settings.SettingsManager;
 import diamonddeer.lib.Debug;
 import java.io.IOException;
 import javafx.application.Application;
