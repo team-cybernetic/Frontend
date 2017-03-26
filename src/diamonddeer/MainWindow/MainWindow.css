@@ -1,0 +1,48 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Mar 20, 2017, 4:14:02 PM
+    Author     : Tootoot222
+*/
+
+#optionsButton {
+    /*
+    -fx-graphic: url("Icons/settings-small.png");
+    */
+    -fx-background-image: url("Icons/settings-small.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#homeButton {
+    -fx-background-image: url("Icons/home-small.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#reloadButton {
+    -fx-background-image: url("Icons/reload-small2.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#bookmarksToggle {
+    -fx-background-image: url("Icons/bookmarks-small.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#backButton {
+    -fx-background-image: url("Icons/back-small.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#forwardButton {
+    -fx-background-image: url("Icons/forward-small.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}

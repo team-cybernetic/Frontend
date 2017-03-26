@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2017 Tootoot222
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" stylesheets="@MainWindow.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.MainWindow.MainWindowController">
+   <children>
+      <VBox layoutX="245.0" layoutY="96.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <MenuBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" VBox.vgrow="NEVER">
+               <menus>
+                  <Menu mnemonicParsing="false" text="File">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Edit">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="2.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="66.0" spacing="12.0">
+                     <children>
+                        <GridPane hgap="2.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="66.0" prefWidth="82.0" vgap="2.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Button fx:id="homeButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleHomeButtonAction" onMouseEntered="#handleHomeButtonMouseEntered" onMouseExited="#handleHomeButtonMouseExited" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                              <Button fx:id="optionsButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleOptionsButtonAction" onMouseEntered="#handleOptionsButtonMouseEntered" onMouseExited="#handleOptionsButtonMouseExited" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                              <ToggleButton fx:id="bookmarksToggle" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleBookmarksToggleAction" onMouseEntered="#handleBookmarksToggleMouseEntered" onMouseExited="#handleBookmarksToggleMouseExited" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+                              <Button fx:id="reloadButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleReloadButtonAction" onMouseEntered="#handleReloadButtonMouseEntered" onMouseExited="#handleReloadButtonMouseExited" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+                           </children>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </GridPane>
+                        <HBox alignment="CENTER_LEFT" fillHeight="false" minWidth="68.0" prefWidth="68.0" HBox.hgrow="NEVER">
+                           <children>
+                              <Button fx:id="backButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleBackButtonAction" onMouseEntered="#handleBackButtonMouseEntered" onMouseExited="#handleBackButtonMouseExited" prefWidth="34.0" />
+                              <Button fx:id="forwardButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleForwardButtonAction" onMouseEntered="#handleForwardButtonMouseEntered" onMouseExited="#handleForwardButtonMouseExited" prefWidth="34.0" />
+                           </children>
+                        </HBox>
+                        <ScrollPane fx:id="addressBarScrollPane" fitToHeight="true" fitToWidth="true" maxWidth="1.7976931348623157E308" minWidth="350.0" vbarPolicy="NEVER" HBox.hgrow="ALWAYS">
+                           <content>
+                              <AnchorPane maxWidth="1.7976931348623157E308" minWidth="-Infinity">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" scaleShape="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <HBox fx:id="addressBarHBox" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" HBox.hgrow="SOMETIMES" />
+                                          <Button fx:id="addressBarCancelButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddressBarCancelButtonAction" text="Cancel" />
+                                          <TextField fx:id="addressBarTextField" maxWidth="1.7976931348623157E308" minWidth="75.0" onAction="#handleAddressBarTextFieldAction" onKeyPressed="#handleAddressBarTextFieldKeyPress" onMouseEntered="#handleAddressBarTextFieldMouseEntered" onMouseExited="#handleAddressBarTextFieldMouseExited" HBox.hgrow="ALWAYS" />
+                                          <Button fx:id="addressBarGoButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddressBarGoButtonAction" text="Go" />
+                                          <Button fx:id="createGroupButton" minWidth="-Infinity" mnemonicParsing="false" onMouseEntered="#handleCreateGroupButtonMouseEntered" onMouseExited="#handleCreateGroupButtonMouseExited" text="+">
+                                             <HBox.margin>
+                                                <Insets left="8.0" />
+                                             </HBox.margin></Button>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <padding>
+                                    <Insets left="2.0" right="2.0" />
+                                 </padding>
+                              </AnchorPane>
+                           </content>
+                        </ScrollPane>
+                        <MenuButton fx:id="feedMenuButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleFeedMenuButtonAction" onMouseEntered="#handleFeedMenuButtonMouseEntered" onMouseExited="#handleFeedMenuButtonMouseExited" text="Feed">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Action 1" />
+                            <MenuItem mnemonicParsing="false" text="Action 2" />
+                          </items>
+                        </MenuButton>
+                        <TextField fx:id="searchTextField" minWidth="171.0" onAction="#handleSearchTextFieldAction" promptText="Search..." />
+                     </children>
+                     <VBox.margin>
+                        <Insets left="8.0" right="8.0" top="2.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <SplitPane dividerPositions="0.764" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                    <items>
+                      <AnchorPane SplitPane.resizableWithParent="false">
+                           <children>
+                              <VBox layoutX="128.0" layoutY="105.0" prefHeight="200.0" prefWidth="100.0" spacing="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
+                                       <content>
+                                          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                             <children>
+                                                <GridPane fx:id="mainContentPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                    <RowConstraints vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                </GridPane>
+                                             </children></AnchorPane>
+                                       </content>
+                                    </ScrollPane>
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                       <children>
+                                          <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="110.0" spacing="4.0">
+                                             <children>
+                                                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Earnings" VBox.vgrow="ALWAYS">
+                                                   <font>
+                                                      <Font name="System Bold" size="18.0" />
+                                                   </font>
+                                                </Label>
+                                                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="Global:">
+                                                         <font>
+                                                            <Font size="12.0" />
+                                                         </font></Label>
+                                                      <Label fx:id="earningsGlobalLabel" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="000.00Kb" textAlignment="RIGHT" HBox.hgrow="ALWAYS">
+                                                         <font>
+                                                            <Font size="12.0" />
+                                                         </font></Label>
+                                                   </children>
+                                                </HBox>
+                                                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                                   <children>
+                                                      <Label text="Local:" textOverrun="CLIP">
+                                                         <font>
+                                                            <Font size="11.0" />
+                                                         </font></Label>
+                                                      <Label fx:id="earningsLocalLabel" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="000.00Kb" textOverrun="CLIP" HBox.hgrow="ALWAYS">
+                                                         <font>
+                                                            <Font size="12.0" />
+                                                         </font></Label>
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                          </VBox>
+                                          <TextArea fx:id="newPostTextArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="75.0" prefHeight="75.0" prefWidth="500.0" promptText="Start a new post..." wrapText="true" HBox.hgrow="ALWAYS" />
+                                          <VBox HBox.hgrow="NEVER">
+                                             <children>
+                                                <StackPane fx:id="rollButtonsStackPane">
+                                                   <children>
+                                                      <Button fx:id="rolldownButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRolldownButtonAction" onMouseEntered="#handleRolldownButtonMouseEntered" onMouseExited="#handleRolldownButtonMouseExited" text="V V V V" textAlignment="CENTER">
+                                                         <font>
+                                                            <Font size="9.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <Button fx:id="rollupButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRollupButtonAction" onMouseEntered="#handleRollupButtonMouseEntered" onMouseExited="#handleRollupButtonMouseExited" text="^^^^">
+                                                         <font>
+                                                            <Font size="9.0" />
+                                                         </font>
+                                                      </Button>
+                                                   </children>
+                                                </StackPane>
+                                                <Button fx:id="postButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="62.0" mnemonicParsing="false" onAction="#handlePostButtonAction" onMouseEntered="#handlePostButtonMouseEntered" onMouseExited="#handlePostButtonMouseExited" text="Post" VBox.vgrow="ALWAYS" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children></AnchorPane>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vbarPolicy="ALWAYS" SplitPane.resizableWithParent="false">
+                           <content>
+                            <AnchorPane fx:id="sidebarPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                           </content>
+                        </ScrollPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </VBox>
+            <HBox maxHeight="0.0" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label fx:id="statusLeftLabel" text="Status" />
+                  <Label fx:id="statusRightLabel" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" textAlignment="RIGHT" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
