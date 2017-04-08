@@ -107,7 +107,16 @@ public class PostController implements Initializable {
     }
 
     public void setBody(String text) {
-        bodyLabel.setText(text);
+        if (text != null) {
+            bodyLabel.setText(text);
+        } else {
+            setBodyVisible(false);
+        }
+    }
+
+    public void setBodyVisible(boolean visible) {
+        bodyLabel.setManaged(visible);
+        bodyLabel.setVisible(visible);
     }
 
     public void setReadMoreVisible(boolean visible) {

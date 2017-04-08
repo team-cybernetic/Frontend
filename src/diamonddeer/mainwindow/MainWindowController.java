@@ -22,6 +22,8 @@ import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
 import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
+import diamonddeer.mainwindow.editor.EditorController;
+import diamonddeer.mainwindow.editor.EditorUI;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -60,6 +62,9 @@ public class MainWindowController implements Initializable {
     private PostSettings postSettings;
     private ObservableList<Node> addressBarChildren = null;
     private String oldAddressText = null;
+    private Pane mainContentPrevious = null;
+    private Pane editorPane;
+    private EditorController editorController;
     
     @FXML
     private Button homeButton;
@@ -82,7 +87,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private TextField searchTextField;
     @FXML
-    private GridPane mainContentPane;
+    private GridPane postGridPane;
     @FXML
     private Label earningsGlobalLabel;
     @FXML
@@ -113,6 +118,8 @@ public class MainWindowController implements Initializable {
     private Button addressBarCancelButton;
     @FXML
     private Button addressBarGoButton;
+    @FXML
+    private ScrollPane mainContentPane;
 
     private void setDefaultFocus() {
         Platform.runLater(() -> rootPane.requestFocus());
@@ -126,10 +133,12 @@ public class MainWindowController implements Initializable {
         statusLeftLabel.setText("");
     }
 
-    public void setup(BerylOctopus model, PostLoader postLoader, PostSettings postSettings) {
+    public void setup(BerylOctopus model, EditorUI editor, PostLoader postLoader, PostSettings postSettings) {
         this.model = model;
         this.postLoader = postLoader;
         this.postSettings = postSettings;
+        this.editorController = editor.getController();
+        this.editorPane = editor.getLayout();
         setCurrentAddress(getCurrentAddress());
         addressBarAddressButtonsCreate();
         setDefaultFocus();
@@ -154,6 +163,7 @@ public class MainWindowController implements Initializable {
         addressBarHBox.widthProperty().addListener((observable, oldH, newH) -> {
             addressBarScrollPane.setHvalue(addressBarScrollPane.getHmax());
         });
+        mainContentPrevious = postGridPane;
     }
 
     public void setCurrentAddress(String address) {
@@ -326,45 +336,109 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void handleRolldownButtonAction(ActionEvent event) {
-        rollupButton.toFront();
+        mainContentHideRollupEditor();
     }
 
     @FXML
     private void handleRollupButtonAction(ActionEvent event) {
-        rolldownButton.toFront();
+        mainContentShowRollupEditor();
     }
 
     private int postRows = 0;
     private int postCols = 0;
 
+    private void mainContentShowPosts() {
+        mainContentPrevious = (Pane)mainContentPane.getContent();
+        mainContentPane.setContent(postGridPane);
+    }
+
+    private void populateRollupEditor(String text) {
+        String[] tSplit = text.split("\n", 2);
+        Debug.debug("t = %s", text);
+        for (int i = 0; i < tSplit.length; i++) {
+            Debug.debug("tSplit[%d] = %s", i, tSplit[i]);
+        }
+        editorController.setTitle(tSplit[0]);
+        editorController.setBody(tSplit.length > 1 ? tSplit[1] : "");
+    }
+
+    private void mainContentShowRollupEditor() {
+        rolldownButton.toFront();
+        if (editorController.getTitle().trim().length() == 0 && newPostTextArea.getText().trim().length() > 0) {
+            populateRollupEditor(newPostTextArea.getText());
+        }
+        newPostTextArea.setText("");
+        newPostTextArea.setDisable(true);
+        mainContentPrevious = (Pane)mainContentPane.getContent();
+        mainContentPane.setContent(editorPane);
+    }
+
+    private void mainContentHideRollupEditor() {
+        rollupButton.toFront();
+        if (editorController.getTitle().trim().length() > 0 && newPostTextArea.getText().trim().length() == 0) {
+            newPostTextArea.setText(editorController.getTitle() + "\n" + editorController.getBody());
+        }
+        newPostTextArea.setDisable(false);
+        Pane p = (Pane)mainContentPane.getContent();
+        mainContentPane.setContent(mainContentPrevious);
+        mainContentPrevious = p;
+    }
+
     private void postAddNew(Pane newPostLayout) {
-        mainContentPane.add(newPostLayout, postCols, postRows);
+        postGridPane.add(newPostLayout, postCols, postRows);
         postCols = (postCols + 1) % postSettings.getMaxPostColumns();
         if (postCols == 0) {
             postRows++;
-            mainContentPane.addRow(postRows);
+            postGridPane.addRow(postRows);
         }
+    }
+
+    private boolean mainContentShowingRollupEditor() {
+        return (mainContentPane.getContent().equals(editorPane));
     }
 
     @FXML
     private void handlePostButtonAction(ActionEvent event) throws Exception {
         try {
+            
             PostUI newPost = postLoader.loadEmptyPost();
-            PostController controller = newPost.getController();
+            PostController postController = newPost.getController();
             //controller.setUsername("testUsername455");
-            controller.setUsername("testUsername455reallylongpusheseverythingaway");
-            controller.setDateTime("2017/03/25 23:01");
-            controller.setSize("544.94", "KB");
-            controller.setValue("935.32", "MB");
-            controller.setLocation("/hello/world/");
-            if (postCols == 1) {
-                controller.setTitle("This is the title of a generic post!");
-                controller.setBody("Here lies the body text of a post. It is short, and boring. Maybe I should make it slightly longer to make it more interesting. That might make it eaiser to test some things like how well the interface reacts to having very long posts, and how resizing is handled, etc. Let's just make it a little bit longer since the default window height is long enough that the entire post ends up being shown on the first try without any resizing happening whatsoever!");
-            } else {
-                controller.setBody("short text");
+            postController.setUsername("testUsername455reallylongpusheseverythingaway");
+            postController.setDateTime("2017/03/25 23:01");
+            postController.setSize("544.94", "KB");
+            postController.setValue("935.32", "MB");
+            postController.setLocation("/hello/world/");
+            if (!mainContentShowingRollupEditor()) {
+                populateRollupEditor(newPostTextArea.getText());
             }
+            postController.setTitle(editorController.getTitle());
+            postController.setBody(editorController.getBody());
+            mainContentHideRollupEditor();
+            newPostTextArea.setText("");
+            editorController.clearAll();
+                /*
+            } else {
+                String t = newPostTextArea.getText();
+                String[] tSplit = t.split("\n", 2);
+                Debug.debug("t = %s", t);
+                for (int i = 0; i < tSplit.length; i++) {
+                    Debug.debug("tSplit[%d] = %s", i, tSplit[i]);
+                }
+                postController.setTitle(tSplit[0]);
+                postController.setBody(tSplit.length > 1 ? tSplit[1] : null);
+            }
+                */
+            /*
+            if (postCols == 1) {
+                String title = "This is the title of a generic post which is so rediculously long that it can'text2 even be seen when it gets pushed all the way down the minimum sized thingy yay!";
+                postController.setTitle(title.length() + title);
+                postController.setBody("Here lies the body text of a post. It is short, and boring. Maybe I should make it slightly longer to make it more interesting. That might make it eaiser to test some things like how well the interface reacts to having very long posts, and how resizing is handled, etc. Let's just make it a little bit longer since the default window height is long enough that the entire post ends up being shown on the first try without any resizing happening whatsoever!");
+            } else {
+                postController.setBody("short text");
+            }
+            */
             postAddNew(newPost.getLayout());
-            //mainContentPane.getChildren().add(newPost.getLayout());
         } catch (IOException ex) {
             Debug.debug("IOException while loading empty post: %s", ex.toString());
             throw (ex);

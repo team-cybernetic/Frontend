@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 Copyright (C) 2017 Tootoot222
 
@@ -55,7 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                <children>
                   <VBox alignment="TOP_CENTER" spacing="4.0">
                      <children>
-                        <Label fx:id="usernameLabel" alignment="TOP_LEFT" text="Username123" underline="true" wrapText="true">
+                        <Label fx:id="usernameLabel" alignment="TOP_LEFT" minHeight="36.0" text="Username123longlonglonglongsuperlongsolongyourmommacantevencompetewithitslength" underline="true" wrapText="true">
                            <font>
                               <Font name="FreeSans" size="14.0" />
                            </font>
@@ -142,7 +143,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font name="FreeSans" size="11.0" />
                            </font>
                         </Label>
-                        <Label fx:id="titleLabel" alignment="TOP_LEFT" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
+                        <Label fx:id="titleLabel" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
                            <font>
                               <Font name="FreeSerif" size="24.0" />
                            </font>

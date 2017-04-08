@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.HTMLEditor?>
+
+<AnchorPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="504.0" prefWidth="740.0" stylesheets="@Editor.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.editor.EditorController">
+   <children>
+      <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="ALWAYS" />
+          <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox minWidth="-Infinity" spacing="8.0">
+               <children>
+                  <Label alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Make a new post" underline="true" VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font name="FreeSerif" size="30.0" />
+                     </font>
+                  </Label>
+                  <GridPane hgap="4.0" minHeight="-Infinity" minWidth="-Infinity" vgap="4.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="NEVER" prefWidth="65.0" />
+                      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Title:">
+                           <font>
+                              <Font name="FreeSans" size="16.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="titleTextField" maxWidth="1.7976931348623157E308" promptText="Post title..." GridPane.columnIndex="1" />
+                        <Label text="Tags:" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="FreeSans" size="16.0" />
+                           </font>
+                        </Label>
+                        <HBox maxWidth="1.7976931348623157E308" spacing="2.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                           <children>
+                              <TextField fx:id="tagsTextField" prefWidth="100.0" promptText="yolo" />
+                              <Button fx:id="tagsAddButton" mnemonicParsing="false" onAction="#handleTagsAddButtonAction" text="+" />
+                           </children>
+                        </HBox>
+                        <Label minHeight="-Infinity" text="Featured media:" wrapText="true" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="FreeSans" size="16.0" />
+                           </font>
+                        </Label>
+                        <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <children>
+                              <Button fx:id="mediaAddButton" mnemonicParsing="false" onAction="#handleMediaAddButtonAction" text="+" />
+                              <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <ImageView fx:id="mediaImageView" pickOnBounds="true" preserveRatio="true" HBox.hgrow="SOMETIMES" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </GridPane>
+                  <StackPane fx:id="contentStackPane" minHeight="250.0" prefWidth="550.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <TextArea fx:id="contentTextArea" wrapText="true" />
+                        <HTMLEditor fx:id="contentHTMLEditor" />
+                     </children>
+                  </StackPane>
+               </children>
+               <GridPane.margin>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </GridPane.margin>
+            </VBox>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="170.0" minHeight="-Infinity" minWidth="170.0" prefWidth="170.0" spacing="4.0" GridPane.columnIndex="1">
+               <children>
+                  <Label minWidth="-Infinity" text="Post settings" underline="true">
+                     <font>
+                        <Font name="FreeSerif" size="18.0" />
+                     </font>
+                  </Label>
+                  <CheckBox fx:id="postSettingsPrivateCheckBox" mnemonicParsing="false" text="Private">
+                     <font>
+                        <Font name="FreeSans" size="13.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="postSettingsForbidRepliesCheckBox" mnemonicParsing="false" text="Forbid replies">
+                     <font>
+                        <Font name="FreeSans" size="13.0" />
+                     </font>
+                  </CheckBox>
+                  <CheckBox fx:id="postSettingsForbidSharingCheckBox" mnemonicParsing="false" text="Forbid sharing">
+                     <font>
+                        <Font name="FreeSans" size="13.0" />
+                     </font>
+                  </CheckBox>
+                  <Label text="Content type:">
+                     <font>
+                        <Font name="FreeSans" size="13.0" />
+                     </font>
+                  </Label>
+                  <ComboBox fx:id="postSettingsContentTypeComboBox" editable="true" promptText="Auto..." />
+                  <VBox alignment="BOTTOM_LEFT" minHeight="-Infinity" spacing="4.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Label minWidth="-Infinity" text="Editor settings" underline="true">
+                           <font>
+                              <Font name="FreeSerif" size="18.0" />
+                           </font>
+                        </Label>
+                        <RadioButton fx:id="editorSettingsHTMLEditorRadioButton" mnemonicParsing="false" onAction="#handleEditorSettingsHTMLEditorRadioButtonAction" selected="true" text="HTML Editor">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="editorType" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="editorSettingsPlaintextEditorRadioButton" mnemonicParsing="false" onAction="#handleeditorSettingsPlaintextEditorRadioButtonAction" text="Plaintext Editor">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="editorType" />
+                           </toggleGroup>
+                        </RadioButton>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </VBox>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

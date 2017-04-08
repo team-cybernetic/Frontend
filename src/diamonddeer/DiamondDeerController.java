@@ -2,6 +2,9 @@ package diamonddeer;
 
 import beryloctopus.BerylOctopus;
 import diamonddeer.mainwindow.MainWindowController;
+import diamonddeer.mainwindow.editor.EditorController;
+import diamonddeer.mainwindow.editor.EditorLoader;
+import diamonddeer.mainwindow.editor.EditorUI;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
@@ -17,7 +20,7 @@ import javafx.stage.Stage;
  *
  * @author Tootoot222
  */
-public class DiamondDeerController implements PostLoader {
+public class DiamondDeerController implements PostLoader, EditorLoader {
     private Stage mainStage;
 
     private Pane mainWindowPane;
@@ -34,7 +37,7 @@ public class DiamondDeerController implements PostLoader {
         loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
-        mainWindowController.setup(model, this, settingsManager);
+        mainWindowController.setup(model, loadEditor(), this, settingsManager);
         return (mainWindowPane);
     }
 
@@ -56,5 +59,14 @@ public class DiamondDeerController implements PostLoader {
         Pane layout = loader.load();
         PostController controller = loader.getController();
         return (new PostUI(layout, controller));
+    }
+
+    @Override
+    public EditorUI loadEditor() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("mainwindow/editor/Editor.fxml"));
+        Pane layout = loader.load();
+        EditorController controller = loader.getController();
+        return (new EditorUI(layout, controller));
     }
 }
