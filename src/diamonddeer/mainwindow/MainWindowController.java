@@ -354,20 +354,12 @@ public class MainWindowController implements Initializable {
 
     private void populateRollupEditor(EditorController editorController, String text) {
         String[] tSplit = text.split("\n", 2);
-        Debug.debug("t = %s", text);
-        for (int i = 0; i < tSplit.length; i++) {
-            Debug.debug("tSplit[%d] = %s", i, tSplit[i]);
-        }
         editorController.setTitle(tSplit[0]);
         editorController.setBody(tSplit.length > 1 ? tSplit[1] : "");
     }
 
     private void populatePost(PostController postController, String text) {
         String[] tSplit = text.split("\n", 2);
-        Debug.debug("t = %s", text);
-        for (int i = 0; i < tSplit.length; i++) {
-            Debug.debug("tSplit[%d] = %s", i, tSplit[i]);
-        }
         postController.setTitle(tSplit[0]);
         postController.setBody(tSplit.length > 1 ? tSplit[1] : "");
     }
@@ -375,6 +367,7 @@ public class MainWindowController implements Initializable {
     private void mainContentShowRollupEditor() {
         rolldownButton.toFront();
         if (editorController.getTitle().trim().length() == 0 && newPostTextArea.getText().trim().length() > 0) {
+            editorController.setEditorPlaintext();
             populateRollupEditor(editorController, newPostTextArea.getText());
         }
         newPostTextArea.setText("");

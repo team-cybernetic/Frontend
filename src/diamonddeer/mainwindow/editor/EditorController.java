@@ -85,6 +85,8 @@ public class EditorController implements Initializable {
     private void contentShowPlaintextEditor() {
         showingHTMLEditor = false;
         showingPlaintextEditor = true;
+        editorSettingsHTMLEditorRadioButton.setSelected(false);
+        editorSettingsPlaintextEditorRadioButton.setSelected(true);
         contentTextArea.setText(contentHTMLEditor.getHtmlText());
         contentTextArea.toFront();
     }
@@ -92,6 +94,8 @@ public class EditorController implements Initializable {
     private void contentShowHTMLEditor() {
         showingHTMLEditor = true;
         showingPlaintextEditor = false;
+        editorSettingsHTMLEditorRadioButton.setSelected(true);
+        editorSettingsPlaintextEditorRadioButton.setSelected(false);
         contentHTMLEditor.setHtmlText(contentTextArea.getText());
         contentHTMLEditor.toFront();
     }
@@ -103,6 +107,14 @@ public class EditorController implements Initializable {
 
     @FXML
     private void handleeditorSettingsPlaintextEditorRadioButtonAction(ActionEvent event) {
+        contentShowPlaintextEditor();
+    }
+
+    public void setEditorHTML() {
+        contentShowHTMLEditor();
+    }
+
+    public void setEditorPlaintext() {
         contentShowPlaintextEditor();
     }
 
