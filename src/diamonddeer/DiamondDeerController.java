@@ -8,6 +8,9 @@ import diamonddeer.mainwindow.editor.EditorUI;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentController;
+import diamonddeer.mainwindow.post.comment.PostCommentLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import diamonddeer.settings.SettingsManager;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +23,7 @@ import javafx.stage.Stage;
  *
  * @author Tootoot222
  */
-public class DiamondDeerController implements PostLoader, EditorLoader {
+public class DiamondDeerController implements PostLoader, EditorLoader, PostCommentLoader {
     private Stage mainStage;
 
     private Pane mainWindowPane;
@@ -37,7 +40,7 @@ public class DiamondDeerController implements PostLoader, EditorLoader {
         loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
-        mainWindowController.setup(model, loadEditor(), this, settingsManager);
+        mainWindowController.setup(model, loadEditor(), this, this, settingsManager);
         return (mainWindowPane);
     }
 
@@ -59,6 +62,15 @@ public class DiamondDeerController implements PostLoader, EditorLoader {
         Pane layout = loader.load();
         PostController controller = loader.getController();
         return (new PostUI(layout, controller));
+    }
+
+    @Override
+    public PostCommentUI loadEmptyPostComment() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("mainwindow/post/comment/PostComment.fxml"));
+        Pane layout = loader.load();
+        PostCommentController controller = loader.getController();
+        return (new PostCommentUI(layout, controller));
     }
 
     @Override

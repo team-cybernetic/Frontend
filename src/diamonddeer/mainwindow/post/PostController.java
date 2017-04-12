@@ -16,6 +16,7 @@
  */
 package diamonddeer.mainwindow.post;
 
+import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -27,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 
 /**
@@ -35,6 +37,9 @@ import javafx.scene.layout.GridPane;
  * @author Tootoot222
  */
 public class PostController implements Initializable {
+
+    private int defaultWidth;
+    private int defaultHeight;
 
     @FXML
     private Label usernameLabel;
@@ -57,7 +62,7 @@ public class PostController implements Initializable {
     @FXML
     private Separator commentsSeparator;
     @FXML
-    private GridPane commentsPane;
+    private FlowPane commentsPane;
     @FXML
     private AnchorPane rootPane;
     @FXML
@@ -76,7 +81,8 @@ public class PostController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        this.defaultWidth = (int)Math.round(rootPane.getPrefWidth());
+        this.defaultHeight = (int)Math.round(rootPane.getPrefHeight());
     }
 
     public void setUsername(String username) {
@@ -122,5 +128,25 @@ public class PostController implements Initializable {
     public void setReadMoreVisible(boolean visible) {
         readmoreHyperlink.setManaged(visible);
         readmoreHyperlink.setVisible(visible);
+    }
+
+    public void setWidthFactor(int widthFactor) {
+        rootPane.setPrefWidth(defaultWidth * widthFactor);
+    }
+
+    public void setHeightFactor(int heightFactor) {
+        rootPane.setPrefHeight(defaultHeight * heightFactor);
+    }
+
+    public String getBody() {
+        return (bodyLabel.getText());
+    }
+
+    public String getTitle() {
+        return (titleLabel.getText());
+    }
+
+    public void addComment(PostCommentUI comment) {
+        commentsPane.getChildren().add(comment.getLayout());
     }
 }

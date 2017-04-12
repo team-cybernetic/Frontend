@@ -24,9 +24,15 @@ import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorUI;
+import diamonddeer.mainwindow.post.comment.PostCommentController;
+import diamonddeer.mainwindow.post.comment.PostCommentLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -46,7 +52,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -59,12 +65,14 @@ public class MainWindowController implements Initializable {
 
     private BerylOctopus model;
     private PostLoader postLoader;
+    private PostCommentLoader postCommentLoader;
     private PostSettings postSettings;
     private ObservableList<Node> addressBarChildren = null;
     private String oldAddressText = null;
     private Pane mainContentPrevious = null;
     private Pane editorPane;
     private EditorController editorController;
+    private HashMap<String, PostUI> posts = new HashMap<>();
     
     @FXML
     private Button homeButton;
@@ -86,8 +94,7 @@ public class MainWindowController implements Initializable {
     private MenuButton feedMenuButton;
     @FXML
     private TextField searchTextField;
-    @FXML
-    private GridPane postGridPane;
+    //private GridPane postGridPane;
     @FXML
     private Label earningsGlobalLabel;
     @FXML
@@ -120,6 +127,8 @@ public class MainWindowController implements Initializable {
     private Button addressBarGoButton;
     @FXML
     private ScrollPane mainContentPane;
+    @FXML
+    private FlowPane postFlowPane;
 
     private void setDefaultFocus() {
         Platform.runLater(() -> rootPane.requestFocus());
@@ -133,9 +142,10 @@ public class MainWindowController implements Initializable {
         statusLeftLabel.setText("");
     }
 
-    public void setup(BerylOctopus model, EditorUI editor, PostLoader postLoader, PostSettings postSettings) {
+    public void setup(BerylOctopus model, EditorUI editor, PostLoader postLoader, PostCommentLoader postCommentLoader, PostSettings postSettings) {
         this.model = model;
         this.postLoader = postLoader;
+        this.postCommentLoader = postCommentLoader;
         this.postSettings = postSettings;
         this.editorController = editor.getController();
         this.editorPane = editor.getLayout();
@@ -163,7 +173,7 @@ public class MainWindowController implements Initializable {
         addressBarHBox.widthProperty().addListener((observable, oldH, newH) -> {
             addressBarScrollPane.setHvalue(addressBarScrollPane.getHmax());
         });
-        mainContentPrevious = postGridPane;
+        mainContentPrevious = postFlowPane;
     }
 
     public void setCurrentAddress(String address) {
@@ -349,7 +359,7 @@ public class MainWindowController implements Initializable {
 
     private void mainContentShowPosts() {
         mainContentPrevious = (Pane)mainContentPane.getContent();
-        mainContentPane.setContent(postGridPane);
+        mainContentPane.setContent(postFlowPane);
     }
 
     private void populateRollupEditor(EditorController editorController, String text) {
@@ -360,8 +370,12 @@ public class MainWindowController implements Initializable {
 
     private void populatePost(PostController postController, String text) {
         String[] tSplit = text.split("\n", 2);
-        postController.setTitle(tSplit[0]);
-        postController.setBody(tSplit.length > 1 ? tSplit[1] : "");
+        populatePost(postController, tSplit[0], tSplit.length > 1 ? tSplit[1] : "");
+    }
+
+    private void populatePost(PostController postController, String title, String body) {
+        postController.setTitle(title);
+        postController.setBody(body);
     }
 
     private void mainContentShowRollupEditor() {
@@ -387,17 +401,31 @@ public class MainWindowController implements Initializable {
         this.mainContentPrevious = p;
     }
 
-    private void postAddNew(Pane newPostLayout) {
+    private void postAddNew(PostUI post) {
+        /*
         postGridPane.add(newPostLayout, postCols, postRows);
         postCols = (postCols + 1) % postSettings.getMaxPostColumns();
         if (postCols == 0) {
             postRows++;
             postGridPane.addRow(postRows);
         }
+*/
+        Debug.debug("adding post with title: %s", post.getController().getTitle());
+        posts.put(post.getController().getTitle(), post);
+        postFlowPane.getChildren().add(post.getLayout());
     }
 
     private boolean mainContentShowingRollupEditor() {
         return (mainContentPane.getContent().equals(editorPane));
+    }
+
+    private void clearAllInputFields() {
+        newPostTextArea.setText("");
+        editorController.clearAll();
+    }
+
+    private PostUI getPostByTitle(String title) {
+        return (posts.get(title));
     }
 
     @FXML
@@ -407,21 +435,52 @@ public class MainWindowController implements Initializable {
             PostUI newPost = postLoader.loadEmptyPost();
             PostController postController = newPost.getController();
             //controller.setUsername("testUsername455");
-            postController.setUsername("testUsername455reallylongpusheseverythingaway");
-            postController.setDateTime("2017/03/25 23:01");
+            postController.setUsername("1234567890123456789012345678901234");
+            postController.setDateTime("2017/03/25 23:01:34");
             postController.setSize("544.94", "KB");
             postController.setValue("935.32", "MB");
-            postController.setLocation("/hello/world/");
+            postController.setLocation(getCurrentAddress());
             if (mainContentShowingRollupEditor()) {
                 mainContentHideRollupEditor();
-                postController.setTitle(editorController.getTitle());
-                postController.setBody(editorController.getBody());
+                populatePost(postController, editorController.getTitle(), editorController.getBody());
             } else {
                 populatePost(postController, newPostTextArea.getText());
             }
-            newPostTextArea.setText("");
-            editorController.clearAll();
-            postAddNew(newPost.getLayout());
+            Matcher replyMatcher = Pattern.compile("^re:(?<reply>[^/]+)/?(?<title>.*)").matcher(postController.getTitle());
+            if (replyMatcher.matches()) {
+                String re = replyMatcher.group("reply");
+                Debug.debug("this is a reply to: %s", re);
+                PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
+                PostCommentController commentController = comment.getController();
+                String commentTitle = replyMatcher.group("title");
+                commentController.setTitle(commentTitle);
+                commentController.setBody(postController.getBody());
+                commentController.setUsername("1234567890123456789012345678901234");
+                commentController.setDateTime("2017/03/25 23:01:39");
+                PostUI ePost = getPostByTitle(re);
+                if (ePost != null) {
+                    ePost.getController().addComment(comment);
+                    clearAllInputFields();
+                } else {
+                    Debug.debug("no such post!");
+                }
+                return;
+            }
+
+            Matcher widthMatcher = Pattern.compile(".*w:(?<width>[0-9]+).*").matcher(postController.getBody());
+            if (widthMatcher.matches()) {
+                int w = Integer.parseInt(widthMatcher.group("width"));
+                Debug.debug("width: %d", w);
+                postController.setWidthFactor(w);
+            }
+            Matcher heightMatcher = Pattern.compile(".*h:(?<height>[0-9]+).*").matcher(postController.getBody());
+            if (heightMatcher.matches()) {
+                int h = Integer.parseInt(heightMatcher.group("height"));
+                Debug.debug("height: %d", h);
+                postController.setHeightFactor(h);
+            }
+            clearAllInputFields();
+            postAddNew(newPost);
         } catch (IOException ex) {
             Debug.debug("IOException while loading empty post: %s", ex.toString());
             throw (ex);
