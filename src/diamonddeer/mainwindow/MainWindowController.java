@@ -16,7 +16,16 @@
  */
 package diamonddeer.mainwindow;
 
+import java.util.UUID;
+import java.util.Set;
+import java.util.LinkedList;
+import beryloctopus.repositories.PostRepository;
 import beryloctopus.BerylOctopus;
+import beryloctopus.models.posts.HtmlPost;
+import beryloctopus.models.posts.Post;
+import beryloctopus.models.posts.TextPost;
+import beryloctopus.models.posts.UserPost;
+import beryloctopus.repositories.UserRepository;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
@@ -30,6 +39,7 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -65,6 +75,11 @@ public class MainWindowController implements Initializable {
     private Pane mainContentPrevious = null;
     private Pane editorPane;
     private EditorController editorController;
+    private PostRepository posts;
+    private UserRepository users;
+    private UUID curUser;
+    private LinkedList<String> previousAddress;
+    private LinkedList<String> forwardAddress;
     
     @FXML
     private Button homeButton;
@@ -164,10 +179,16 @@ public class MainWindowController implements Initializable {
             addressBarScrollPane.setHvalue(addressBarScrollPane.getHmax());
         });
         mainContentPrevious = postGridPane;
+        posts = new PostRepository();
+        users = new UserRepository();
+        curUser = UUID.randomUUID();
+        previousAddress = new LinkedList();
+        forwardAddress = new LinkedList();
     }
 
     public void setCurrentAddress(String address) {
         try {
+            previousAddress.add(0,getCurrentAddress());
             model.setCurrentPath(address);
             statusRightLabel.setText(String.format("Current address: %s", getCurrentAddress()));
         } catch (Exception ex) {
@@ -204,7 +225,9 @@ public class MainWindowController implements Initializable {
         }
         oldAddressText = null;
         addressBarEditButtonsHide();
+        updatePosts();
         //setDefaultFocus();
+        //Set posts
     }
 
     private void addressBarEditCancel() {
@@ -267,6 +290,7 @@ public class MainWindowController implements Initializable {
             if (newButton.isSelected()) {
                 setCurrentAddress((String)newButton.getUserData());
                 addressBarAddressButtonsUntoggleExcept(newButton);
+                updatePosts();
             } else {
                 newButton.setSelected(true);
             }
@@ -296,6 +320,10 @@ public class MainWindowController implements Initializable {
             lastButton.setSelected(true);
         }
     }
+    public void gotoPost(String title) {
+        addressBarEditEnd(getCurrentAddress()+title+"/");
+    }
+    
 
     @FXML
     private void handleHomeButtonAction(ActionEvent event) {
@@ -311,14 +339,23 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void handleReloadButtonAction(ActionEvent event) {
+        updatePosts();
     }
 
     @FXML
     private void handleBackButtonAction(ActionEvent event) {
+        if (previousAddress.size() > 0) {
+        forwardAddress.add(0,getCurrentAddress());
+        addressBarEditEnd(previousAddress.remove());
+        previousAddress.remove();
+        }
     }
 
     @FXML
     private void handleForwardButtonAction(ActionEvent event) {
+        if (forwardAddress.size() > 0) {
+            addressBarEditEnd(forwardAddress.remove());
+        }
     }
 
     @FXML
@@ -395,6 +432,37 @@ public class MainWindowController implements Initializable {
             postGridPane.addRow(postRows);
         }
     }
+    
+    private void updatePosts() {
+        try {
+            postGridPane.getChildren().clear();
+            Set<Post> curContent = (Set<Post>)posts.getChildrenPostsByAddress(getCurrentAddress());
+            postRows = 0;
+            postCols = 0;
+            for(Post k: curContent) {
+                PostUI newPost = postLoader.loadEmptyPost();
+                PostController postController = newPost.getController();
+                //TODO: make username show up
+                postController.setUsername("Temporary Username");
+                postController.setDateTime(k.getDate());
+                postController.setSize("544.94", "KB");
+                postController.setValue("935.32", "MB");
+                postController.setLocation(getCurrentAddress());
+                postController.setTitle(k.getTitle());
+                postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
+                    public void handle(ActionEvent t) {
+                        gotoPost(postController.getTitle());
+                    }
+                });
+                if (k instanceof TextPost || k instanceof HtmlPost) {
+                    postController.setBody(((TextPost)k).getTextContent());
+                }
+                postAddNew(newPost.getLayout());
+            }
+        } catch (IOException e) {
+            Debug.debug("IOException while reloading posts: %s", e.toString());
+        }
+    }
 
     private boolean mainContentShowingRollupEditor() {
         return (mainContentPane.getContent().equals(editorPane));
@@ -403,25 +471,44 @@ public class MainWindowController implements Initializable {
     @FXML
     private void handlePostButtonAction(ActionEvent event) throws Exception {
         try {
-            
+            //default
+            String postType = "Text Post";
             PostUI newPost = postLoader.loadEmptyPost();
             PostController postController = newPost.getController();
             //controller.setUsername("testUsername455");
-            postController.setUsername("testUsername455reallylongpusheseverythingaway");
-            postController.setDateTime("2017/03/25 23:01");
+            //TODO: make usernames work
+            postController.setUsername("Temporary Username");
+            postController.setDateTime(java.util.Calendar.getInstance().getTime().toString());
             postController.setSize("544.94", "KB");
             postController.setValue("935.32", "MB");
-            postController.setLocation("/hello/world/");
+            postController.setLocation(getCurrentAddress());
             if (mainContentShowingRollupEditor()) {
                 mainContentHideRollupEditor();
                 postController.setTitle(editorController.getTitle());
                 postController.setBody(editorController.getBody());
+                postType = editorController.getContentType();
             } else {
                 populatePost(postController, newPostTextArea.getText());
             }
             newPostTextArea.setText("");
             editorController.clearAll();
+            postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
+                    public void handle(ActionEvent t) {
+                        gotoPost(postController.getTitle());
+                    }
+                });
             postAddNew(newPost.getLayout());
+            Post thepost;
+            switch(postType) {
+                default: //Text posts are default, we can add user post above
+                    thepost = new TextPost(postController.getTitle(),
+                            postController.getLocation(), curUser,
+                            postController.getBody(),System.currentTimeMillis(), 
+                            java.util.Calendar.getInstance().getTime().toString(),
+                            posts,new UserRepository());
+                    break;
+            }
+            posts.addPost(getCurrentAddress()+postController.getTitle(),thepost);
         } catch (IOException ex) {
             Debug.debug("IOException while loading empty post: %s", ex.toString());
             throw (ex);

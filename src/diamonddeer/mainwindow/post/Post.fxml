@@ -143,11 +143,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font name="FreeSans" size="11.0" />
                            </font>
                         </Label>
-                        <Label fx:id="titleLabel" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
+                        <Hyperlink fx:id="gotoPost" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
                            <font>
                               <Font name="FreeSerif" size="24.0" />
                            </font>
-                        </Label>
+                        </Hyperlink>
                         <Label fx:id="bodyLabel" alignment="TOP_LEFT" text="Text of post goes here. It could be quite long and should likely word wrap around until it finds a suitable length at which it can be cut off and have a clickable link that says something along the lines of &quot;read more&quot; or such. Perhaps even an indication of how much longer it is? I'm not really sure. Maybe I should just keep writing more and more and more and more text to see how far I can push it before it starts getting cut off the edge of the screen. Guess I need even more text than I had put previously, but this should surely be enough to push it all the way off the bottom of the screen." wrapText="true">
                            <font>
                               <Font name="FreeSans" size="14.0" />

@@ -7,6 +7,8 @@ package diamonddeer.mainwindow.editor;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,7 +57,7 @@ public class EditorController implements Initializable {
     @FXML
     private CheckBox postSettingsForbidSharingCheckBox;
     @FXML
-    private ComboBox<?> postSettingsContentTypeComboBox;
+    private ComboBox<String> postSettingsContentTypeComboBox;
     @FXML
     private RadioButton editorSettingsHTMLEditorRadioButton;
     @FXML
@@ -72,7 +74,14 @@ public class EditorController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         editorSettingsHTMLEditorRadioButton.setToggleGroup(editorType);
         editorSettingsPlaintextEditorRadioButton.setToggleGroup(editorType);
+        ObservableList<String> postTypeList = FXCollections.observableArrayList(
+                "Text Post", "User Profile Post");
+        postSettingsContentTypeComboBox.setItems(postTypeList);
     }    
+    public String getContentType() {
+        return postSettingsContentTypeComboBox.getSelectionModel()
+                .getSelectedItem().toString();
+    }
 
     @FXML
     private void handleTagsAddButtonAction(ActionEvent event) {

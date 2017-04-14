@@ -28,6 +28,8 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 /**
  * FXML Controller class
@@ -50,8 +52,10 @@ public class PostController implements Initializable {
     private ChoiceBox<?> voteAmountUnitChoiceBox;
     @FXML
     private Label locationLabel;
+    //@FXML
+    //private Label titleLabel;
     @FXML
-    private Label titleLabel;
+    public Hyperlink gotoPost;
     @FXML
     private Hyperlink readmoreHyperlink;
     @FXML
@@ -70,6 +74,7 @@ public class PostController implements Initializable {
     private Label valueUnitLabel;
     @FXML
     private Label bodyLabel;
+    
 
     /**
      * Initializes the controller class.
@@ -78,6 +83,7 @@ public class PostController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }
+    
 
     public void setUsername(String username) {
         usernameLabel.setText(username);
@@ -101,9 +107,18 @@ public class PostController implements Initializable {
     public void setLocation(String path) {
         locationLabel.setText(path);
     }
+    
+    public String getLocation() {
+        return locationLabel.toString();
+    }
 
     public void setTitle(String title) {
-        titleLabel.setText(title);
+        //titleLabel.setText(title);
+        gotoPost.setText(title);
+    }
+    
+    public String getTitle() {
+        return gotoPost.getText();
     }
 
     public void setBody(String text) {
@@ -112,6 +127,9 @@ public class PostController implements Initializable {
         } else {
             setBodyVisible(false);
         }
+    }
+    public String getBody() {
+        return bodyLabel.getText();
     }
 
     public void setBodyVisible(boolean visible) {
@@ -122,5 +140,10 @@ public class PostController implements Initializable {
     public void setReadMoreVisible(boolean visible) {
         readmoreHyperlink.setManaged(visible);
         readmoreHyperlink.setVisible(visible);
+    }
+    
+    public void setGoToPostVisible(boolean visible) {
+        gotoPost.setManaged(visible);
+        gotoPost.setVisible(visible);
     }
 }
