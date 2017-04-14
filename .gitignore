@@ -4,3 +4,5 @@ manifest.mf
 nbproject/
 /dist/
 .idea
+DiamondDeer.iml
+out/
