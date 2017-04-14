@@ -17,6 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -32,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="370.0" stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.post.PostController">
+<AnchorPane fx:id="rootPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="370.0" stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.post.PostController">
    <children>
       <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -73,16 +78,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                            <children>
                               <VBox alignment="CENTER_RIGHT">
                                  <children>
-                                    <Button fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="22.0" />
-                                    <TextField fx:id="voteAmountTextField" maxHeight="22.0" maxWidth="49.0" promptText="123.45">
+                                    <Button fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="22.0" onAction="#handleUpvoteButtonAction" />
+                                    <TextField fx:id="voteAmountTextField" maxHeight="22.0" maxWidth="49.0" promptText="123.45" onAction="#handleTipButtonAction" >
                                        <font>
                                           <Font name="FreeSans" size="11.0" />
                                        </font>
                                     </TextField>
-                                    <Button fx:id="downvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="22.0" />
+                                    <Button fx:id="downvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="22.0" onAction="#handleDownvoteButtonAction" />
                                  </children>
                               </VBox>
-                              <ChoiceBox fx:id="voteAmountUnitChoiceBox" maxHeight="22.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" />
+                              <Button mnemonicParsing="false" text="Tip" onAction="#handleTipButtonAction" />
                            </children>
                         </HBox>
                         <GridPane hgap="2.0" vgap="2.0">

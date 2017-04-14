@@ -80,6 +80,8 @@ public class MainWindowController implements Initializable {
     private UUID curUser;
     private LinkedList<String> previousAddress;
     private LinkedList<String> forwardAddress;
+    private int earningsGlobal;
+    private int earningsLocal;
     
     @FXML
     private Button homeButton;
@@ -184,6 +186,10 @@ public class MainWindowController implements Initializable {
         curUser = UUID.randomUUID();
         previousAddress = new LinkedList();
         forwardAddress = new LinkedList();
+        earningsGlobal = 123456;
+        earningsLocal = 123456;
+        earningsGlobalLabel.setText(earningsGlobal + " Kb");
+        earningsLocalLabel.setText(earningsLocal + " Kb");
     }
 
     public void setCurrentAddress(String address) {
@@ -322,6 +328,13 @@ public class MainWindowController implements Initializable {
     }
     public void gotoPost(String title) {
         addressBarEditEnd(getCurrentAddress()+title+"/");
+    }
+
+    public void changeEarnings(int change) {
+        earningsLocal += change;
+        earningsLocalLabel.setText(earningsLocal + " Kb");
+        earningsGlobal += change;
+        earningsGlobalLabel.setText(earningsGlobal + " Kb");
     }
     
 
@@ -482,6 +495,7 @@ public class MainWindowController implements Initializable {
             postController.setSize("544.94", "KB");
             postController.setValue("935.32", "MB");
             postController.setLocation(getCurrentAddress());
+            postController.setMainWindow(this);
             if (mainContentShowingRollupEditor()) {
                 mainContentHideRollupEditor();
                 postController.setTitle(editorController.getTitle());
