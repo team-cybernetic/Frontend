@@ -190,7 +190,7 @@ public class MainWindowController implements Initializable {
         try {
             previousAddress.add(0,getCurrentAddress());
             model.setCurrentPath(address);
-            statusRightLabel.setText(String.format("Current address: %s", getCurrentAddress()));
+            statusRightLabel.setText(String.format("Current Address: %s", getCurrentAddress()));
         } catch (Exception ex) {
             Debug.error("Exception while trying to change current address path: %s", ex.toString());
             //TODO: show some sort of prompt or window notifying the user of the problem
