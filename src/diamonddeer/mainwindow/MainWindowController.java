@@ -461,6 +461,7 @@ public class MainWindowController implements Initializable {
                 postController.setSize("544.94", "KB");
                 postController.setValue("935.32", "MB");
                 postController.setLocation(getCurrentAddress());
+                postController.setMainWindow(this);
                 postController.setTitle(k.getTitle());
                 postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent t) {
