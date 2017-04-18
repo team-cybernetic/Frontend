@@ -16,9 +16,8 @@
  */
 package diamonddeer.mainwindow;
 
-import java.util.UUID;
-import java.util.Set;
-import java.util.LinkedList;
+import java.util.*;
+
 import beryloctopus.repositories.PostRepository;
 import beryloctopus.BerylOctopus;
 import beryloctopus.models.posts.HtmlPost;
@@ -29,13 +28,16 @@ import beryloctopus.repositories.UserRepository;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.mainwindow.sidebar.SidebarController;
+import diamonddeer.mainwindow.sidebar.SidebarLoader;
+import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorUI;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ResourceBundle;
+
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -55,11 +57,10 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 
 /**
  *
@@ -69,6 +70,7 @@ public class MainWindowController implements Initializable {
 
     private BerylOctopus model;
     private PostLoader postLoader;
+    private SidebarLoader sidebarLoader;
     private PostSettings postSettings;
     private ObservableList<Node> addressBarChildren = null;
     private String oldAddressText = null;
@@ -148,12 +150,15 @@ public class MainWindowController implements Initializable {
         statusLeftLabel.setText("");
     }
 
-    public void setup(BerylOctopus model, EditorUI editor, PostLoader postLoader, PostSettings postSettings) {
+    public void setup(BerylOctopus model, EditorUI editor, SidebarLoader sidebarLoader, PostLoader postLoader, PostSettings postSettings) {
         this.model = model;
         this.postLoader = postLoader;
+        this.sidebarLoader = sidebarLoader;
+
         this.postSettings = postSettings;
         this.editorController = editor.getController();
         this.editorPane = editor.getLayout();
+//        this.sidebarPane = sidebar.getLayout();
         setCurrentAddress(getCurrentAddress());
         addressBarAddressButtonsCreate();
         setDefaultFocus();
@@ -191,6 +196,7 @@ public class MainWindowController implements Initializable {
             previousAddress.add(0,getCurrentAddress());
             model.setCurrentPath(address);
             statusRightLabel.setText(String.format("Current Address: %s", getCurrentAddress()));
+//            sidebarPane.setAccessibleText("Accessibility text.");
         } catch (Exception ex) {
             Debug.error("Exception while trying to change current address path: %s", ex.toString());
             //TODO: show some sort of prompt or window notifying the user of the problem
@@ -320,7 +326,21 @@ public class MainWindowController implements Initializable {
             lastButton.setSelected(true);
         }
     }
-    public void gotoPost(String title) {
+    public void gotoPost(PostController postController, String title) {
+        // Update sidebar information here:
+        sidebarPane.getChildren().clear();
+        List<Text> textAreas = Arrays.asList(new Text("Title: \n" + postController.getTitle() + "\n"),
+                                            new Text("Body: \n" + postController.getBody() + "\n"),
+                                            new Text("Username: \n" + postController.getUsername() + "\n"),
+                new Text("Date Posted: \n" + postController.getDateTime() + "\n"),
+                new Text("Post Size: \n" + postController.getSize() + "\n"),
+                new Text("Post Value: \n" + postController.getValue() + "\n"),
+                new Text("Post Location: \n" + postController.getLocation() + "\n")
+        );
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(textAreas);
+        sidebarPane.getChildren().addAll(vBox);
+        // Update address bar:
         addressBarEditEnd(getCurrentAddress()+title+"/");
     }
     
@@ -441,7 +461,10 @@ public class MainWindowController implements Initializable {
             postCols = 0;
             for(Post k: curContent) {
                 PostUI newPost = postLoader.loadEmptyPost();
+                SidebarUI newSidebar = sidebarLoader.loadSidebar();
+//                PostUI newSidebar = sidebarLoader.loadSidebar();
                 PostController postController = newPost.getController();
+//                SidebarController sidebarController = newSidebar.getController();
                 //TODO: make username show up
                 postController.setUsername("Temporary Username");
                 postController.setDateTime(k.getDate());
@@ -451,13 +474,18 @@ public class MainWindowController implements Initializable {
                 postController.setTitle(k.getTitle());
                 postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent t) {
-                        gotoPost(postController.getTitle());
+                        gotoPost(postController, postController.getTitle());
                     }
                 });
                 if (k instanceof TextPost || k instanceof HtmlPost) {
                     postController.setBody(((TextPost)k).getTextContent());
                 }
                 postAddNew(newPost.getLayout());
+
+                // When we leave a post we clean up the sidebar by clearing it.
+                sidebarPane.getChildren().clear();
+
+
             }
         } catch (IOException e) {
             Debug.debug("IOException while reloading posts: %s", e.toString());
@@ -474,7 +502,9 @@ public class MainWindowController implements Initializable {
             //default
             String postType = "Text Post";
             PostUI newPost = postLoader.loadEmptyPost();
+//            SidebarUI newSidebar = sidebarLoader.loadSidebar();
             PostController postController = newPost.getController();
+//            SidebarController sidebarController = newSidebar.getController();
             //controller.setUsername("testUsername455");
             //TODO: make usernames work
             postController.setUsername("Temporary Username");
@@ -494,7 +524,7 @@ public class MainWindowController implements Initializable {
             editorController.clearAll();
             postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent t) {
-                        gotoPost(postController.getTitle());
+                        gotoPost(postController, postController.getTitle());
                     }
                 });
             postAddNew(newPost.getLayout());

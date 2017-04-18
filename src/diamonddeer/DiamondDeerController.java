@@ -8,11 +8,15 @@ import diamonddeer.mainwindow.editor.EditorUI;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.mainwindow.sidebar.SidebarController;
+import diamonddeer.mainwindow.sidebar.SidebarLoader;
+import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.SettingsManager;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -20,7 +24,7 @@ import javafx.stage.Stage;
  *
  * @author Tootoot222
  */
-public class DiamondDeerController implements PostLoader, EditorLoader {
+public class DiamondDeerController implements PostLoader, EditorLoader, SidebarLoader {
     private Stage mainStage;
 
     private Pane mainWindowPane;
@@ -37,7 +41,9 @@ public class DiamondDeerController implements PostLoader, EditorLoader {
         loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
-        mainWindowController.setup(model, loadEditor(), this, settingsManager);
+        mainWindowController.setup(model, loadEditor(), this, this, settingsManager);
+
+//        mainWindowController.setup(model, loadEditor(), loadSidebar(), this, settingsManager);
         return (mainWindowPane);
     }
 
@@ -59,6 +65,15 @@ public class DiamondDeerController implements PostLoader, EditorLoader {
         Pane layout = loader.load();
         PostController controller = loader.getController();
         return (new PostUI(layout, controller));
+    }
+
+    @Override
+    public SidebarUI loadSidebar() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("mainwindow/sidebar/Sidebar.fxml"));
+        AnchorPane layout = loader.load();
+        SidebarController controller = loader.getController();
+        return (new SidebarUI(layout, controller));
     }
 
     @Override

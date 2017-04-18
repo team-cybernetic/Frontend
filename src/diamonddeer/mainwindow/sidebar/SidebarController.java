@@ -14,29 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.post;
+package diamonddeer.mainwindow.sidebar;
+
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 /**
  * FXML Controller class
  *
  * @author Tootoot222
  */
-public class PostController implements Initializable {
+public class SidebarController implements Initializable {
 
     @FXML
     private Label usernameLabel;
@@ -74,8 +68,7 @@ public class PostController implements Initializable {
     private Label valueUnitLabel;
     @FXML
     private Label bodyLabel;
-    private String value;
-
+    
 
     /**
      * Initializes the controller class.
@@ -142,25 +135,9 @@ public class PostController implements Initializable {
         readmoreHyperlink.setManaged(visible);
         readmoreHyperlink.setVisible(visible);
     }
-
+    
     public void setGoToPostVisible(boolean visible) {
         gotoPost.setManaged(visible);
         gotoPost.setVisible(visible);
-    }
-
-    public String getUsername() {
-        return usernameLabel.getText();
-    }
-
-    public String getDateTime() {
-        return dateTimeLabel.getText();
-    }
-
-    public String getSize() {
-        return sizeAmountLabel.getText() + " " + sizeUnitLabel.getText();
-    }
-
-    public String getValue() {
-        return valueAmountLabel.getText() + " " + valueUnitLabel.getText();
     }
 }
