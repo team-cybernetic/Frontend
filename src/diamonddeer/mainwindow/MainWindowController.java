@@ -326,7 +326,8 @@ public class MainWindowController implements Initializable {
             lastButton.setSelected(true);
         }
     }
-    public void gotoPost(PostController postController, String title) {
+
+    public void gotoPost(PostController postController) {
         // Update sidebar information here:
         sidebarPane.getChildren().clear();
         List<Text> textAreas = Arrays.asList(new Text("Title: \n" + postController.getTitle() + "\n"),
@@ -341,7 +342,7 @@ public class MainWindowController implements Initializable {
         vBox.getChildren().addAll(textAreas);
         sidebarPane.getChildren().addAll(vBox);
         // Update address bar:
-        addressBarEditEnd(getCurrentAddress()+title+"/");
+        addressBarEditEnd(getCurrentAddress() + postController.getTitle() + "/");
     }
     
 
@@ -456,25 +457,27 @@ public class MainWindowController implements Initializable {
     private void updatePosts() {
         try {
             postGridPane.getChildren().clear();
-            Set<Post> curContent = (Set<Post>)posts.getChildrenPostsByAddress(getCurrentAddress());
-            postRows = 0;
-            postCols = 0;
+            Debug.debug("Getting all posts for address: %s", getCurrentAddress());
+            Set<? extends Post> curContent = posts.getChildrenPostsByAddress(getCurrentAddress());
+            Debug.debug("There are %d posts for address %s", curContent.size(), getCurrentAddress());
             for(Post k: curContent) {
                 PostUI newPost = postLoader.loadEmptyPost();
-                SidebarUI newSidebar = sidebarLoader.loadSidebar();
+//                SidebarUI newSidebar = sidebarLoader.loadSidebar();
 //                PostUI newSidebar = sidebarLoader.loadSidebar();
                 PostController postController = newPost.getController();
 //                SidebarController sidebarController = newSidebar.getController();
                 //TODO: make username show up
+                //TODO: use values from the post rather than static strings
                 postController.setUsername("Temporary Username");
-                postController.setDateTime(k.getDate());
+                //postController.setDateTime(k.getDate()); //TODO: make a post have a date
                 postController.setSize("544.94", "KB");
                 postController.setValue("935.32", "MB");
                 postController.setLocation(getCurrentAddress());
                 postController.setTitle(k.getTitle());
+                //TODO: not force feed gotoPost
                 postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent t) {
-                        gotoPost(postController, postController.getTitle());
+                        gotoPost(postController);
                     }
                 });
                 if (k instanceof TextPost || k instanceof HtmlPost) {
@@ -522,9 +525,11 @@ public class MainWindowController implements Initializable {
             }
             newPostTextArea.setText("");
             editorController.clearAll();
+
+            //TODO: pass a callback method in to postController.setTitleAction(this, postController) rather than force feeding it to gotoPost
             postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent t) {
-                        gotoPost(postController, postController.getTitle());
+                        gotoPost(postController);
                     }
                 });
             postAddNew(newPost.getLayout());
@@ -533,12 +538,14 @@ public class MainWindowController implements Initializable {
                 default: //Text posts are default, we can add user post above
                     thepost = new TextPost(postController.getTitle(),
                             postController.getLocation(), curUser,
-                            postController.getBody(),System.currentTimeMillis(), 
-                            java.util.Calendar.getInstance().getTime().toString(),
+                            postController.getBody().getBytes("UTF-8"),
+                            System.currentTimeMillis(), 
+                            //java.util.Calendar.getInstance().getTime().toString(),
                             posts,new UserRepository());
                     break;
             }
-            posts.addPost(getCurrentAddress()+postController.getTitle(),thepost);
+            Debug.debug("adding a new post: %s", getCurrentAddress() + postController.getTitle());
+            posts.addPost(getCurrentAddress() + postController.getTitle(), thepost);
         } catch (IOException ex) {
             Debug.debug("IOException while loading empty post: %s", ex.toString());
             throw (ex);

@@ -110,7 +110,7 @@ public class PostController implements Initializable {
     }
     
     public String getLocation() {
-        return locationLabel.toString();
+        return locationLabel.getText();
     }
 
     public void setTitle(String title) {
