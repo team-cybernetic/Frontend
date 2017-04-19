@@ -19,14 +19,12 @@ package diamonddeer.mainwindow.post;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import diamonddeer.mainwindow.MainWindowController;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -42,6 +40,7 @@ public class PostController implements Initializable {
 
     private int defaultWidth;
     private int defaultHeight;
+    private MainWindowController mainWindow;
 
     @FXML
     private Label usernameLabel;
@@ -89,8 +88,27 @@ public class PostController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.defaultWidth = (int)Math.round(rootPane.getPrefWidth());
         this.defaultHeight = (int)Math.round(rootPane.getPrefHeight());
+        // TODO
+        voteAmountTextField.textProperty().addListener((ObservableValue
+            <? extends String> observable, String oldValue, String newValue)
+            -> {
+            if (!newValue.matches("\\-?\\d*") || newValue.length() > 8) {
+                if (newValue.length() > 8) {
+                    newValue = newValue.substring(0, 8);
+                }
+                if (newValue.charAt(0) == '-') {
+                    newValue = '-' + newValue.replaceAll("[^(\\d)]", "");
+                } else {
+                    newValue = newValue.replaceAll("[^(\\d)]", "");
+                }
+            }
+            voteAmountTextField.setText(newValue);
+        });
     }
-    
+
+    public void setMainWindow(MainWindowController mainWindow) {
+        this.mainWindow = mainWindow;
+    }
 
     public void setUsername(String username) {
         usernameLabel.setText(username);
@@ -180,5 +198,48 @@ public class PostController implements Initializable {
 
     public void addComment(PostCommentUI comment) {
         commentsPane.getChildren().add(comment.getLayout());
+
+    }
+
+    @FXML
+    private void handleTipButtonAction() {
+        int tipAmount = 0;
+        if (!voteAmountTextField.getText().equals("")
+                && !voteAmountTextField.getText().equals("-")) {
+            tipAmount = Integer.valueOf(voteAmountTextField.getText());
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Tip");
+        alert.setHeaderText("Are you sure you want to tip " + tipAmount + " Kb?");
+        //alert.setContentText("");
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.OK) {
+            mainWindow.changeEarnings(-1 * Math.abs(tipAmount));
+            voteAmountTextField.setText("");
+        }
+    }
+
+    @FXML
+    private void handleUpvoteButtonAction() {
+        int tipAmount = 0;
+        if (!voteAmountTextField.getText().equals("")
+                && !voteAmountTextField.getText().equals("-")) {
+            tipAmount = Integer.valueOf(voteAmountTextField.getText());
+        }
+        tipAmount += 100;
+        voteAmountTextField.setText(String.valueOf(tipAmount));
+    }
+
+    @FXML
+    private void handleDownvoteButtonAction() {
+        int tipAmount = 0;
+        if (!voteAmountTextField.getText().equals("")
+                && !voteAmountTextField.getText().equals("-")) {
+            tipAmount = Integer.valueOf(voteAmountTextField.getText());
+        }
+        tipAmount -= 100;
+        voteAmountTextField.setText(String.valueOf(tipAmount));
     }
 }

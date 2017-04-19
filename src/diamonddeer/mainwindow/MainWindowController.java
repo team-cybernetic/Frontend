@@ -90,6 +90,8 @@ public class MainWindowController implements Initializable {
     private LinkedList<String> previousAddress;
     private LinkedList<String> forwardAddress;
     private HashMap<String, PostUI> postsUI = new HashMap<>();
+    private int earningsGlobal;
+    private int earningsLocal;
     
     @FXML
     private Button homeButton;
@@ -202,6 +204,10 @@ public class MainWindowController implements Initializable {
         posts.addPost("/hello/world", new TextPost("world", "/hello", curUser, "This is the world. Deal with it".getBytes(), System.currentTimeMillis(), posts, users));
         previousAddress = new LinkedList();
         forwardAddress = new LinkedList();
+        earningsGlobal = 123456;
+        earningsLocal = 123456;
+        earningsGlobalLabel.setText(earningsGlobal + " Kb");
+        earningsLocalLabel.setText(earningsLocal + " Kb");
     }
 
     public void setCurrentAddress(String address) {
@@ -357,6 +363,13 @@ public class MainWindowController implements Initializable {
         // Update address bar:
         addressBarEditEnd(getCurrentAddress() + postController.getTitle() + "/");
     }
+
+    public void changeEarnings(int change) {
+        earningsLocal += change;
+        earningsLocalLabel.setText(earningsLocal + " Kb");
+        earningsGlobal += change;
+        earningsGlobalLabel.setText(earningsGlobal + " Kb");
+    }
     
 
     @FXML
@@ -495,6 +508,7 @@ public class MainWindowController implements Initializable {
                 postController.setSize("544.94", "KB");
                 postController.setValue("935.32", "MB");
                 postController.setLocation(getCurrentAddress());
+                postController.setMainWindow(this);
                 postController.setTitle(k.getTitle());
                 //TODO: not force feed gotoPost
                 postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
@@ -546,6 +560,7 @@ public class MainWindowController implements Initializable {
             postController.setSize("544.94", "KB");
             postController.setValue("935.32", "MB");
             postController.setLocation(getCurrentAddress());
+            postController.setMainWindow(this);
             if (mainContentShowingRollupEditor()) {
                 mainContentHideRollupEditor();
                 postController.setTitle(editorController.getTitle());
