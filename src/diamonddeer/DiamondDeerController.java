@@ -8,6 +8,9 @@ import diamonddeer.mainwindow.editor.EditorUI;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentController;
+import diamonddeer.mainwindow.post.comment.PostCommentLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import diamonddeer.mainwindow.sidebar.SidebarController;
 import diamonddeer.mainwindow.sidebar.SidebarLoader;
 import diamonddeer.mainwindow.sidebar.SidebarUI;
@@ -24,7 +27,7 @@ import javafx.stage.Stage;
  *
  * @author Tootoot222
  */
-public class DiamondDeerController implements PostLoader, EditorLoader, SidebarLoader {
+public class DiamondDeerController implements PostLoader, EditorLoader, PostCommentLoader, SidebarLoader {
     private Stage mainStage;
 
     private Pane mainWindowPane;
@@ -41,9 +44,7 @@ public class DiamondDeerController implements PostLoader, EditorLoader, SidebarL
         loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
-        mainWindowController.setup(model, loadEditor(), this, this, settingsManager);
-
-//        mainWindowController.setup(model, loadEditor(), loadSidebar(), this, settingsManager);
+        mainWindowController.setup(model, loadEditor(), this, this, this, settingsManager);
         return (mainWindowPane);
     }
 
@@ -68,6 +69,14 @@ public class DiamondDeerController implements PostLoader, EditorLoader, SidebarL
     }
 
     @Override
+    public PostCommentUI loadEmptyPostComment() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("mainwindow/post/comment/PostComment.fxml"));
+        Pane layout = loader.load();
+        PostCommentController controller = loader.getController();
+        return (new PostCommentUI(layout, controller));
+    }
+
     public SidebarUI loadSidebar() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("mainwindow/sidebar/Sidebar.fxml"));

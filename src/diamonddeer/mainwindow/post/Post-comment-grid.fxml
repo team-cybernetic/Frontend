@@ -22,12 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -41,14 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           <ColumnConstraints hgrow="SOMETIMES" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints vgrow="ALWAYS" />
+          <RowConstraints percentHeight="61.8" vgrow="ALWAYS" />
             <RowConstraints minHeight="-Infinity" percentHeight="0.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" />
+          <RowConstraints maxHeight="-Infinity" />
         </rowConstraints>
          <children>
-            <GridPane hgap="2.0">
+            <GridPane hgap="4.0">
               <columnConstraints>
-                <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="101.0" percentWidth="0.0" />
+                <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="0.0" />
                   <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
@@ -56,9 +54,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <RowConstraints vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <VBox spacing="4.0">
+                  <VBox alignment="TOP_CENTER" spacing="4.0">
                      <children>
-                        <Label fx:id="usernameLabel" alignment="TOP_LEFT" minHeight="36.0" text="1234567890123456789012345678901234" underline="true" wrapText="true">
+                        <Label fx:id="usernameLabel" alignment="TOP_LEFT" minHeight="36.0" text="Username123longlonglonglongsuperlongsolongyourmommacantevencompetewithitslength" underline="true" wrapText="true">
                            <font>
                               <Font name="FreeMono" size="14.0" />
                            </font>
@@ -66,7 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Insets />
                            </VBox.margin>
                         </Label>
-                        <Label fx:id="dateTimeLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" text="23:41:33 03/23/17" textAlignment="CENTER" textFill="#867d7d" wrapText="true">
+                        <Label fx:id="dateTimeLabel" text="23:41 03/23/17" textFill="#867d7d" wrapText="true">
                            <font>
                               <Font name="FreeSans" size="12.0" />
                            </font>
@@ -134,7 +132,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <HBox minHeight="-Infinity" minWidth="-Infinity" />
                      </children>
                      <GridPane.margin>
-                        <Insets />
+                        <Insets right="1.0" />
                      </GridPane.margin>
                   </VBox>
                   <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" GridPane.columnIndex="1" GridPane.vgrow="ALWAYS" />
@@ -145,11 +143,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font name="FreeSans" size="11.0" />
                            </font>
                         </Label>
-                        <Hyperlink fx:id="gotoPost" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
+                        <Label fx:id="titleLabel" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
                            <font>
                               <Font name="FreeSerif" size="24.0" />
                            </font>
-                        </Hyperlink>
+                        </Label>
                         <Label fx:id="bodyLabel" alignment="TOP_LEFT" text="Text of post goes here. It could be quite long and should likely word wrap around until it finds a suitable length at which it can be cut off and have a clickable link that says something along the lines of &quot;read more&quot; or such. Perhaps even an indication of how much longer it is? I'm not really sure. Maybe I should just keep writing more and more and more and more text to see how far I can push it before it starts getting cut off the edge of the screen. Guess I need even more text than I had put previously, but this should surely be enough to push it all the way off the bottom of the screen." wrapText="true">
                            <font>
                               <Font name="FreeSans" size="14.0" />
@@ -160,11 +158,79 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                </children>
             </GridPane>
             <Separator fx:id="commentsSeparator" GridPane.rowIndex="1" />
-            <ScrollPane hbarPolicy="ALWAYS" vbarPolicy="NEVER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
-               <content>
-                  <FlowPane fx:id="commentsPane" orientation="VERTICAL" prefHeight="157.0" prefWidth="1.0" />
-               </content>
-            </ScrollPane>
+            <GridPane fx:id="commentsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2">
+              <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" percentWidth="32.0" />
+                  <ColumnConstraints halignment="CENTER" />
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" percentWidth="32.0" />
+                  <ColumnConstraints halignment="CENTER" />
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" percentWidth="32.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints percentHeight="100.0" vgrow="ALWAYS" />
+              </rowConstraints>
+               <children>
+                  <VBox spacing="1.0" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                     <children>
+                        <Label text="Username123" underline="true">
+                           <font>
+                              <Font name="FreeSans" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_LEFT" text="Comment title" wrapText="true">
+                           <font>
+                              <Font name="FreeSerif" size="16.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_LEFT" text="Comment text goes here. You likely won't be able to see very much of it, unless there's a weird bug which may cause this text to bleed out of this box and into the neighboring box. Which is bad. And should be fixed." wrapText="true">
+                           <font>
+                              <Font name="FreeSans" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox spacing="1.0" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                     <children>
+                        <Label text="Somebodyelse" underline="true">
+                           <font>
+                              <Font name="FreeSans" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_LEFT" text="A comment with an extremely long title which will drive all the comment text out of the box and what happens if it gets even longer? nobody knows" wrapText="true" VBox.vgrow="SOMETIMES">
+                           <font>
+                              <Font name="FreeSerif" size="16.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_LEFT" text="Comment text goes here. You likely won't be able to see very much of it." wrapText="true" VBox.vgrow="ALWAYS">
+                           <font>
+                              <Font name="FreeSans" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox spacing="1.0" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                     <children>
+                        <Label text="Nameuser321superduperlonger" underline="true">
+                           <font>
+                              <Font name="FreeSans" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_LEFT" text="Comment title" wrapText="true">
+                           <font>
+                              <Font name="FreeSerif" size="16.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="TOP_LEFT" text="Comment text goes here. You likely won't be able to see very much of it." wrapText="true">
+                           <font>
+                              <Font name="FreeSans" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <Separator orientation="VERTICAL" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                  <Separator orientation="VERTICAL" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+               </children>
+            </GridPane>
          </children>
       </GridPane>
    </children>

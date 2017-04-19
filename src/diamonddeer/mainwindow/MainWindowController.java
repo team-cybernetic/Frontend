@@ -23,21 +23,24 @@ import beryloctopus.BerylOctopus;
 import beryloctopus.models.posts.HtmlPost;
 import beryloctopus.models.posts.Post;
 import beryloctopus.models.posts.TextPost;
-import beryloctopus.models.posts.UserPost;
 import beryloctopus.repositories.UserRepository;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
-import diamonddeer.mainwindow.sidebar.SidebarController;
 import diamonddeer.mainwindow.sidebar.SidebarLoader;
-import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorUI;
+import diamonddeer.mainwindow.post.comment.PostCommentController;
+import diamonddeer.mainwindow.post.comment.PostCommentLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.io.IOException;
 import java.net.URL;
-
+import java.util.HashMap;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -57,9 +60,12 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 /**
@@ -70,6 +76,7 @@ public class MainWindowController implements Initializable {
 
     private BerylOctopus model;
     private PostLoader postLoader;
+    private PostCommentLoader postCommentLoader;
     private SidebarLoader sidebarLoader;
     private PostSettings postSettings;
     private ObservableList<Node> addressBarChildren = null;
@@ -82,6 +89,7 @@ public class MainWindowController implements Initializable {
     private UUID curUser;
     private LinkedList<String> previousAddress;
     private LinkedList<String> forwardAddress;
+    private HashMap<String, PostUI> postsUI = new HashMap<>();
     
     @FXML
     private Button homeButton;
@@ -103,8 +111,7 @@ public class MainWindowController implements Initializable {
     private MenuButton feedMenuButton;
     @FXML
     private TextField searchTextField;
-    @FXML
-    private GridPane postGridPane;
+    //private GridPane postGridPane;
     @FXML
     private Label earningsGlobalLabel;
     @FXML
@@ -137,6 +144,8 @@ public class MainWindowController implements Initializable {
     private Button addressBarGoButton;
     @FXML
     private ScrollPane mainContentPane;
+    @FXML
+    private FlowPane postFlowPane;
 
     private void setDefaultFocus() {
         Platform.runLater(() -> rootPane.requestFocus());
@@ -150,9 +159,10 @@ public class MainWindowController implements Initializable {
         statusLeftLabel.setText("");
     }
 
-    public void setup(BerylOctopus model, EditorUI editor, SidebarLoader sidebarLoader, PostLoader postLoader, PostSettings postSettings) {
+    public void setup(BerylOctopus model, EditorUI editor, PostLoader postLoader, PostCommentLoader postCommentLoader, SidebarLoader sidebarLoader, PostSettings postSettings) {
         this.model = model;
         this.postLoader = postLoader;
+        this.postCommentLoader = postCommentLoader;
         this.sidebarLoader = sidebarLoader;
 
         this.postSettings = postSettings;
@@ -183,10 +193,13 @@ public class MainWindowController implements Initializable {
         addressBarHBox.widthProperty().addListener((observable, oldH, newH) -> {
             addressBarScrollPane.setHvalue(addressBarScrollPane.getHmax());
         });
-        mainContentPrevious = postGridPane;
+        mainContentPrevious = postFlowPane;
         posts = new PostRepository();
         users = new UserRepository();
         curUser = UUID.randomUUID();
+        posts.addPost("/", new TextPost("", "", curUser, "This is the root".getBytes(), System.currentTimeMillis(), posts, users));
+        posts.addPost("/hello", new TextPost("hello", "/", curUser, "This is the hello group".getBytes(), System.currentTimeMillis(), posts, users));
+        posts.addPost("/hello/world", new TextPost("world", "/hello", curUser, "This is the world. Deal with it".getBytes(), System.currentTimeMillis(), posts, users));
         previousAddress = new LinkedList();
         forwardAddress = new LinkedList();
     }
@@ -407,7 +420,7 @@ public class MainWindowController implements Initializable {
 
     private void mainContentShowPosts() {
         mainContentPrevious = (Pane)mainContentPane.getContent();
-        mainContentPane.setContent(postGridPane);
+        mainContentPane.setContent(postFlowPane);
     }
 
     private void populateRollupEditor(EditorController editorController, String text) {
@@ -418,8 +431,12 @@ public class MainWindowController implements Initializable {
 
     private void populatePost(PostController postController, String text) {
         String[] tSplit = text.split("\n", 2);
-        postController.setTitle(tSplit[0]);
-        postController.setBody(tSplit.length > 1 ? tSplit[1] : "");
+        populatePost(postController, tSplit[0], tSplit.length > 1 ? tSplit[1] : "");
+    }
+
+    private void populatePost(PostController postController, String title, String body) {
+        postController.setTitle(title);
+        postController.setBody(body);
     }
 
     private void mainContentShowRollupEditor() {
@@ -445,18 +462,23 @@ public class MainWindowController implements Initializable {
         this.mainContentPrevious = p;
     }
 
-    private void postAddNew(Pane newPostLayout) {
+    private void postAddNew(PostUI post) {
+        /*
         postGridPane.add(newPostLayout, postCols, postRows);
         postCols = (postCols + 1) % postSettings.getMaxPostColumns();
         if (postCols == 0) {
             postRows++;
             postGridPane.addRow(postRows);
         }
+*/
+        Debug.debug("adding post with title: %s", post.getController().getTitle());
+        postsUI.put(post.getController().getTitle(), post);
+        postFlowPane.getChildren().add(post.getLayout());
     }
     
     private void updatePosts() {
         try {
-            postGridPane.getChildren().clear();
+            postFlowPane.getChildren().clear();
             Debug.debug("Getting all posts for address: %s", getCurrentAddress());
             Set<? extends Post> curContent = posts.getChildrenPostsByAddress(getCurrentAddress());
             Debug.debug("There are %d posts for address %s", curContent.size(), getCurrentAddress());
@@ -483,7 +505,7 @@ public class MainWindowController implements Initializable {
                 if (k instanceof TextPost || k instanceof HtmlPost) {
                     postController.setBody(((TextPost)k).getTextContent());
                 }
-                postAddNew(newPost.getLayout());
+                postAddNew(newPost);
 
                 // When we leave a post we clean up the sidebar by clearing it.
                 sidebarPane.getChildren().clear();
@@ -497,6 +519,15 @@ public class MainWindowController implements Initializable {
 
     private boolean mainContentShowingRollupEditor() {
         return (mainContentPane.getContent().equals(editorPane));
+    }
+
+    private void clearAllInputFields() {
+        newPostTextArea.setText("");
+        editorController.clearAll();
+    }
+
+    private PostUI getPostByTitle(String title) {
+        return (postsUI.get(title));
     }
 
     @FXML
@@ -520,11 +551,47 @@ public class MainWindowController implements Initializable {
                 postController.setTitle(editorController.getTitle());
                 postController.setBody(editorController.getBody());
                 postType = editorController.getContentType();
+                populatePost(postController, editorController.getTitle(), editorController.getBody());
             } else {
                 populatePost(postController, newPostTextArea.getText());
             }
-            newPostTextArea.setText("");
-            editorController.clearAll();
+            Matcher replyMatcher = Pattern.compile("^re:(?<reply>[^/]+)/?(?<title>.*)").matcher(postController.getTitle());
+            if (replyMatcher.matches()) {
+                String re = replyMatcher.group("reply");
+                Debug.debug("this is a reply to: %s", re);
+                PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
+                PostCommentController commentController = comment.getController();
+                String commentTitle = replyMatcher.group("title");
+                commentController.setTitle(commentTitle);
+                commentController.setBody(postController.getBody());
+                commentController.setUsername("1234567890123456789012345678901234");
+                commentController.setDateTime("2017/03/25 23:01:39");
+                PostUI ePost = getPostByTitle(re);
+                if (ePost != null) {
+                    ePost.getController().addComment(comment);
+                    clearAllInputFields();
+                } else {
+                    Debug.debug("no such post!");
+                }
+                return;
+            }
+
+            Matcher widthMatcher = Pattern.compile(".*w:(?<width>[0-9]+).*").matcher(postController.getBody());
+            if (widthMatcher.matches()) {
+                int w = Integer.parseInt(widthMatcher.group("width"));
+                Debug.debug("width: %d", w);
+                postController.setWidthFactor(w);
+            }
+            Matcher heightMatcher = Pattern.compile(".*h:(?<height>[0-9]+).*").matcher(postController.getBody());
+            if (heightMatcher.matches()) {
+                int h = Integer.parseInt(heightMatcher.group("height"));
+                Debug.debug("height: %d", h);
+                postController.setHeightFactor(h);
+            }
+            clearAllInputFields();
+            //postAddNew(newPost);
+            //newPostTextArea.setText("");
+            //editorController.clearAll();
 
             //TODO: pass a callback method in to postController.setTitleAction(this, postController) rather than force feeding it to gotoPost
             postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
@@ -532,7 +599,9 @@ public class MainWindowController implements Initializable {
                         gotoPost(postController);
                     }
                 });
-            postAddNew(newPost.getLayout());
+            postAddNew(newPost);
+
+            //TODO: this is backwards; we should be asking the model if the post is OK, and then placing it in the UI after it has been validated on the backend
             Post thepost;
             switch(postType) {
                 default: //Text posts are default, we can add user post above
