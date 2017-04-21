@@ -26,13 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="8.0" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" spacing="4.0">
+                  <VBox styleClass="pane" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" spacing="4.0">
                      <children>
                         <Label minHeight="-Infinity" text="Username123" underline="true" wrapText="true">
                            <font>
@@ -44,9 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font size="12.0" />
                            </font>
                         </Label>
-                        <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+                        <HBox styleClass="pane" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                            <children>
-                              <VBox alignment="CENTER_RIGHT">
+                              <VBox styleClass="pane" alignment="CENTER_RIGHT">
                                  <children>
                                     <Button mnemonicParsing="false" text="UV" />
                                     <TextField maxHeight="22.0" maxWidth="49.0" promptText="123.45">
@@ -60,7 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <ChoiceBox maxHeight="22.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" />
                            </children>
                         </HBox>
-                        <HBox minHeight="-Infinity" minWidth="-Infinity">
+                        <HBox styleClass="pane" minHeight="-Infinity" minWidth="-Infinity">
                            <children>
                               <Label text="Size: ">
                                  <font>
@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               </Label>
                            </children>
                         </HBox>
-                        <HBox minHeight="-Infinity" minWidth="-Infinity">
+                        <HBox styleClass="pane" minHeight="-Infinity" minWidth="-Infinity">
                            <children>
                               <Label text="Value:">
                                  <font>
@@ -90,7 +90,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </HBox>
                      </children>
                   </VBox>
-                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="4.0">
+                  <VBox styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="4.0">
                      <children>
                         <Label alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minHeight="-Infinity" text="/generic/location/where/this/post/resides/" wrapText="true">
                            <font>

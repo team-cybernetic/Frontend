@@ -8,41 +8,134 @@ and open the template in the editor.
     Author     : Tootoot222
 */
 
-#optionsButton {
-    /*
-    -fx-graphic: url("icons/settings-small.png");
-    */
-    -fx-background-image: url("icons/settings-small.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
+.root,
+.pane.scroll-pane,
+.pane {
+    -fx-background-color: #FFFFFF;
 }
 
-#homeButton {
-    -fx-background-image: url("icons/home-small.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
+.pane.status {
+    -fx-background-color: #EEEEEE;
 }
 
-#reloadButton {
-    -fx-background-image: url("icons/reload-small2.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
+#rootPane {
+    -fx-font-family: "Roboto-Regular", "sans-serif";
+    -fx-text-fill: #333333;
 }
 
-#bookmarksToggle {
-    -fx-background-image: url("icons/bookmarks-small.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
+.btn {
+    -fx-focus-color: transparent;
+    -fx-background-color: #496B71;
+    -fx-background-radius: 4px;
+    -fx-text-fill: #FFFFFF;
+}
+.menu-button:hover,
+.btn:hover {
+    -fx-background-color: #153A41;
+}
+.button.menu-button > .label {
+    -fx-text-fill: #FFFFFF;
+}
+.button .arrow-button .arrow {
+    -fx-background-color: #FFFFFF;
 }
 
-#backButton {
-    -fx-background-image: url("icons/back-small.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
+.text-field.address-bar {
+    -fx-background-radius: 0 4 4 0;
 }
 
-#forwardButton {
-    -fx-background-image: url("icons/forward-small.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
+.toggle-button.address-bar {
+    -fx-background-radius: 0;
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, -fx-control-inner-background;
+}
+.toggle-button.address-bar.first {
+    -fx-background-radius: 4 0 0 4;
+}
+.toggle-button.address-bar:focused,
+.toggle-button.address-bar:selected {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+}
+.toggle-button.address-bar:hover,
+.toggle-button.address-bar:selected {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, #EEEEEE;
+}
+
+.toggle-button.icons,
+.button.icons {
+    -fx-font-family: "FontAwesome";
+    -fx-font-size: 20px;
+    -fx-background-color: transparent;
+    -fx-text-fill: #333333;
+    -fx-padding: 0px;
+}
+.toggle-button.icons:hover,
+.button.icons:hover {
+    -fx-text-fill: #000000;
+}
+.toggle-button.rollup {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #496B71;
+    -fx-background-radius: 0 4 4 0;
+    -fx-font-size: 10px;
+    -fx-padding: 0.166667em 0.833333em 0.25em 0.833333em;
+}
+.toggle-button.rollup:hover {
+    -fx-background-color: #153A41;
+    -fx-text-fill: #FFFFFF;
+}
+#postButton {
+    -fx-background-radius: 4 0 0 4;
+}
+
+.pane.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-focus-color: transparent;
+}
+.topBar,
+.topBar .pane {
+    -fx-background-color: #EEEEEE;
+}
+
+/* The main scrollbar **track** CSS class  */
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track{
+	-fx-background-color: #FFFFFF;
+	-fx-border-color:transparent;
+	-fx-background-radius: 0em;
+}
+
+/* The increment and decrement button CSS class of scrollbar */
+.scroll-bar:horizontal .increment-button ,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color: #FFFFFF;
+	-fx-background-radius: 0em;
+	-fx-padding:0 0 0 0;
+
+}
+
+/* The increment and decrement button CSS class of scrollbar */
+
+.scroll-bar:vertical .increment-button ,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color:transparent;
+	-fx-background-radius: 0em;
+	-fx-padding:0 0 0 0;
+
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+	-fx-shape: " ";
+	-fx-padding:0;
+	-fx-background-radius: 0em;
+}
+
+/* The main scrollbar **thumb** CSS class which we drag every time (movable) */
+scroll-bar:horizontal .thumb,
+scroll-bar:vertical .thumb {
+    -fx-background-color: #DDDDDD;
+    -fx-border-color: #DDDDDD;
+    -fx-background-radius: 0em;
+	-fx-background-insets: 0, 0, 0;
 }

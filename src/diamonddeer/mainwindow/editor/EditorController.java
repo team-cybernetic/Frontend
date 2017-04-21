@@ -77,6 +77,7 @@ public class EditorController implements Initializable {
         ObservableList<String> postTypeList = FXCollections.observableArrayList(
                 "Text Post", "User Profile Post");
         postSettingsContentTypeComboBox.setItems(postTypeList);
+        postSettingsContentTypeComboBox.getSelectionModel().selectFirst();
     }    
     public String getContentType() {
         return postSettingsContentTypeComboBox.getSelectionModel()
