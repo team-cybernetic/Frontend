@@ -609,6 +609,7 @@ public class MainWindowController implements Initializable {
             byte[] content;
             if (mainContentShowingRollupEditor()) {
                 mainContentHideRollupEditor();
+                rollupButton.selectedProperty().set(false);
                 title = editorController.getTitle();
                 content = editorController.getBody().getBytes();
                 contentType = editorController.getContentType();

@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </Label>
                         <Label fx:id="dateTimeLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" text="23:41:33 03/23/17" textAlignment="CENTER" textFill="#867d7d" wrapText="true">
                            <font>
-                              <Font name="FreeSans" size="12.0" />
+                              <Font name="Roboto-Regular" size="12.0" />
                            </font>
                         </Label>
                         <HBox styleClass="pane" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
@@ -81,7 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <VBox styleClass="pane" alignment="CENTER_RIGHT">
                                  <children>
                                     <Button styleClass="icons, btn" fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" onAction="#handleUpvoteButtonAction"></Button>
-                                    <TextField fx:id="voteAmountTextField" minHeight="28.0" maxHeight="28" maxWidth="49.0" promptText="100" onAction="#handleTipButtonAction" >
+                                    <TextField fx:id="voteAmountTextField" minHeight="28.0" maxHeight="28" maxWidth="49.0" promptText="0" onAction="#handleTipButtonAction" >
                                        <font>
                                           <Font name="Roboto-Regular" size="10.0" />
                                        </font>
@@ -105,32 +105,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                            <children>
                               <Label minWidth="-Infinity" text="Size: ">
                                  <font>
-                                    <Font name="FreeSans" size="11.0" />
+                                    <Font name="Roboto-Regular" size="11.0" />
                                  </font>
                               </Label>
                               <Label fx:id="sizeAmountLabel" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="123.56" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
                                  <font>
-                                    <Font name="FreeSans" size="11.0" />
+                                    <Font name="Roboto-Regular" size="11.0" />
                                  </font>
                               </Label>
                               <Label minWidth="-Infinity" text="Value:" GridPane.rowIndex="1">
                                  <font>
-                                    <Font name="FreeSans" size="11.0" />
+                                    <Font name="Roboto-Regular" size="11.0" />
                                  </font>
                               </Label>
                               <Label fx:id="valueAmountLabel" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="456.99" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                                  <font>
-                                    <Font name="FreeSans" size="11.0" />
+                                    <Font name="Roboto-Regular" size="11.0" />
                                  </font>
                               </Label>
                               <Label fx:id="sizeUnitLabel" alignment="CENTER_RIGHT" minWidth="-Infinity" text="KB" GridPane.columnIndex="2">
                                  <font>
-                                    <Font name="FreeSans" size="11.0" />
+                                    <Font name="Roboto-Regular" size="11.0" />
                                  </font>
                               </Label>
                               <Label fx:id="valueUnitLabel" alignment="CENTER_RIGHT" minWidth="-Infinity" text="MB" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                  <font>
-                                    <Font name="FreeSans" size="11.0" />
+                                    <Font name="Roboto-Regular" size="11.0" />
                                  </font>
                               </Label>
                            </children>
@@ -147,7 +147,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                      <children>
                         <Label fx:id="locationLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minHeight="-Infinity" text="/generic/location/where/this/post/resides/" wrapText="true">
                            <font>
-                              <Font name="FreeSans" size="11.0" />
+                              <Font name="Roboto-Regular" size="11.0" />
                            </font>
                         </Label>
                         <Hyperlink fx:id="gotoPost" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
@@ -157,7 +157,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </Hyperlink>
                         <Label fx:id="bodyLabel" alignment="TOP_LEFT" text="Text of post goes here. It could be quite long and should likely word wrap around until it finds a suitable length at which it can be cut off and have a clickable link that says something along the lines of &quot;read more&quot; or such. Perhaps even an indication of how much longer it is? I'm not really sure. Maybe I should just keep writing more and more and more and more text to see how far I can push it before it starts getting cut off the edge of the screen. Guess I need even more text than I had put previously, but this should surely be enough to push it all the way off the bottom of the screen." wrapText="true">
                            <font>
-                              <Font name="FreeSans" size="14.0" />
+                              <Font name="Roboto-Regular" size="14.0" />
                            </font></Label>
                         <Hyperlink fx:id="readmoreHyperlink" text="Read more..." />
                      </children>

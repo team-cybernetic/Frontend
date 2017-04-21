@@ -33,11 +33,7 @@
          <children>
             <VBox minWidth="-Infinity" spacing="8.0">
                <children>
-                  <Label alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Make a new post" underline="true" VBox.vgrow="ALWAYS">
-                     <font>
-                        <Font name="FreeSerif" size="30.0" />
-                     </font>
-                  </Label>
+                  <Label alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="New Post" underline="true" VBox.vgrow="ALWAYS" />
                   <GridPane hgap="4.0" minHeight="-Infinity" minWidth="-Infinity" vgap="4.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="NEVER" prefWidth="65.0" />
@@ -49,28 +45,16 @@
                         <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="Title:">
-                           <font>
-                              <Font name="FreeSans" size="16.0" />
-                           </font>
-                        </Label>
+                        <Label text="Title:" />
                         <TextField fx:id="titleTextField" maxWidth="1.7976931348623157E308" promptText="Post title..." GridPane.columnIndex="1" />
-                        <Label text="Tags:" GridPane.rowIndex="1">
-                           <font>
-                              <Font name="FreeSans" size="16.0" />
-                           </font>
-                        </Label>
+                        <Label text="Tags:" GridPane.rowIndex="1" />
                         <HBox maxWidth="1.7976931348623157E308" spacing="2.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                            <children>
                               <TextField fx:id="tagsTextField" prefWidth="100.0" promptText="yolo" />
                               <Button styleClass="btn" fx:id="tagsAddButton" mnemonicParsing="false" onAction="#handleTagsAddButtonAction" text="+" />
                            </children>
                         </HBox>
-                        <Label minHeight="-Infinity" text="Featured media:" wrapText="true" GridPane.rowIndex="2">
-                           <font>
-                              <Font name="FreeSans" size="16.0" />
-                           </font>
-                        </Label>
+                        <Label minHeight="-Infinity" text="Featured media:" wrapText="true" GridPane.rowIndex="2" />
                         <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
                               <Button styleClass="btn" fx:id="mediaAddButton" mnemonicParsing="false" onAction="#handleMediaAddButtonAction" text="+" />
@@ -96,39 +80,15 @@
             </VBox>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="170.0" minHeight="-Infinity" minWidth="170.0" prefWidth="170.0" spacing="4.0" GridPane.columnIndex="1">
                <children>
-                  <Label minWidth="-Infinity" text="Post settings" underline="true">
-                     <font>
-                        <Font name="FreeSerif" size="18.0" />
-                     </font>
-                  </Label>
-                  <CheckBox fx:id="postSettingsPrivateCheckBox" mnemonicParsing="false" text="Private">
-                     <font>
-                        <Font name="FreeSans" size="13.0" />
-                     </font>
-                  </CheckBox>
-                  <CheckBox fx:id="postSettingsForbidRepliesCheckBox" mnemonicParsing="false" text="Forbid replies">
-                     <font>
-                        <Font name="FreeSans" size="13.0" />
-                     </font>
-                  </CheckBox>
-                  <CheckBox fx:id="postSettingsForbidSharingCheckBox" mnemonicParsing="false" text="Forbid sharing">
-                     <font>
-                        <Font name="FreeSans" size="13.0" />
-                     </font>
-                  </CheckBox>
-                  <Label text="Content type:">
-                     <font>
-                        <Font name="FreeSans" size="13.0" />
-                     </font>
-                  </Label>
+                  <Label minWidth="-Infinity" text="Post settings" underline="true" />
+                  <CheckBox fx:id="postSettingsPrivateCheckBox" mnemonicParsing="false" text="Private" />
+                  <CheckBox fx:id="postSettingsForbidRepliesCheckBox" mnemonicParsing="false" text="Forbid replies" />
+                  <CheckBox fx:id="postSettingsForbidSharingCheckBox" mnemonicParsing="false" text="Forbid sharing" />
+                  <Label text="Content type:" />
                   <ComboBox fx:id="postSettingsContentTypeComboBox" editable="true" promptText="Auto..." />
                   <VBox alignment="BOTTOM_LEFT" minHeight="-Infinity" spacing="4.0" VBox.vgrow="ALWAYS">
                      <children>
-                        <Label minWidth="-Infinity" text="Editor settings" underline="true">
-                           <font>
-                              <Font name="FreeSerif" size="18.0" />
-                           </font>
-                        </Label>
+                        <Label minWidth="-Infinity" text="Editor settings" underline="true" />
                         <RadioButton fx:id="editorSettingsHTMLEditorRadioButton" mnemonicParsing="false" onAction="#handleEditorSettingsHTMLEditorRadioButtonAction" selected="true" text="HTML Editor">
                            <toggleGroup>
                               <ToggleGroup fx:id="editorType" />
