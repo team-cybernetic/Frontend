@@ -17,14 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -39,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane styleClass="pane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="370.0" stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.post.PostController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="370.0" styleClass="pane" stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.post.PostController">
    <children>
       <GridPane styleClass="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -51,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" />
         </rowConstraints>
          <children>
-            <GridPane styleClass="pane" hgap="2.0">
+            <GridPane hgap="2.0" styleClass="pane">
               <columnConstraints>
                 <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="101.0" percentWidth="0.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="0.0" />
@@ -61,7 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <RowConstraints vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <VBox styleClass="pane" spacing="4.0">
+                  <VBox spacing="4.0" styleClass="pane">
                      <children>
                         <Label fx:id="usernameLabel" alignment="TOP_LEFT" minHeight="36.0" text="1234567890123456789012345678901234" underline="true" wrapText="true">
                            <font>
@@ -76,23 +70,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font name="Roboto-Regular" size="12.0" />
                            </font>
                         </Label>
-                        <HBox styleClass="pane" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+                        <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="pane">
                            <children>
-                              <VBox styleClass="pane" alignment="CENTER_RIGHT">
+                              <VBox alignment="CENTER_RIGHT" styleClass="pane">
                                  <children>
-                                    <Button styleClass="icons, btn" fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" onAction="#handleUpvoteButtonAction"></Button>
-                                    <TextField fx:id="voteAmountTextField" minHeight="28.0" maxHeight="28" maxWidth="49.0" promptText="0" onAction="#handleTipButtonAction" >
+                                    <Button fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleUpvoteButtonAction" prefHeight="22.0" prefWidth="22.0" styleClass="icons, btn"></Button>
+                                    <TextField fx:id="voteAmountTextField" maxHeight="28" maxWidth="49.0" minHeight="28.0" onAction="#handleTipButtonAction" promptText="0">
                                        <font>
                                           <Font name="Roboto-Regular" size="10.0" />
                                        </font>
                                     </TextField>
-                                    <Button styleClass="icons, btn" fx:id="downvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" onAction="#handleDownvoteButtonAction"></Button>
+                                    <Button fx:id="downvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleDownvoteButtonAction" prefHeight="22.0" prefWidth="22.0" styleClass="icons, btn"></Button>
                                  </children>
                               </VBox>
-                              <Button styleClass="btn" mnemonicParsing="false" text="Tip" onAction="#handleTipButtonAction" />
+                              <Button mnemonicParsing="false" onAction="#handleTipButtonAction" styleClass="btn" text="Tip" />
                            </children>
                         </HBox>
-                        <GridPane styleClass="pane" hgap="2.0" vgap="2.0">
+                        <GridPane hgap="2.0" styleClass="pane" vgap="2.0">
                           <columnConstraints>
                             <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="SOMETIMES" />
                             <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
@@ -135,22 +129,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               </Label>
                            </children>
                         </GridPane>
-                        <HBox styleClass="pane" minHeight="-Infinity" minWidth="-Infinity" />
-                        <HBox styleClass="pane" minHeight="-Infinity" minWidth="-Infinity" />
+                        <HBox minHeight="-Infinity" minWidth="-Infinity" styleClass="pane" />
+                        <HBox minHeight="-Infinity" minWidth="-Infinity" styleClass="pane" />
                      </children>
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
                   </VBox>
                   <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" GridPane.columnIndex="1" GridPane.vgrow="ALWAYS" />
-                  <VBox styleClass="pane" maxWidth="-Infinity" spacing="4.0" GridPane.columnIndex="2">
+                  <VBox maxWidth="-Infinity" spacing="4.0" styleClass="pane" GridPane.columnIndex="2">
                      <children>
                         <Label fx:id="locationLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minHeight="-Infinity" text="/generic/location/where/this/post/resides/" wrapText="true">
                            <font>
                               <Font name="Roboto-Regular" size="11.0" />
                            </font>
                         </Label>
-                        <Hyperlink fx:id="gotoPost" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
+                        <Hyperlink fx:id="gotoPost" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" onAction="#handleGotoPostAction" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
                            <font>
                               <Font name="FreeSerif" size="24.0" />
                            </font>
@@ -159,15 +153,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                            <font>
                               <Font name="Roboto-Regular" size="14.0" />
                            </font></Label>
-                        <Hyperlink fx:id="readmoreHyperlink" text="Read more..." />
+                        <Hyperlink fx:id="readmoreHyperlink" disable="true" text="Read more..." visible="false" />
                      </children>
                   </VBox>
                </children>
             </GridPane>
             <Separator fx:id="commentsSeparator" GridPane.rowIndex="1" />
-            <ScrollPane styleClass="pane" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+            <ScrollPane hbarPolicy="AS_NEEDED" styleClass="pane" vbarPolicy="NEVER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
                <content>
-                  <FlowPane styleClass="pane" fx:id="commentsPane" orientation="VERTICAL" prefHeight="157.0" />
+                  <FlowPane fx:id="commentsPane" orientation="VERTICAL" prefHeight="157.0" styleClass="pane" />
                </content>
             </ScrollPane>
          </children>

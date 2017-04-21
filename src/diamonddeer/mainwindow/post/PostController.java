@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 
 import diamonddeer.mainwindow.MainWindowController;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -57,8 +58,6 @@ public class PostController implements Initializable {
     private TextField voteAmountTextField;
     @FXML
     private Button downvoteButton;
-    @FXML
-    private ChoiceBox<?> voteAmountUnitChoiceBox;
     @FXML
     private Label locationLabel;
     //@FXML
@@ -268,5 +267,10 @@ public class PostController implements Initializable {
         }
         tipAmount -= post.getByteSize();
         voteAmountTextField.setText(String.valueOf(tipAmount));
+    }
+
+    @FXML
+    private void handleGotoPostAction(ActionEvent event) {
+        mainWindow.gotoPost(post);
     }
 }

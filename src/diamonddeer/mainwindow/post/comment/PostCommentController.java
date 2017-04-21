@@ -5,10 +5,15 @@
  */
 package diamonddeer.mainwindow.post.comment;
 
+import beryloctopus.Post;
+import diamonddeer.mainwindow.MainWindowController;
+import diamonddeer.mainwindow.post.PostController;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 
@@ -21,13 +26,15 @@ public class PostCommentController implements Initializable {
 
     private int defaultWidth;
     private int defaultHeight;
+    private MainWindowController mainWindow;
+    private Post post;
 
     @FXML
     private AnchorPane rootPane;
     @FXML
     private Label usernameLabel;
     @FXML
-    private Label titleLabel;
+    private Hyperlink titleLabel;
     @FXML
     private Label bodyLabel;
     @FXML
@@ -40,6 +47,19 @@ public class PostCommentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.defaultWidth = (int)Math.round(rootPane.getPrefWidth());
         this.defaultHeight = (int)Math.round(rootPane.getPrefHeight());
+    }
+
+    public void setMainWindow(MainWindowController mainWindow) {
+        this.mainWindow = mainWindow;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+        //TODO: do all setup here
+    }
+
+    public Post getPost() {
+        return (post);
     }
 
     public void setUsername(String username) {
@@ -84,6 +104,11 @@ public class PostCommentController implements Initializable {
 
     public String getBody() {
         return (bodyLabel.getText());
+    }
+
+    @FXML
+    private void handleTitleLabelAction(ActionEvent event) {
+        mainWindow.gotoPost(post);
     }
    
 }

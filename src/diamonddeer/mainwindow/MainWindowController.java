@@ -403,11 +403,11 @@ public class MainWindowController implements Initializable {
         */
     }
 
-    public void gotoPost(PostController postController) {
+    public void gotoPost(Post post) {
         // Update address bar:
-        addressBarEditEnd(getCurrentAddress() + postController.getTitle() + "/");
+        addressBarEditEnd(post.getPath().getFullPath());
         // Update sidebar information here:
-        populateSidebar(sidebarController, postController.getPost());
+        populateSidebar(sidebarController, post);
     }
 
     public void changeEarnings(int change) {
@@ -497,12 +497,16 @@ public class MainWindowController implements Initializable {
         postController.setTitle(post.getTitle());
         postController.setPost(post);
         
+
+        //postController.setTitleHandler(this);
         //TODO: not force feed event handlers into gotoPost
+        /*
         postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent t) {
                 gotoPost(postController);
             }
         });
+        */
 
         //TODO: arbitrary javafx elements as body (html, video, etc)
         postController.setBody(new String(post.getContent()));
@@ -515,6 +519,8 @@ public class MainWindowController implements Initializable {
     }
 
     private void populatePostComment(PostCommentController commentController, Post post) {
+        commentController.setMainWindow(this);
+        commentController.setPost(post);
         commentController.setTitle(post.getTitle());
         commentController.setBody(new String(post.getContent()));
         commentController.setUsername(post.getAuthor().getUsername());
