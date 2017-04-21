@@ -32,9 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="370.0" stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.post.PostController">
+<AnchorPane styleClass="pane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="370.0" stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.post.PostController">
    <children>
-      <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <GridPane styleClass="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" />
         </columnConstraints>
@@ -44,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           <RowConstraints maxHeight="-Infinity" />
         </rowConstraints>
          <children>
-            <GridPane hgap="4.0">
+            <GridPane styleClass="pane" hgap="4.0">
               <columnConstraints>
                 <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="0.0" />
@@ -54,7 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <RowConstraints vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <VBox alignment="TOP_CENTER" spacing="4.0">
+                  <VBox styleClass="pane" alignment="TOP_CENTER" spacing="4.0">
                      <children>
                         <Label fx:id="usernameLabel" alignment="TOP_LEFT" minHeight="36.0" text="Username123longlonglonglongsuperlongsolongyourmommacantevencompetewithitslength" underline="true" wrapText="true">
                            <font>
@@ -69,9 +69,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font name="FreeSans" size="12.0" />
                            </font>
                         </Label>
-                        <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+                        <HBox styleClass="pane" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                            <children>
-                              <VBox alignment="CENTER_RIGHT">
+                              <VBox styleClass="pane" alignment="CENTER_RIGHT">
                                  <children>
                                     <Button fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="22.0" />
                                     <TextField fx:id="voteAmountTextField" maxHeight="22.0" maxWidth="49.0" promptText="123.45">
@@ -85,7 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <ChoiceBox fx:id="voteAmountUnitChoiceBox" maxHeight="22.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" />
                            </children>
                         </HBox>
-                        <GridPane hgap="2.0" vgap="2.0">
+                        <GridPane styleClass="pane" hgap="2.0" vgap="2.0">
                           <columnConstraints>
                             <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="SOMETIMES" />
                             <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
@@ -128,15 +128,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               </Label>
                            </children>
                         </GridPane>
-                        <HBox minHeight="-Infinity" minWidth="-Infinity" />
-                        <HBox minHeight="-Infinity" minWidth="-Infinity" />
+                        <HBox styleClass="pane" minHeight="-Infinity" minWidth="-Infinity" />
+                        <HBox styleClass="pane" minHeight="-Infinity" minWidth="-Infinity" />
                      </children>
                      <GridPane.margin>
                         <Insets right="1.0" />
                      </GridPane.margin>
                   </VBox>
                   <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" GridPane.columnIndex="1" GridPane.vgrow="ALWAYS" />
-                  <VBox maxWidth="-Infinity" spacing="4.0" GridPane.columnIndex="2">
+                  <VBox styleClass="pane" maxWidth="-Infinity" spacing="4.0" GridPane.columnIndex="2">
                      <children>
                         <Label fx:id="locationLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" minHeight="-Infinity" text="/generic/location/where/this/post/resides/" wrapText="true">
                            <font>
@@ -158,7 +158,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                </children>
             </GridPane>
             <Separator fx:id="commentsSeparator" GridPane.rowIndex="1" />
-            <GridPane fx:id="commentsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2">
+            <GridPane styleClass="pane" fx:id="commentsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="2">
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" minWidth="0.0" percentWidth="32.0" />
                   <ColumnConstraints halignment="CENTER" />
@@ -170,7 +170,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <RowConstraints percentHeight="100.0" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <VBox spacing="1.0" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                  <VBox styleClass="pane" spacing="1.0" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <children>
                         <Label text="Username123" underline="true">
                            <font>
@@ -189,7 +189,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </Label>
                      </children>
                   </VBox>
-                  <VBox spacing="1.0" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                  <VBox styleClass="pane" spacing="1.0" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <children>
                         <Label text="Somebodyelse" underline="true">
                            <font>
@@ -208,7 +208,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         </Label>
                      </children>
                   </VBox>
-                  <VBox spacing="1.0" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                  <VBox styleClass="pane" spacing="1.0" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <children>
                         <Label text="Nameuser321superduperlonger" underline="true">
                            <font>

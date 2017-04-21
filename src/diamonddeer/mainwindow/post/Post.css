@@ -8,18 +8,6 @@ and open the template in the editor.
     Author     : Tootoot222
 */
 
-#upvoteButton {
-    -fx-background-image: url("icons/upvote.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-}
-
-#downvoteButton {
-    -fx-background-image: url("icons/downvote.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-}
-
 #rootPane {
     -fx-border-color: -fx-box-border;
 }

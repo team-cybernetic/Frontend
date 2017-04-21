@@ -66,6 +66,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 /**
@@ -121,9 +122,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private TextArea newPostTextArea;
     @FXML
-    private Button rolldownButton;
-    @FXML
-    private Button rollupButton;
+    private ToggleButton rollupButton;
     @FXML
     private Button postButton;
     @FXML
@@ -136,8 +135,6 @@ public class MainWindowController implements Initializable {
     private Label statusLeftLabel;
     @FXML
     private StackPane rollButtonsStackPane;
-    @FXML
-    private Label statusRightLabel;
     @FXML
     private ScrollPane addressBarScrollPane;
     @FXML
@@ -171,6 +168,7 @@ public class MainWindowController implements Initializable {
         this.editorController = editor.getController();
         this.editorPane = editor.getLayout();
 //        this.sidebarPane = sidebar.getLayout();
+        loadFonts();
         setCurrentAddress(getCurrentAddress());
         addressBarAddressButtonsCreate();
         setDefaultFocus();
@@ -199,9 +197,9 @@ public class MainWindowController implements Initializable {
         posts = new PostRepository();
         users = new UserRepository();
         curUser = UUID.randomUUID();
-        posts.addPost("/", new TextPost("", "", curUser, "This is the root".getBytes(), System.currentTimeMillis(), posts, users));
-        posts.addPost("/hello", new TextPost("hello", "/", curUser, "This is the hello group".getBytes(), System.currentTimeMillis(), posts, users));
-        posts.addPost("/hello/world", new TextPost("world", "/hello", curUser, "This is the world. Deal with it".getBytes(), System.currentTimeMillis(), posts, users));
+        posts.addPost("/", new TextPost("", "", curUser, "This is the root", System.currentTimeMillis(), "", posts, users));
+        posts.addPost("/hello", new TextPost("hello", "/", curUser, "This is the hello group", System.currentTimeMillis(), "", posts, users));
+        posts.addPost("/hello/world", new TextPost("world", "/hello", curUser, "This is the world. Deal with it", System.currentTimeMillis(), "", posts, users));
         previousAddress = new LinkedList();
         forwardAddress = new LinkedList();
         earningsGlobal = 123456;
@@ -210,12 +208,15 @@ public class MainWindowController implements Initializable {
         earningsLocalLabel.setText(earningsLocal + " Kb");
     }
 
+    private void loadFonts() {
+        Font.loadFont(MainWindowController.class.getResource("fonts/Roboto-Regular.ttf").toExternalForm(), 10);
+        Font.loadFont(MainWindowController.class.getResource("fonts/fontawesome-webfont.ttf").toExternalForm(), 10);
+    }
+
     public void setCurrentAddress(String address) {
         try {
-            previousAddress.add(0,getCurrentAddress());
-            model.setCurrentPath(address);
-            statusRightLabel.setText(String.format("Current Address: %s", getCurrentAddress()));
-//            sidebarPane.setAccessibleText("Accessibility text.");
+            previousAddress.add(0, getCurrentAddress());
+            model.setCurrentPath(address.replaceAll("/\\/+/", "/"));
         } catch (Exception ex) {
             Debug.error("Exception while trying to change current address path: %s", ex.toString());
             //TODO: show some sort of prompt or window notifying the user of the problem
@@ -251,7 +252,7 @@ public class MainWindowController implements Initializable {
         oldAddressText = null;
         addressBarEditButtonsHide();
         updatePosts();
-        //setDefaultFocus();
+        setDefaultFocus();
         //Set posts
     }
 
@@ -305,9 +306,11 @@ public class MainWindowController implements Initializable {
         addressBarAddressButtonsUntoggleExcept(null);
     }
 
-    private ToggleButton addressBarAddressButtonsAppend(String buttonText, String path) {
+    private ToggleButton addressBarAddressButtonsAppend(String buttonText, String path, String pos) {
         ObservableList<Node> children = addressBarGetAddressButtons();
         ToggleButton newButton = new ToggleButton(buttonText);
+        newButton.getStyleClass().add("address-bar");
+        if (pos != null) newButton.getStyleClass().add(pos);
         newButton.setUserData(path);
         newButton.setTextOverrun(OverrunStyle.CLIP);
         newButton.setMinWidth(Control.USE_PREF_SIZE);
@@ -332,14 +335,24 @@ public class MainWindowController implements Initializable {
 
     public void addressBarAddressButtonsCreate() {
         String[] split = model.getCurrentPathArray();
+        if (model.getCurrentPath().equals("/")) {
+            split = new String[]{""};
+        }
         String sep = model.getPathSeparator();
         StringBuilder fullPath = new StringBuilder();
 
         addressBarAddressButtonsClear();
         ToggleButton lastButton = null;
-        for (String subSplit : split) {
+        for (int i = 0; i < split.length; i++) {
+            String subSplit = split[i];
             fullPath.append(subSplit + sep);
-            lastButton = addressBarAddressButtonsAppend(subSplit + sep, fullPath.toString());
+            String pos = null;
+            if (i == 0) {
+                pos = "first";
+            } else if (i == split.length - 1) {
+                pos = "last";
+            }
+            lastButton = addressBarAddressButtonsAppend(subSplit + sep, fullPath.toString(), pos);
         }
         if (lastButton != null) {
             lastButton.setSelected(true);
@@ -382,6 +395,12 @@ public class MainWindowController implements Initializable {
 
     @FXML
     private void handleBookmarksToggleAction(ActionEvent event) {
+        ToggleButton button = (ToggleButton) event.getSource();
+        if (button.isSelected()) {
+            button.setText("\uf02e");
+        } else {
+            button.setText("\uf097");
+        }
     }
 
     @FXML
@@ -392,9 +411,9 @@ public class MainWindowController implements Initializable {
     @FXML
     private void handleBackButtonAction(ActionEvent event) {
         if (previousAddress.size() > 0) {
-        forwardAddress.add(0,getCurrentAddress());
-        addressBarEditEnd(previousAddress.remove());
-        previousAddress.remove();
+            forwardAddress.add(0,getCurrentAddress());
+            addressBarEditEnd(previousAddress.remove());
+            previousAddress.remove();
         }
     }
 
@@ -419,21 +438,13 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    private void handleRolldownButtonAction(ActionEvent event) {
-        mainContentHideRollupEditor();
-    }
-
-    @FXML
     private void handleRollupButtonAction(ActionEvent event) {
-        mainContentShowRollupEditor();
-    }
-
-    private int postRows = 0;
-    private int postCols = 0;
-
-    private void mainContentShowPosts() {
-        mainContentPrevious = (Pane)mainContentPane.getContent();
-        mainContentPane.setContent(postFlowPane);
+        ToggleButton button = (ToggleButton) event.getSource();
+        if (button.isSelected()) {
+            mainContentShowRollupEditor();
+        } else {
+            mainContentHideRollupEditor();
+        }
     }
 
     private void populateRollupEditor(EditorController editorController, String text) {
@@ -453,7 +464,8 @@ public class MainWindowController implements Initializable {
     }
 
     private void mainContentShowRollupEditor() {
-        rolldownButton.toFront();
+        rollupButton.setText("\uf078");
+        rollupButton.toFront();
         if (editorController.getTitle().trim().length() == 0 && newPostTextArea.getText().trim().length() > 0) {
             editorController.setEditorPlaintext();
             populateRollupEditor(editorController, newPostTextArea.getText());
@@ -465,6 +477,7 @@ public class MainWindowController implements Initializable {
     }
 
     private void mainContentHideRollupEditor() {
+        rollupButton.setText("\uf077");
         rollupButton.toFront();
         if (editorController.getTitle().trim().length() > 0 && newPostTextArea.getText().trim().length() == 0) {
             newPostTextArea.setText(editorController.getTitle() + "\n" + editorController.getBody());
@@ -476,14 +489,6 @@ public class MainWindowController implements Initializable {
     }
 
     private void postAddNew(PostUI post) {
-        /*
-        postGridPane.add(newPostLayout, postCols, postRows);
-        postCols = (postCols + 1) % postSettings.getMaxPostColumns();
-        if (postCols == 0) {
-            postRows++;
-            postGridPane.addRow(postRows);
-        }
-*/
         Debug.debug("adding post with title: %s", post.getController().getTitle());
         postsUI.put(post.getController().getTitle(), post);
         postFlowPane.getChildren().add(post.getLayout());
@@ -622,9 +627,9 @@ public class MainWindowController implements Initializable {
                 default: //Text posts are default, we can add user post above
                     thepost = new TextPost(postController.getTitle(),
                             postController.getLocation(), curUser,
-                            postController.getBody().getBytes("UTF-8"),
-                            System.currentTimeMillis(), 
-                            //java.util.Calendar.getInstance().getTime().toString(),
+                            postController.getBody(),
+                            System.currentTimeMillis(),
+                            java.util.Calendar.getInstance().getTime().toString(),
                             posts,new UserRepository());
                     break;
             }
@@ -727,23 +732,18 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    private void handleRolldownButtonMouseExited(MouseEvent event) {
-        resetStatus();
-    }
-
-    @FXML
-    private void handleRolldownButtonMouseEntered(MouseEvent event) {
-        setStatus("Hide the rollup editor");
-    }
-
-    @FXML
     private void handleRollupButtonMouseExited(MouseEvent event) {
         resetStatus();
     }
 
     @FXML
     private void handleRollupButtonMouseEntered(MouseEvent event) {
-        setStatus("Show the rollup editor");
+        ToggleButton button = (ToggleButton) event.getSource();
+        if (button.isSelected()) {
+            setStatus("Hide the rollup editor");
+        } else {
+            setStatus("Show the rollup editor");
+        }
     }
 
     @FXML

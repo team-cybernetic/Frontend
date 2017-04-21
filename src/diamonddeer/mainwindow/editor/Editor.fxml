@@ -63,7 +63,7 @@
                         <HBox maxWidth="1.7976931348623157E308" spacing="2.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                            <children>
                               <TextField fx:id="tagsTextField" prefWidth="100.0" promptText="yolo" />
-                              <Button fx:id="tagsAddButton" mnemonicParsing="false" onAction="#handleTagsAddButtonAction" text="+" />
+                              <Button styleClass="btn" fx:id="tagsAddButton" mnemonicParsing="false" onAction="#handleTagsAddButtonAction" text="+" />
                            </children>
                         </HBox>
                         <Label minHeight="-Infinity" text="Featured media:" wrapText="true" GridPane.rowIndex="2">
@@ -73,7 +73,7 @@
                         </Label>
                         <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
-                              <Button fx:id="mediaAddButton" mnemonicParsing="false" onAction="#handleMediaAddButtonAction" text="+" />
+                              <Button styleClass="btn" fx:id="mediaAddButton" mnemonicParsing="false" onAction="#handleMediaAddButtonAction" text="+" />
                               <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
                                  <children>
                                     <ImageView fx:id="mediaImageView" pickOnBounds="true" preserveRatio="true" HBox.hgrow="SOMETIMES" />
