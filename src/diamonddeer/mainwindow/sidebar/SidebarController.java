@@ -16,14 +16,15 @@
  */
 package diamonddeer.mainwindow.sidebar;
 
+import diamonddeer.lib.ByteUnitConverter;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 
 /**
  * FXML Controller class
@@ -43,20 +44,6 @@ public class SidebarController implements Initializable {
     @FXML
     private Button downvoteButton;
     @FXML
-    private ChoiceBox<?> voteAmountUnitChoiceBox;
-    @FXML
-    private Label locationLabel;
-    //@FXML
-    //private Label titleLabel;
-    @FXML
-    public Hyperlink gotoPost;
-    @FXML
-    private Hyperlink readmoreHyperlink;
-    @FXML
-    private Separator commentsSeparator;
-    @FXML
-    private GridPane commentsPane;
-    @FXML
     private AnchorPane rootPane;
     @FXML
     private Label sizeAmountLabel;
@@ -68,6 +55,14 @@ public class SidebarController implements Initializable {
     private Label valueUnitLabel;
     @FXML
     private Label bodyLabel;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private TitledPane RulesetTitledPane;
+    @FXML
+    private TitledPane UsersTitledPane;
+    @FXML
+    private TitledPane ContentTypeTitledPane;
     
 
     /**
@@ -88,36 +83,30 @@ public class SidebarController implements Initializable {
         dateTimeLabel.setText(datetime);
     }
 
-    public void setSize(String sizeAmount, String sizeUnit) {
-        sizeAmountLabel.setText(sizeAmount);
-        sizeUnitLabel.setText(sizeUnit);
+    public void setSize(long bytes) {
+        String[] sizeString = ByteUnitConverter.bytesToUnitSplit(bytes);
+        sizeAmountLabel.setText(sizeString[0]);
+        sizeUnitLabel.setText(sizeString[1]);
     }
 
-    public void setValue(String valueAmount, String valueUnit) {
-        valueAmountLabel.setText(valueAmount);
-        valueUnitLabel.setText(valueUnit);
-    }
-
-    public void setLocation(String path) {
-        locationLabel.setText(path);
-    }
-    
-    public String getLocation() {
-        return locationLabel.toString();
+    public void setValue(long bytes) {
+        String[] sizeString = ByteUnitConverter.bytesToUnitSplit(bytes);
+        valueAmountLabel.setText(sizeString[0]);
+        valueUnitLabel.setText(sizeString[1]);
     }
 
     public void setTitle(String title) {
-        //titleLabel.setText(title);
-        gotoPost.setText(title);
+        titleLabel.setText(title + "/");
     }
     
     public String getTitle() {
-        return gotoPost.getText();
+        return titleLabel.getText();
     }
 
     public void setBody(String text) {
         if (text != null) {
             bodyLabel.setText(text);
+            setBodyVisible(true);
         } else {
             setBodyVisible(false);
         }
@@ -131,13 +120,15 @@ public class SidebarController implements Initializable {
         bodyLabel.setVisible(visible);
     }
 
-    public void setReadMoreVisible(boolean visible) {
-        readmoreHyperlink.setManaged(visible);
-        readmoreHyperlink.setVisible(visible);
+    @FXML
+    private void handleUpvoteButtonAction(ActionEvent event) {
     }
-    
-    public void setGoToPostVisible(boolean visible) {
-        gotoPost.setManaged(visible);
-        gotoPost.setVisible(visible);
+
+    @FXML
+    private void handleTipButtonAction(ActionEvent event) {
+    }
+
+    @FXML
+    private void handleDownvoteButtonAction(ActionEvent event) {
     }
 }

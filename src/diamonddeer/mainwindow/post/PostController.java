@@ -16,6 +16,8 @@
  */
 package diamonddeer.mainwindow.post;
 
+import beryloctopus.Post;
+import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -41,6 +43,9 @@ public class PostController implements Initializable {
     private int defaultWidth;
     private int defaultHeight;
     private MainWindowController mainWindow;
+    private long size;
+    private long value;
+    private Post post;
 
     @FXML
     private Label usernameLabel;
@@ -78,7 +83,6 @@ public class PostController implements Initializable {
     private Label valueUnitLabel;
     @FXML
     private Label bodyLabel;
-    private String value;
 
 
     /**
@@ -106,6 +110,15 @@ public class PostController implements Initializable {
         });
     }
 
+    public void setPost(Post post) {
+        this.post = post;
+        //TODO: do all setup here
+    }
+
+    public Post getPost() {
+        return (post);
+    }
+
     public void setMainWindow(MainWindowController mainWindow) {
         this.mainWindow = mainWindow;
     }
@@ -119,18 +132,25 @@ public class PostController implements Initializable {
         dateTimeLabel.setText(datetime);
     }
 
-    public void setSize(String sizeAmount, String sizeUnit) {
-        sizeAmountLabel.setText(sizeAmount);
-        sizeUnitLabel.setText(sizeUnit);
+    public void setSize(long bytes) {
+        String[] sizeString = ByteUnitConverter.bytesToUnitSplit(bytes);
+        sizeAmountLabel.setText(sizeString[0]);
+        sizeUnitLabel.setText(sizeString[1]);
     }
 
-    public void setValue(String valueAmount, String valueUnit) {
-        valueAmountLabel.setText(valueAmount);
-        valueUnitLabel.setText(valueUnit);
+    public void setValue(long bytes) {
+        String[] sizeString = ByteUnitConverter.bytesToUnitSplit(bytes);
+        valueAmountLabel.setText(sizeString[0]);
+        valueUnitLabel.setText(sizeString[1]);
     }
 
     public void setLocation(String path) {
-        locationLabel.setText(path);
+        if (path != null) {
+            locationLabel.setText(path);
+            setLocationVisible(true);
+        } else {
+            setLocationVisible(false);
+        }
     }
     
     public String getLocation() {
@@ -157,6 +177,11 @@ public class PostController implements Initializable {
         return bodyLabel.getText();
     }
 
+    public void setLocationVisible(boolean visible) {
+        locationLabel.setManaged(visible);
+        locationLabel.setVisible(visible);
+    }
+
     public void setBodyVisible(boolean visible) {
         bodyLabel.setManaged(visible);
         bodyLabel.setVisible(visible);
@@ -180,12 +205,12 @@ public class PostController implements Initializable {
         return dateTimeLabel.getText();
     }
 
-    public String getSize() {
-        return sizeAmountLabel.getText() + " " + sizeUnitLabel.getText();
+    public long getSize() {
+        return (size);
     }
 
-    public String getValue() {
-        return valueAmountLabel.getText() + " " + valueUnitLabel.getText();
+    public long getValue() {
+        return (value);
     }
 
     public void setWidthFactor(int widthFactor) {
@@ -218,6 +243,8 @@ public class PostController implements Initializable {
         if (alert.getResult() == ButtonType.OK) {
             mainWindow.changeEarnings(-1 * Math.abs(tipAmount));
             voteAmountTextField.setText("");
+            mainWindow.tipPost(post, tipAmount);
+            setValue(post.getValue());
         }
     }
 
@@ -228,7 +255,7 @@ public class PostController implements Initializable {
                 && !voteAmountTextField.getText().equals("-")) {
             tipAmount = Integer.valueOf(voteAmountTextField.getText());
         }
-        tipAmount += 100;
+        tipAmount += post.getByteSize();
         voteAmountTextField.setText(String.valueOf(tipAmount));
     }
 
@@ -239,7 +266,7 @@ public class PostController implements Initializable {
                 && !voteAmountTextField.getText().equals("-")) {
             tipAmount = Integer.valueOf(voteAmountTextField.getText());
         }
-        tipAmount -= 100;
+        tipAmount -= post.getByteSize();
         voteAmountTextField.setText(String.valueOf(tipAmount));
     }
 }

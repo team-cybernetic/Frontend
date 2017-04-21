@@ -1,6 +1,7 @@
 package diamonddeer;
 
 import beryloctopus.BerylOctopus;
+import beryloctopus.models.User;
 import diamonddeer.mainwindow.MainWindowController;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorLoader;
@@ -44,7 +45,7 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
         loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
-        mainWindowController.setup(model, loadEditor(), this, this, this, settingsManager);
+        mainWindowController.setup(model, new User("MyUsernameGoesHere".getBytes()), this, this, this, this, settingsManager);
         return (mainWindowPane);
     }
 

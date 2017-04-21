@@ -197,11 +197,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                  </children>
                               </VBox>
                            </children></AnchorPane>
-                        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vbarPolicy="ALWAYS" SplitPane.resizableWithParent="false">
-                           <content>
-                            <AnchorPane fx:id="sidebarPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
-                           </content>
-                        </ScrollPane>
+                        <ScrollPane fx:id="sidebarPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vbarPolicy="ALWAYS" SplitPane.resizableWithParent="false" />
                     </items>
                   </SplitPane>
                </children>
