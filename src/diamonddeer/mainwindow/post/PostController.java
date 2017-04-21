@@ -236,7 +236,7 @@ public class PostController implements Initializable {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Tip");
-        alert.setHeaderText("Are you sure you want to tip " + tipAmount + " Kb?");
+        alert.setHeaderText("Are you sure you want to tip " + ByteUnitConverter.bytesToUnit(tipAmount) + "?");
         //alert.setContentText("");
         alert.showAndWait();
 

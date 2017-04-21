@@ -21,13 +21,6 @@ import java.util.*;
 import beryloctopus.BerylOctopus;
 import beryloctopus.Post;
 import beryloctopus.User;
-/*
-import beryloctopus.models.posts.HtmlPost;
-import beryloctopus.models.posts.Post;
-import beryloctopus.models.posts.TextPost;
-import beryloctopus.repositories.UserRepository;
-import beryloctopus.repositories.PostRepository;
-*/
 import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
@@ -49,6 +42,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -353,8 +348,8 @@ public class MainWindowController implements Initializable {
 
     public void addressBarAddressButtonsCreate() {
         String[] split = model.getCurrentPathArray();
-        if (model.getCurrentPath().equals("/")) {
-            split = new String[]{""};
+        if (split.length == 0) {
+            split = new String[] {""};
         }
         String sep = model.getPathSeparator();
         StringBuilder fullPath = new StringBuilder();
@@ -571,16 +566,12 @@ public class MainWindowController implements Initializable {
     private void updatePosts() {
         try {
             postPaneClear();
-            Debug.debug("Getting all posts for address: %s", getCurrentAddress());
             Post topPost = model.getPostAt(getCurrentAddress());
             if (topPost == null) {
                 return;
             }
             populateSidebar(sidebarController, topPost);
-
-            //Set<? extends Post> curContent = posts.getChildrenPostsByAddress(getCurrentAddress());
             Set<Post> curContent = topPost.getSubposts();
-            Debug.debug("There are %d posts for address %s", curContent.size(), getCurrentAddress());
             for (Post curPost : curContent) {
                 PostUI newPost = postLoader.loadEmptyPost();
                 PostController newPostController = newPost.getController();
@@ -613,8 +604,6 @@ public class MainWindowController implements Initializable {
     @FXML
     private void handlePostButtonAction(ActionEvent event) throws Exception {
         try {
-            //default
-            //String postType = "Text Post";
             String contentType;
             String title;
             byte[] content;
@@ -627,79 +616,28 @@ public class MainWindowController implements Initializable {
                 String[] tSplit = newPostTextArea.getText().split("\n", 2);
                 title = tSplit[0];
                 content = (tSplit.length > 1 ? tSplit[1] : "").getBytes();
-                contentType = "text/plain";
+                contentType = "text/plain"; //TODO: MIME factory
             }
+            Post thePost = model.createPost(getCurrentAddress(), title, content, contentType, curUser); //could throw an exception if the model doesn't like it
             PostUI newPost = postLoader.loadEmptyPost();
             PostController postController = newPost.getController();
-            Post thePost = model.createPost(getCurrentAddress(), title, content, contentType, curUser); //could throw an exception if the model doesn't like it
             populatePost(postController, thePost);
             /*
-            Matcher replyMatcher = Pattern.compile("^re:(?<reply>[^/]+)/?(?<title>.*)").matcher(title);
-            if (replyMatcher.matches()) {
-                String re = replyMatcher.group("reply");
-                Debug.debug("this is a reply to: %s", re);
-                PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
-                PostCommentController commentController = comment.getController();
-                String commentTitle = replyMatcher.group("title");
-                commentController.setTitle(commentTitle);
-                commentController.setBody(postController.getBody());
-                commentController.setUsername("1234567890123456789012345678901234");
-                commentController.setDateTime("2017/03/25 23:01:39");
-                PostUI ePost = getPostByTitle(re);
-                if (ePost != null) {
-                    ePost.getController().addComment(comment);
-                    clearAllInputFields();
-                } else {
-                    Debug.debug("no such post!");
-                }
-                return;
-            }
-
-            Matcher widthMatcher = Pattern.compile(".*w:(?<width>[0-9]+).*").matcher(postController.getBody());
+            Matcher widthMatcher = Pattern.compile(".*w:(?<width>[0-9]+).*").matcher(new String(content));
             if (widthMatcher.matches()) {
                 int w = Integer.parseInt(widthMatcher.group("width"));
                 Debug.debug("width: %d", w);
                 postController.setWidthFactor(w);
             }
-            Matcher heightMatcher = Pattern.compile(".*h:(?<height>[0-9]+).*").matcher(postController.getBody());
+            Matcher heightMatcher = Pattern.compile(".*h:(?<height>[0-9]+).*").matcher(new String(content));
             if (heightMatcher.matches()) {
                 int h = Integer.parseInt(heightMatcher.group("height"));
                 Debug.debug("height: %d", h);
                 postController.setHeightFactor(h);
             }
-            */
+            // */
             clearAllInputFields();
-            //postAddNew(newPost);
-            //newPostTextArea.setText("");
-            //editorController.clearAll();
-
-            //TODO: pass a callback method in to postController.setTitleAction(this, postController) rather than force feeding it to gotoPost
-            /*
-            postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent t) {
-                        gotoPost(postController);
-                    }
-                });
-            */
             postPaneAdd(newPost);
-
-            /*
-            //TODO: this is backwards; we should be asking the model if the post is OK, and then placing it in the UI after it has been validated on the backend
-            Post thepost;
-            switch(postType) {
-                default: //Text posts are default, we can add user post above
-                    thepost = new TextPost(postController.getLocation(),
-                            postController.getTitle(),
-                            curUser,
-                            postController.getBody(),
-                            System.currentTimeMillis(), 
-                            //java.util.Calendar.getInstance().getTime().toString(),
-                            posts,new UserRepository());
-                    break;
-            }
-            Debug.debug("adding a new post: %s", getCurrentAddress() + postController.getTitle());
-            posts.addPost(getCurrentAddress() + postController.getTitle(), thepost);
-            */
         } catch (IOException ex) {
             Debug.debug("IOException while loading empty post: %s", ex.toString());
             throw (ex);
