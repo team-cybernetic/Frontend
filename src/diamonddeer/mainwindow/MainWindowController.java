@@ -21,8 +21,6 @@ import java.util.*;
 import beryloctopus.BerylOctopus;
 import beryloctopus.Post;
 import beryloctopus.User;
-import beryloctopus.models.posts.TextPost;
-import beryloctopus.repositories.UserRepository;
 /*
 import beryloctopus.models.posts.HtmlPost;
 import beryloctopus.models.posts.Post;
@@ -40,8 +38,8 @@ import diamonddeer.lib.Debug;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorLoader;
 import diamonddeer.mainwindow.editor.EditorUI;
-import diamonddeer.mainwindow.post.comment.PostCommentController;
 import diamonddeer.mainwindow.post.comment.PostCommentLoader;
+import diamonddeer.mainwindow.post.comment.PostCommentController;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import diamonddeer.mainwindow.sidebar.SidebarController;
 import diamonddeer.mainwindow.sidebar.SidebarUI;
@@ -51,8 +49,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -523,6 +519,13 @@ public class MainWindowController implements Initializable {
 
     }
 
+    private void populatePostComment(PostCommentController commentController, Post post) {
+        commentController.setTitle(post.getTitle());
+        commentController.setBody(new String(post.getContent()));
+        commentController.setUsername(post.getAuthor().getUsername());
+        commentController.setDateTime(dateTimeFromMillis(post.getTimestampMillis()));
+    }
+
     private void mainContentShowRollupEditor() {
         rollupButton.setText("\uf078");
         rollupButton.toFront();
@@ -578,9 +581,15 @@ public class MainWindowController implements Initializable {
             //Set<? extends Post> curContent = posts.getChildrenPostsByAddress(getCurrentAddress());
             Set<Post> curContent = topPost.getSubposts();
             Debug.debug("There are %d posts for address %s", curContent.size(), getCurrentAddress());
-            for(Post curPost: curContent) {
+            for (Post curPost : curContent) {
                 PostUI newPost = postLoader.loadEmptyPost();
-                populatePost(newPost.getController(), curPost);
+                PostController newPostController = newPost.getController();
+                populatePost(newPostController, curPost);
+                for (Post childPost : curPost.getSubposts()) {
+                    PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
+                    populatePostComment(comment.getController(), childPost);
+                    newPostController.addComment(comment);
+                }
                 postPaneAdd(newPost);
             }
         } catch (IOException e) {
