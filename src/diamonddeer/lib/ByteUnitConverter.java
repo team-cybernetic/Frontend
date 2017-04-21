@@ -39,7 +39,7 @@ public class ByteUnitConverter {
     }
 
     public static String bytesToSIUnit(long bytes) {
-        String[] split = bytesToBinaryUnitSplit(bytes);
+        String[] split = bytesToSIUnitSplit(bytes);
         return (String.format("%s %s", split[0], split[1]));
     }
 
@@ -53,11 +53,11 @@ public class ByteUnitConverter {
      * @return A string representation of the number of bytes in the system default format
      */
     public static String bytesToUnit(long bytes) {
-        return (bytesToBinaryUnit(bytes));
+        return (bytesToSIUnit(bytes));
     }
 
     public static String[] bytesToUnitSplit(long bytes) {
-        return (bytesToBinaryUnitSplit(bytes));
+        return (bytesToSIUnitSplit(bytes));
     }
 
 }

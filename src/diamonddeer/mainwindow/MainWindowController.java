@@ -210,11 +210,11 @@ public class MainWindowController implements Initializable {
     }
 
     private void setEarningsGlobal(long bytes) {
-        earningsGlobalLabel.setText(ByteUnitConverter.bytesToBinaryUnit(bytes));
+        earningsGlobalLabel.setText(ByteUnitConverter.bytesToUnit(bytes));
     }
 
     private void setEarningsLocal(long bytes) {
-        earningsLocalLabel.setText(ByteUnitConverter.bytesToBinaryUnit(bytes));
+        earningsLocalLabel.setText(ByteUnitConverter.bytesToUnit(bytes));
     }
 
     public void tipPost(Post post, long amount) {
