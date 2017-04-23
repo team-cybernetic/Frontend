@@ -17,12 +17,17 @@
 package diamonddeer.mainwindow.post;
 
 import beryloctopus.Post;
+import beryloctopus.ValueSender;
+import beryloctopus.exceptions.InsufficientFundsException;
 import diamonddeer.lib.ByteUnitConverter;
+import diamonddeer.lib.TimeConverter;
+import diamonddeer.mainwindow.PostViewer;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import diamonddeer.mainwindow.MainWindowController;
+import diamonddeer.mainwindow.post.comment.PostCommentLoader;
+import java.io.IOException;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,9 +35,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 /**
  * FXML Controller class
@@ -43,10 +45,13 @@ public class PostController implements Initializable {
 
     private int defaultWidth;
     private int defaultHeight;
-    private MainWindowController mainWindow;
     private long size;
     private long value;
     private Post post;
+    private ValueSender tipSource;
+    private PostViewer postViewer;
+
+    private static PostCommentLoader postCommentLoader;
 
     @FXML
     private Label usernameLabel;
@@ -63,7 +68,7 @@ public class PostController implements Initializable {
     //@FXML
     //private Label titleLabel;
     @FXML
-    public Hyperlink gotoPost;
+    public Hyperlink titleHyperLink;
     @FXML
     private Hyperlink readmoreHyperlink;
     @FXML
@@ -83,6 +88,10 @@ public class PostController implements Initializable {
     @FXML
     private Label bodyLabel;
 
+
+    public static void setPostCommentLoader(PostCommentLoader postCommentLoader) {
+        PostController.postCommentLoader = postCommentLoader;
+    }
 
     /**
      * Initializes the controller class.
@@ -109,17 +118,35 @@ public class PostController implements Initializable {
         });
     }
 
-    public void setPost(Post post) {
+    public void setTipSource(ValueSender valueSender) {
+        this.tipSource = valueSender;
+    }
+
+    public void setPost(Post post) throws IOException {
         this.post = post;
         //TODO: do all setup here
+        setUsername(post.getAuthor().getUsername());
+        setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
+        setSize(post.getByteSize());
+        setValue(post.getValue());
+        setLocation(post.getParentFullPath());
+        setTitle(post.getTitle());
+
+        //TODO: arbitrary javafx elements as body (html, video, etc)
+        setBody(new String(post.getContent()));
+
+        //TODO: sort comments by feed settings
+        for (Post childPost : post.getSubposts()) {
+            PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
+            comment.getController().setPost(childPost);
+            addComment(comment);
+        }
+
+
     }
 
     public Post getPost() {
         return (post);
-    }
-
-    public void setMainWindow(MainWindowController mainWindow) {
-        this.mainWindow = mainWindow;
     }
 
     public void setUsername(String username) {
@@ -151,18 +178,10 @@ public class PostController implements Initializable {
             setLocationVisible(false);
         }
     }
-    
-    public String getLocation() {
-        return locationLabel.getText();
-    }
 
     public void setTitle(String title) {
         //titleLabel.setText(title);
-        gotoPost.setText(title);
-    }
-    
-    public String getTitle() {
-        return gotoPost.getText();
+        titleHyperLink.setText(title);
     }
 
     public void setBody(String text) {
@@ -171,9 +190,6 @@ public class PostController implements Initializable {
         } else {
             setBodyVisible(false);
         }
-    }
-    public String getBody() {
-        return bodyLabel.getText();
     }
 
     public void setLocationVisible(boolean visible) {
@@ -191,25 +207,9 @@ public class PostController implements Initializable {
         readmoreHyperlink.setVisible(visible);
     }
 
-    public void setGoToPostVisible(boolean visible) {
-        gotoPost.setManaged(visible);
-        gotoPost.setVisible(visible);
-    }
-
-    public String getUsername() {
-        return usernameLabel.getText();
-    }
-
-    public String getDateTime() {
-        return dateTimeLabel.getText();
-    }
-
-    public long getSize() {
-        return (size);
-    }
-
-    public long getValue() {
-        return (value);
+    public void setTitleVisible(boolean visible) {
+        titleHyperLink.setManaged(visible);
+        titleHyperLink.setVisible(visible);
     }
 
     public void setWidthFactor(int widthFactor) {
@@ -222,28 +222,53 @@ public class PostController implements Initializable {
 
     public void addComment(PostCommentUI comment) {
         commentsPane.getChildren().add(comment.getLayout());
+    }
 
+    public void setPostViewer(PostViewer postViewer) {
+        this.postViewer = postViewer;
     }
 
     @FXML
     private void handleTipButtonAction() {
-        int tipAmount = 0;
-        if (!voteAmountTextField.getText().equals("")
-                && !voteAmountTextField.getText().equals("-")) {
-            tipAmount = Integer.valueOf(voteAmountTextField.getText());
+        long tipAmount = 0;
+        if (voteAmountTextField.getText().equals("")
+                || voteAmountTextField.getText().equals("-")) {
+            //TODO: warn the user of invalid input
+            return;
+        }
+        try {
+            tipAmount = Long.valueOf(voteAmountTextField.getText());
+        } catch (NumberFormatException ex) {
+            //TODO: warn invalid input
+            return;
+        }
+        if (tipAmount == 0){
+            //TODO: warn that tipping 0 doesn't mean anything
+            return;
         }
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Tip");
-        alert.setHeaderText("Are you sure you want to tip " + ByteUnitConverter.bytesToUnit(tipAmount) + "?");
+        String valueStr = ByteUnitConverter.bytesToUnit(tipAmount);
+        alert.setHeaderText("Are you sure you want to tip " + valueStr + " to \"" + post.getTitle() + "\"?");
         //alert.setContentText("");
         alert.showAndWait();
 
         if (alert.getResult() == ButtonType.OK) {
+            /*
             mainWindow.changeEarnings(-1 * Math.abs(tipAmount));
-            voteAmountTextField.setText("");
             mainWindow.tipPost(post, tipAmount);
-            setValue(post.getValue());
+            */
+            voteAmountTextField.setText("");
+            try {
+                tipSource.sendValue(post, tipAmount);
+                setValue(post.getValue());
+            } catch (InsufficientFundsException ex) {
+                Alert noFunds = new Alert(Alert.AlertType.ERROR);
+                noFunds.setTitle("Insufficient funds!");
+                noFunds.setHeaderText("You don't have enough value earned to send " + valueStr + "!");
+                noFunds.showAndWait();
+            }
         }
     }
 
@@ -271,6 +296,37 @@ public class PostController implements Initializable {
 
     @FXML
     private void handleGotoPostAction(ActionEvent event) {
-        mainWindow.gotoPost(post);
+        postViewer.viewPost(post);
     }
+
+    
+    /*
+    public String getLocation() {
+        return locationLabel.getText();
+    }
+   
+    public String getTitle() {
+        return titleHyperLink.getText();
+    }
+
+    public String getBody() {
+        return bodyLabel.getText();
+    }
+
+    public String getUsername() {
+        return usernameLabel.getText();
+    }
+
+    public String getDateTime() {
+        return dateTimeLabel.getText();
+    }
+
+    public long getSize() {
+        return (size);
+    }
+
+    public long getValue() {
+        return (value);
+    }
+    */
 }

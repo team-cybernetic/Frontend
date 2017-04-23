@@ -16,7 +16,9 @@
  */
 package diamonddeer.mainwindow.sidebar;
 
+import beryloctopus.Post;
 import diamonddeer.lib.ByteUnitConverter;
+import diamonddeer.lib.TimeConverter;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -32,6 +34,8 @@ import javafx.event.ActionEvent;
  * @author Tootoot222
  */
 public class SidebarController implements Initializable {
+
+    private Post post;
 
     @FXML
     private Label usernameLabel;
@@ -71,6 +75,20 @@ public class SidebarController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+        setTitle(post.getTitle());
+        setBody(new String(post.getContent())); //TODO: arbitrary content
+
+        setUsername(post.getAuthor().getUsername());
+        setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
+        setSize(post.getByteSize());
+        setValue(post.getValue());
+        setTitle(post.getTitle());
+        //setContentType(post.getContentType());
+
     }
     
 

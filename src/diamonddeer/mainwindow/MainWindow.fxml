@@ -30,18 +30,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane styleClass="pane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" stylesheets="@MainWindow.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.MainWindowController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" styleClass="pane" stylesheets="@MainWindow.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="diamonddeer.mainwindow.MainWindowController">
    <children>
-      <VBox styleClass="pane" layoutX="245.0" layoutY="96.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="245.0" layoutY="96.0" styleClass="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <MenuBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" VBox.vgrow="NEVER">
                <menus>
@@ -62,31 +58,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                   </Menu>
                </menus>
             </MenuBar>
-            <VBox styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="2.0" VBox.vgrow="ALWAYS">
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="2.0" styleClass="pane" VBox.vgrow="ALWAYS">
                <children>
-                  <HBox styleClass="pane, topBar" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="38.0">
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="42.0" styleClass="pane, topBar">
                      <children>
-                        <HBox styleClass="pane" alignment="CENTER_LEFT" fillHeight="false" minWidth="68.0" HBox.hgrow="NEVER">
+                        <HBox alignment="CENTER_LEFT" fillHeight="false" styleClass="pane" HBox.hgrow="NEVER">
                            <children>
-                              <Button styleClass="icons, btn" fx:id="optionsButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleOptionsButtonAction" onMouseEntered="#handleOptionsButtonMouseEntered" onMouseExited="#handleOptionsButtonMouseExited" prefWidth="28"></Button>
-                              <ToggleButton styleClass="icons" fx:id="bookmarksToggle" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleBookmarksToggleAction" onMouseEntered="#handleBookmarksToggleMouseEntered" onMouseExited="#handleBookmarksToggleMouseExited" prefWidth="28"></ToggleButton>
-                              <Button styleClass="icons, btn" fx:id="backButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleBackButtonAction" onMouseEntered="#handleBackButtonMouseEntered" onMouseExited="#handleBackButtonMouseExited" prefWidth="28"></Button>
-                              <Button styleClass="icons, btn" fx:id="forwardButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleForwardButtonAction" onMouseEntered="#handleForwardButtonMouseEntered" onMouseExited="#handleForwardButtonMouseExited" prefWidth="28"></Button>
-                              <Button styleClass="icons, btn" fx:id="reloadButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleReloadButtonAction" onMouseEntered="#handleReloadButtonMouseEntered" onMouseExited="#handleReloadButtonMouseExited" prefWidth="28"></Button>
-                              <Button styleClass="icons, btn" fx:id="homeButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleHomeButtonAction" onMouseEntered="#handleHomeButtonMouseEntered" onMouseExited="#handleHomeButtonMouseExited" prefWidth="28"></Button>
+                              <Button fx:id="optionsButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleOptionsButtonAction" onMouseEntered="#handleOptionsButtonMouseEntered" onMouseExited="#handleOptionsButtonMouseExited" prefWidth="28" styleClass="icons, btn"></Button>
+                              <ToggleButton fx:id="bookmarksToggle" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleBookmarksToggleAction" onMouseEntered="#handleBookmarksToggleMouseEntered" onMouseExited="#handleBookmarksToggleMouseExited" prefWidth="28" styleClass="icons"></ToggleButton>
+                              <Button fx:id="backButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleBackButtonAction" onMouseEntered="#handleBackButtonMouseEntered" onMouseExited="#handleBackButtonMouseExited" prefWidth="28" styleClass="icons, btn"></Button>
+                              <Button fx:id="forwardButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleForwardButtonAction" onMouseEntered="#handleForwardButtonMouseEntered" onMouseExited="#handleForwardButtonMouseExited" prefWidth="28" styleClass="icons, btn"></Button>
+                              <Button fx:id="reloadButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleReloadButtonAction" onMouseEntered="#handleReloadButtonMouseEntered" onMouseExited="#handleReloadButtonMouseExited" prefWidth="28" styleClass="icons, btn" text=""></Button>
+                              <Button fx:id="homeButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleHomeButtonAction" onMouseEntered="#handleHomeButtonMouseEntered" onMouseExited="#handleHomeButtonMouseExited" prefWidth="28" styleClass="icons, btn"></Button>
                            </children>
                         </HBox>
-                        <ScrollPane styleClass="pane" fx:id="addressBarScrollPane" fitToHeight="true" fitToWidth="true" maxWidth="1.7976931348623157E308" minWidth="350.0" vbarPolicy="NEVER" HBox.hgrow="ALWAYS">
+                        <ScrollPane fx:id="addressBarScrollPane" fitToHeight="true" fitToWidth="true" maxWidth="1.7976931348623157E308" minWidth="350.0" styleClass="pane" vbarPolicy="NEVER" HBox.hgrow="ALWAYS">
                            <content>
-                              <AnchorPane styleClass="pane" maxWidth="1.7976931348623157E308" minWidth="-Infinity">
+                              <AnchorPane maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="pane">
                                  <children>
                                     <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" scaleShape="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
                                           <HBox fx:id="addressBarHBox" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" HBox.hgrow="SOMETIMES" />
-                                          <Button styleClass="btn" fx:id="addressBarCancelButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddressBarCancelButtonAction" text="Cancel" />
-                                          <TextField styleClass="address-bar" fx:id="addressBarTextField" maxWidth="1.7976931348623157E308" minWidth="75.0" onAction="#handleAddressBarTextFieldAction" onKeyPressed="#handleAddressBarTextFieldKeyPress" onMouseEntered="#handleAddressBarTextFieldMouseEntered" onMouseExited="#handleAddressBarTextFieldMouseExited" HBox.hgrow="ALWAYS" />
-                                          <Button styleClass="btn" fx:id="addressBarGoButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddressBarGoButtonAction" text="Go" />
-                                          <Button styleClass="btn" fx:id="createGroupButton" minWidth="-Infinity" mnemonicParsing="false" onMouseEntered="#handleCreateGroupButtonMouseEntered" onMouseExited="#handleCreateGroupButtonMouseExited" text="+">
+                                          <Button fx:id="addressBarCancelButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddressBarCancelButtonAction" styleClass="btn" text="Cancel" />
+                                          <TextField fx:id="addressBarTextField" maxWidth="1.7976931348623157E308" minWidth="75.0" onAction="#handleAddressBarTextFieldAction" onKeyPressed="#handleAddressBarTextFieldKeyPress" onMouseEntered="#handleAddressBarTextFieldMouseEntered" onMouseExited="#handleAddressBarTextFieldMouseExited" styleClass="address-bar" HBox.hgrow="ALWAYS" />
+                                          <Button fx:id="addressBarGoButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddressBarGoButtonAction" styleClass="btn" text="Go" />
+                                          <Button fx:id="createGroupButton" minWidth="-Infinity" mnemonicParsing="false" onMouseEntered="#handleCreateGroupButtonMouseEntered" onMouseExited="#handleCreateGroupButtonMouseExited" styleClass="btn" text="+">
                                              <HBox.margin>
                                                 <Insets left="8.0" />
                                              </HBox.margin></Button>
@@ -99,7 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               </AnchorPane>
                            </content>
                         </ScrollPane>
-                        <MenuButton styleClass="button, btn" fx:id="feedMenuButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleFeedMenuButtonAction" onMouseEntered="#handleFeedMenuButtonMouseEntered" onMouseExited="#handleFeedMenuButtonMouseExited" text="Feed">
+                        <MenuButton fx:id="feedMenuButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleFeedMenuButtonAction" onMouseEntered="#handleFeedMenuButtonMouseEntered" onMouseExited="#handleFeedMenuButtonMouseExited" styleClass="button, btn" text="Feed">
                           <items>
                             <MenuItem mnemonicParsing="false" text="Hot" />
                             <MenuItem mnemonicParsing="false" text="Recent" />
@@ -111,27 +107,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <Insets left="8.0" right="8.0" top="2.0" />
                      </VBox.margin>
                   </HBox>
-                  <SplitPane styleClass="pane" dividerPositions="0.764" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                  <SplitPane dividerPositions="0.764" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="pane" VBox.vgrow="ALWAYS">
                     <items>
                       <AnchorPane styleClass="pane" SplitPane.resizableWithParent="false">
                            <children>
-                              <VBox styleClass="pane" layoutX="128.0" layoutY="105.0" prefHeight="200.0" prefWidth="100.0" spacing="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox layoutX="128.0" layoutY="105.0" prefHeight="200.0" prefWidth="100.0" spacing="2.0" styleClass="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <ScrollPane styleClass="pane" fx:id="mainContentPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                                    <ScrollPane fx:id="mainContentPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="pane" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
                                        <content>
-                                          <FlowPane styleClass="pane" fx:id="postFlowPane" prefWrapLength="740.0" />
+                                          <FlowPane fx:id="postFlowPane" prefWrapLength="740.0" styleClass="pane" />
                                        </content>
                                     </ScrollPane>
-                                    <HBox styleClass="pane" alignment="CENTER_LEFT" spacing="8.0">
+                                    <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="pane">
                                        <children>
-                                          <VBox styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="110.0" spacing="4.0">
+                                          <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="110.0" spacing="4.0" styleClass="pane">
                                              <children>
                                                 <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Earnings" VBox.vgrow="ALWAYS">
                                                    <font>
                                                       <Font name="System Bold" size="18.0" />
                                                    </font>
                                                 </Label>
-                                                <HBox styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="pane" VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <Label text="Global:">
                                                          <font>
@@ -143,7 +139,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                          </font></Label>
                                                    </children>
                                                 </HBox>
-                                                <HBox styleClass="pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                                                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="pane" VBox.vgrow="ALWAYS">
                                                    <children>
                                                       <Label text="Local:" textOverrun="CLIP">
                                                          <font>
@@ -160,10 +156,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                           <TextArea fx:id="newPostTextArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="75.0" prefHeight="75.0" prefWidth="500.0" promptText="Start a new post..." wrapText="true" HBox.hgrow="ALWAYS" />
                                           <VBox styleClass="pane" VBox.vgrow="NEVER">
                                                <children>
-                                                 <HBox styleClass="pane" HBox.hgrow="NEVER" alignment="BOTTOM_CENTER">
+                                                 <HBox alignment="BOTTOM_CENTER" styleClass="pane" HBox.hgrow="NEVER">
                                                     <children>
-                                                       <Button styleClass="btn" fx:id="postButton" mnemonicParsing="false" onAction="#handlePostButtonAction" onMouseEntered="#handlePostButtonMouseEntered" onMouseExited="#handlePostButtonMouseExited" text="Post" prefHeight="28" />
-                                                       <ToggleButton styleClass="icons, rollup" fx:id="rollupButton" mnemonicParsing="false" onAction="#handleRollupButtonAction" onMouseEntered="#handleRollupButtonMouseEntered" onMouseExited="#handleRollupButtonMouseExited" prefHeight="28"></ToggleButton>
+                                                       <Button fx:id="postButton" mnemonicParsing="false" onAction="#handlePostButtonAction" onMouseEntered="#handlePostButtonMouseEntered" onMouseExited="#handlePostButtonMouseExited" prefHeight="28" styleClass="btn" text="Post" />
+                                                       <ToggleButton fx:id="rollupButton" mnemonicParsing="false" onAction="#handleRollupButtonAction" onMouseEntered="#handleRollupButtonMouseEntered" onMouseExited="#handleRollupButtonMouseExited" prefHeight="28" styleClass="icons, rollup"></ToggleButton>
                                                     </children>
                                                  </HBox>
                                                </children>
@@ -173,12 +169,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                  </children>
                               </VBox>
                            </children></AnchorPane>
-                        <ScrollPane styleClass="pane" fx:id="sidebarPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vbarPolicy="ALWAYS" SplitPane.resizableWithParent="false" />
+                        <ScrollPane fx:id="sidebarPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="pane" SplitPane.resizableWithParent="false" />
                     </items>
                   </SplitPane>
                </children>
             </VBox>
-            <HBox styleClass="pane, status" maxHeight="0.0" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+            <HBox maxHeight="0.0" maxWidth="1.7976931348623157E308" styleClass="pane, status" VBox.vgrow="ALWAYS">
                <children>
                   <Label fx:id="statusLeftLabel" />
                </children>

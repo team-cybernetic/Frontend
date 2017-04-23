@@ -31,12 +31,13 @@ import javafx.stage.Stage;
 public class DiamondDeer extends Application {
 
     private DiamondDeerController mainController;
-    private BerylOctopus model = new BerylOctopusDummy1();
+    private BerylOctopus model;
     private SettingsManager settingsManager;
     
     @Override
     public void start(Stage stage) throws Exception {
         try {
+            this.model = new BerylOctopusDummy1();
             this.mainController = new DiamondDeerController(stage);
             this.settingsManager = new SettingsManager();
             mainController.setup(model, settingsManager);

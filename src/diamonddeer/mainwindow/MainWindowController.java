@@ -16,11 +16,9 @@
  */
 package diamonddeer.mainwindow;
 
-import java.util.*;
-
 import beryloctopus.BerylOctopus;
 import beryloctopus.Post;
-import beryloctopus.User;
+import beryloctopus.UserIdentity;
 import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
@@ -28,26 +26,23 @@ import diamonddeer.mainwindow.post.PostLoader;
 import diamonddeer.mainwindow.sidebar.SidebarLoader;
 import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
+import diamonddeer.lib.TimeConverter;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorLoader;
 import diamonddeer.mainwindow.editor.EditorUI;
 import diamonddeer.mainwindow.post.comment.PostCommentLoader;
-import diamonddeer.mainwindow.post.comment.PostCommentController;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import diamonddeer.mainwindow.sidebar.SidebarController;
 import diamonddeer.mainwindow.sidebar.SidebarUI;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -74,7 +69,7 @@ import javafx.scene.text.Font;
  *
  * @author Tootoot222
  */
-public class MainWindowController implements Initializable {
+public class MainWindowController implements Initializable, PostViewer {
 
     private BerylOctopus model;
     private PostLoader postLoader;
@@ -88,7 +83,7 @@ public class MainWindowController implements Initializable {
     private SidebarController sidebarController;
 //    private PostRepository posts;
 //    private UserRepository users;
-    private User curUser;
+    private UserIdentity curUser;
     private LinkedList<String> previousAddress;
     private LinkedList<String> forwardAddress;
     private HashMap<String, PostUI> postsUI = new HashMap<>();
@@ -158,11 +153,14 @@ public class MainWindowController implements Initializable {
         statusLeftLabel.setText("");
     }
 
-    public void setup(BerylOctopus model, User curUser, EditorLoader editorLoader, PostLoader postLoader, PostCommentLoader postCommentLoader, SidebarLoader sidebarLoader, PostSettings postSettings) throws IOException {
+    public void setup(BerylOctopus model, UserIdentity curUser, EditorLoader editorLoader, PostLoader postLoader, PostCommentLoader postCommentLoader, SidebarLoader sidebarLoader, PostSettings postSettings) throws IOException {
         this.model = model;
         this.curUser = curUser;
         this.postLoader = postLoader;
         this.postCommentLoader = postCommentLoader;
+
+        PostController.setPostCommentLoader(postCommentLoader);
+
         SidebarUI sidebar = sidebarLoader.loadSidebar();
         this.sidebarController = sidebar.getController();
         this.sidebarPane.setContent(sidebar.getLayout());
@@ -171,9 +169,11 @@ public class MainWindowController implements Initializable {
         EditorUI editor = editorLoader.loadEditor();
         this.editorController = editor.getController();
         this.editorPane = editor.getLayout();
-//        this.sidebarPane = sidebar.getLayout();
+
         loadFonts();
         setCurrentAddress(getCurrentAddress());
+        setEarningsLocal(model.getValueLocal(curUser)); //TODO
+        setEarningsGlobal(model.getValueGlobal(curUser));
         addressBarAddressButtonsCreate();
         updatePosts();
         setDefaultFocus();
@@ -199,14 +199,8 @@ public class MainWindowController implements Initializable {
             addressBarScrollPane.setHvalue(addressBarScrollPane.getHmax());
         });
         mainContentPrevious = postFlowPane;
-//        posts = new PostRepository();
-//        users = new UserRepository();
         previousAddress = new LinkedList<>();
         forwardAddress = new LinkedList<>();
-        earningsGlobal = 123456;
-        earningsLocal = 123456;
-        setEarningsLocal(earningsLocal);
-        setEarningsGlobal(earningsGlobal);
     }
 
     private void setEarningsGlobal(long bytes) {
@@ -266,7 +260,6 @@ public class MainWindowController implements Initializable {
         addressBarEditButtonsHide();
         updatePosts();
         setDefaultFocus();
-        //Set posts
     }
 
     private void addressBarEditCancel() {
@@ -372,42 +365,9 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    private String dateTimeFromMillis(long millis) {
-        Date date = new Date(millis);
-        DateFormat formatter = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");;
-        return (formatter.format(date));
-    }
-
-    private void populateSidebar(SidebarController sidebarController, Post post) {
-        sidebarController.setTitle(post.getTitle());
-        sidebarController.setBody(new String(post.getContent()));
-
-        sidebarController.setDateTime(dateTimeFromMillis(post.getTimestampMillis()));
-        sidebarController.setSize(post.getByteSize());
-        sidebarController.setValue(post.getValue());
-        sidebarController.setTitle(post.getTitle());
-        //sidebarController.setContentType(post.getContentType());
-        /*
-        sidebarPane.getChildren().clear();
-        List<Text> textAreas = Arrays.asList(new Text("Title: \n" + postController.getTitle() + "\n"),
-                                            new Text("Body: \n" + postController.getBody() + "\n"),
-                                            new Text("Username: \n" + postController.getUsername() + "\n"),
-                new Text("Date Posted: \n" + postController.getDateTime() + "\n"),
-                new Text("Post Size: \n" + postController.getSize() + "\n"),
-                new Text("Post Value: \n" + postController.getValue() + "\n"),
-                new Text("Post Location: \n" + postController.getLocation() + "\n")
-        );
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(textAreas);
-        sidebarPane.getChildren().addAll(vBox);
-        */
-    }
-
-    public void gotoPost(Post post) {
+    public void viewPost(Post post) {
         // Update address bar:
         addressBarEditEnd(post.getPath().getFullPath());
-        // Update sidebar information here:
-        populateSidebar(sidebarController, post);
     }
 
     public void changeEarnings(int change) {
@@ -486,50 +446,63 @@ public class MainWindowController implements Initializable {
         editorController.setBody(tSplit.length > 1 ? tSplit[1] : "");
     }
 
-    private void populatePost(PostController postController, Post post) {
+    private void populatePost(PostController postController, Post post) throws IOException {
+        postController.setPost(post);
+        postController.setPostViewer(this);
+        /*
         postController.setUsername(post.getAuthor().getUsername());
-        postController.setDateTime(dateTimeFromMillis(post.getTimestampMillis()));
+        postController.setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
         postController.setSize(post.getByteSize());
         postController.setValue(post.getValue());
         Post parent = post.getParent();
         postController.setLocation(parent != null ? parent.getPath().getFullPath() : null);
-        postController.setMainWindow(this); //coupling
+        //postController.setMainWindow(this); //coupling
+        postController.setTipSource(curUser);
         postController.setTitle(post.getTitle());
         postController.setPost(post);
-        
 
         //postController.setTitleHandler(this);
-        //TODO: not force feed event handlers into gotoPost
-        /*
-        postController.gotoPost.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent t) {
-                gotoPost(postController);
-            }
-        });
-        */
 
         //TODO: arbitrary javafx elements as body (html, video, etc)
         postController.setBody(new String(post.getContent()));
-        /*
-        if (k instanceof TextPost || k instanceof HtmlPost) {
-        postController.setBody(((TextPost)k).getTextContent());
+
+        //TODO: sort comments by feed settings
+        for (Post childPost : post.getSubposts()) {
+            PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
+            comment.getController().setPost(childPost);
+            postController.addComment(comment);
         }
         */
 
+
     }
 
+    /*
     private void populatePostComment(PostCommentController commentController, Post post) {
         commentController.setMainWindow(this);
         commentController.setPost(post);
         commentController.setTitle(post.getTitle());
         commentController.setBody(new String(post.getContent()));
         commentController.setUsername(post.getAuthor().getUsername());
-        commentController.setDateTime(dateTimeFromMillis(post.getTimestampMillis()));
+        commentController.setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
     }
+    */
+
+    /*
+    private void populateSidebar(SidebarController sidebarController, Post post) {
+        sidebarController.setTitle(post.getTitle());
+        sidebarController.setBody(new String(post.getContent()));
+
+        sidebarController.setDateTime(dateTimeFromMillis(post.getTimestampMillis()));
+        sidebarController.setSize(post.getByteSize());
+        sidebarController.setValue(post.getValue());
+        sidebarController.setTitle(post.getTitle());
+        //sidebarController.setContentType(post.getContentType());
+    }
+    */
 
     private void mainContentShowRollupEditor() {
         rollupButton.setText("\uf078");
-        rollupButton.toFront();
         if (editorController.getTitle().trim().length() == 0 && newPostTextArea.getText().trim().length() > 0) {
             editorController.setEditorPlaintext();
             populateRollupEditor(editorController, newPostTextArea.getText());
@@ -542,51 +515,38 @@ public class MainWindowController implements Initializable {
 
     private void mainContentHideRollupEditor() {
         rollupButton.setText("\uf077");
-        rollupButton.toFront();
         if (editorController.getTitle().trim().length() > 0 && newPostTextArea.getText().trim().length() == 0) {
             newPostTextArea.setText(editorController.getTitle() + "\n" + editorController.getBody());
         }
         newPostTextArea.setDisable(false);
         Pane p = (Pane)mainContentPane.getContent();
-        mainContentPane.setContent(mainContentPrevious);
+        mainContentPane.setContent(mainContentPrevious); //TODO: previous or postsPane?
         this.mainContentPrevious = p;
     }
 
     private void postPaneClear() {
         postFlowPane.getChildren().clear();
+        postsUI.clear();
     }
 
     private void postPaneAdd(PostUI post) {
-        /*
-        postGridPane.add(newPostLayout, postCols, postRows);
-        postCols = (postCols + 1) % postSettings.getMaxPostColumns();
-        if (postCols == 0) {
-            postRows++;
-            postGridPane.addRow(postRows);
-        }
-*/
-        postsUI.put(post.getController().getTitle(), post);
+        postsUI.put(post.getController().getPost().getTitle(), post); //horrible chaining
         postFlowPane.getChildren().add(post.getLayout());
     }
     
     private void updatePosts() {
         try {
             postPaneClear();
-            Post topPost = model.getPostAt(getCurrentAddress());
-            if (topPost == null) {
+            Post curPost = model.getPostAt(getCurrentAddress());
+            if (curPost == null) {
                 return;
             }
-            populateSidebar(sidebarController, topPost);
-            Set<Post> curContent = topPost.getSubposts();
-            for (Post curPost : curContent) {
+            sidebarController.setPost(curPost);
+            Set<Post> curContent = curPost.getSubposts();
+            for (Post subPost : curContent) {
                 PostUI newPost = postLoader.loadEmptyPost();
                 PostController newPostController = newPost.getController();
-                populatePost(newPostController, curPost);
-                for (Post childPost : curPost.getSubposts()) {
-                    PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
-                    populatePostComment(comment.getController(), childPost);
-                    newPostController.addComment(comment);
-                }
+                populatePost(newPostController, subPost);
                 postPaneAdd(newPost);
             }
         } catch (IOException e) {

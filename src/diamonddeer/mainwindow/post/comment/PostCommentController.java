@@ -6,8 +6,9 @@
 package diamonddeer.mainwindow.post.comment;
 
 import beryloctopus.Post;
+import diamonddeer.lib.TimeConverter;
 import diamonddeer.mainwindow.MainWindowController;
-import diamonddeer.mainwindow.post.PostController;
+import diamonddeer.mainwindow.PostViewer;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -28,6 +29,7 @@ public class PostCommentController implements Initializable {
     private int defaultHeight;
     private MainWindowController mainWindow;
     private Post post;
+    private PostViewer postViewer;
 
     @FXML
     private AnchorPane rootPane;
@@ -55,7 +57,10 @@ public class PostCommentController implements Initializable {
 
     public void setPost(Post post) {
         this.post = post;
-        //TODO: do all setup here
+        setTitle(post.getTitle());
+        setBody(new String(post.getContent())); //TODO: arbitrary content
+        setUsername(post.getAuthor().getUsername());
+        setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
     }
 
     public Post getPost() {
@@ -106,9 +111,13 @@ public class PostCommentController implements Initializable {
         return (bodyLabel.getText());
     }
 
+    public void setPostViewer(PostViewer postViewer) {
+        this.postViewer = postViewer;
+    }
+
     @FXML
     private void handleTitleLabelAction(ActionEvent event) {
-        mainWindow.gotoPost(post);
+        postViewer.viewPost(post);
     }
    
 }

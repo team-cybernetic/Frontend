@@ -1,7 +1,7 @@
 package diamonddeer;
 
 import beryloctopus.BerylOctopus;
-import beryloctopus.models.User;
+import beryloctopus.models.UserIdentity;
 import diamonddeer.mainwindow.MainWindowController;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorLoader;
@@ -17,6 +17,7 @@ import diamonddeer.mainwindow.sidebar.SidebarLoader;
 import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.SettingsManager;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -40,16 +41,16 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
         this.mainStage = mainStage;
     }
 
-    private Parent loadMainWindow() throws IOException {
+    private Parent loadMainWindow() throws IOException, NoSuchAlgorithmException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
-        mainWindowController.setup(model, new User("MyUsernameGoesHere".getBytes()), this, this, this, this, settingsManager);
+        mainWindowController.setup(model, new UserIdentity(), this, this, this, this, settingsManager);
         return (mainWindowPane);
     }
 
-    public void setup(BerylOctopus model, SettingsManager settingsManager) throws IOException {
+    public void setup(BerylOctopus model, SettingsManager settingsManager) throws IOException, NoSuchAlgorithmException {
         this.model = model;
         this.settingsManager = settingsManager;
 

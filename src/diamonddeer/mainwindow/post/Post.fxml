@@ -144,7 +144,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                               <Font name="Roboto-Regular" size="11.0" />
                            </font>
                         </Label>
-                        <Hyperlink fx:id="gotoPost" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" onAction="#handleGotoPostAction" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
+                        <Hyperlink fx:id="titleHyperLink" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0" onAction="#handleGotoPostAction" text="Title of post goes here" wrapText="true" VBox.vgrow="SOMETIMES">
                            <font>
                               <Font name="FreeSerif" size="24.0" />
                            </font>
