@@ -124,7 +124,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                           <Button styleClass="icons, btn" fx:id="downvoteButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="22.0" prefWidth="22.0" onAction="#handleDownvoteButtonAction"></Button>
                                        </children>
                                     </VBox>
-                                    <Button mnemonicParsing="false" onAction="#handleTipButtonAction" text="Tip" />
+                                    <Button styleClass="btn" mnemonicParsing="false" onAction="#handleTipButtonAction" text="Tip" />
                                  </children>
                               </HBox>
                            </children>
