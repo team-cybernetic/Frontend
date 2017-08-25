@@ -22,6 +22,7 @@ import beryloctopus.exceptions.InsufficientFundsException;
 import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.lib.TimeConverter;
 import diamonddeer.mainwindow.PostViewer;
+import diamonddeer.mainwindow.post.comment.PostCommentController;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -124,7 +125,6 @@ public class PostController implements Initializable {
 
     public void setPost(Post post) throws IOException {
         this.post = post;
-        //TODO: do all setup here
         setUsername(post.getAuthor().getUsername());
         setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
         setSize(post.getByteSize());
@@ -138,7 +138,9 @@ public class PostController implements Initializable {
         //TODO: sort comments by feed settings
         for (Post childPost : post.getSubposts()) {
             PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
-            comment.getController().setPost(childPost);
+            PostCommentController commentController = comment.getController();
+            commentController.setPost(childPost);
+            commentController.setPostViewer(postViewer);
             addComment(comment);
         }
 

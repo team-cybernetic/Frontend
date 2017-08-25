@@ -447,59 +447,10 @@ public class MainWindowController implements Initializable, PostViewer {
     }
 
     private void populatePost(PostController postController, Post post) throws IOException {
-        postController.setPost(post);
-        postController.setPostViewer(this);
-        /*
-        postController.setUsername(post.getAuthor().getUsername());
-        postController.setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
-        postController.setSize(post.getByteSize());
-        postController.setValue(post.getValue());
-        Post parent = post.getParent();
-        postController.setLocation(parent != null ? parent.getPath().getFullPath() : null);
-        //postController.setMainWindow(this); //coupling
         postController.setTipSource(curUser);
-        postController.setTitle(post.getTitle());
+        postController.setPostViewer(this);
         postController.setPost(post);
-
-        //postController.setTitleHandler(this);
-
-        //TODO: arbitrary javafx elements as body (html, video, etc)
-        postController.setBody(new String(post.getContent()));
-
-        //TODO: sort comments by feed settings
-        for (Post childPost : post.getSubposts()) {
-            PostCommentUI comment = postCommentLoader.loadEmptyPostComment();
-            comment.getController().setPost(childPost);
-            postController.addComment(comment);
-        }
-        */
-
-
     }
-
-    /*
-    private void populatePostComment(PostCommentController commentController, Post post) {
-        commentController.setMainWindow(this);
-        commentController.setPost(post);
-        commentController.setTitle(post.getTitle());
-        commentController.setBody(new String(post.getContent()));
-        commentController.setUsername(post.getAuthor().getUsername());
-        commentController.setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
-    }
-    */
-
-    /*
-    private void populateSidebar(SidebarController sidebarController, Post post) {
-        sidebarController.setTitle(post.getTitle());
-        sidebarController.setBody(new String(post.getContent()));
-
-        sidebarController.setDateTime(dateTimeFromMillis(post.getTimestampMillis()));
-        sidebarController.setSize(post.getByteSize());
-        sidebarController.setValue(post.getValue());
-        sidebarController.setTitle(post.getTitle());
-        //sidebarController.setContentType(post.getContentType());
-    }
-    */
 
     private void mainContentShowRollupEditor() {
         rollupButton.setText("\uf078");
