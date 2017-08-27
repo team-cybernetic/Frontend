@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.post;
+package diamonddeer.ui.sidebar;
 
 import java.io.IOException;
 
 /**
  * @author Tootoot222
  */
-public interface PostLoader {
-    PostUI loadEmptyPost() throws IOException;
+public interface SidebarLoader {
+    SidebarUI loadSidebar() throws IOException;
 }

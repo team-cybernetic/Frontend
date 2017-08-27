@@ -14,27 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.post;
+package diamonddeer.ui.sidebar;
 
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * @author Tootoot222
  */
-public class PostUI {
-    private Pane layout;
-    private PostController controller;
+public class SidebarUI {
+    private AnchorPane layout;
+    private SidebarController controller;
 
-    public PostUI(Pane layout, PostController controller) {
+    public SidebarUI(AnchorPane layout, SidebarController controller) {
         this.layout = layout;
         this.controller = controller;
     }
 
-    public Pane getLayout() {
+    public AnchorPane getLayout() {
         return layout;
     }
 
-    public PostController getController() {
+    public SidebarController getController() {
         return controller;
     }
 }

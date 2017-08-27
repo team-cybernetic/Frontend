@@ -14,13 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.editor;
+package diamonddeer.ui.post;
 
-import java.io.IOException;
+import javafx.scene.layout.Pane;
 
 /**
  * @author Tootoot222
  */
-public interface EditorLoader {
-    EditorUI loadEditor() throws IOException;
+public class PostUI {
+    private Pane layout;
+    private PostController controller;
+
+    public PostUI(Pane layout, PostController controller) {
+        this.layout = layout;
+        this.controller = controller;
+    }
+
+    public Pane getLayout() {
+        return layout;
+    }
+
+    public PostController getController() {
+        return controller;
+    }
 }

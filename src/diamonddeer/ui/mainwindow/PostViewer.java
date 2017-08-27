@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diamonddeer.mainwindow.post.comment;
+package diamonddeer.ui.mainwindow;
 
-import java.io.IOException;
+import beryloctopus.Post;
 
 /**
  * @author Tootoot222
  */
-public interface PostCommentLoader {
-    PostCommentUI loadEmptyPostComment() throws IOException;
+public interface PostViewer {
+    void viewPost(Post post);
 }

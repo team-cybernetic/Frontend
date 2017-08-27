@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright (C) 2017 Tootoot222
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="400.0" prefWidth="370.0" styleClass="pane"
+            stylesheets="@Post.css" xmlns="http://javafx.com/javafx/8.0.111"
+            fx:controller="diamonddeer.ui.post.PostController">
+    <padding>
+        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+    </padding>
+    <GridPane styleClass="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="ALWAYS"/>
+            <RowConstraints minHeight="-Infinity" percentHeight="0.0" vgrow="SOMETIMES"/>
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity"/>
+        </rowConstraints>
+        <GridPane hgap="2.0" styleClass="pane">
+            <columnConstraints>
+                <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="101.0"
+                                   percentWidth="0.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" percentWidth="0.0"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS"/>
+            </rowConstraints>
+            <VBox spacing="4.0" styleClass="pane">
+                <GridPane.margin>
+                    <Insets/>
+                </GridPane.margin>
+                <Label fx:id="usernameLabel" alignment="TOP_LEFT" minHeight="36.0"
+                       text="1234567890123456789012345678901234" underline="true" wrapText="true">
+                    <font>
+                        <Font name="FreeMono" size="14.0"/>
+                    </font>
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                </Label>
+                <Label fx:id="dateTimeLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308"
+                       text="23:41:33 03/23/17" textAlignment="CENTER" textFill="#867d7d"
+                       wrapText="true">
+                    <font>
+                        <Font name="Roboto-Regular" size="12.0"/>
+                    </font>
+                </Label>
+                <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                      minWidth="-Infinity" styleClass="pane">
+                    <VBox alignment="CENTER_RIGHT" styleClass="pane">
+                        <Button fx:id="upvoteButton" minHeight="-Infinity" minWidth="-Infinity"
+                                mnemonicParsing="false" onAction="#handleUpvoteButtonAction"
+                                prefHeight="22.0" prefWidth="22.0" styleClass="icons, btn">
+                        </Button>
+                        <TextField fx:id="voteAmountTextField" maxHeight="28" maxWidth="49.0"
+                                   minHeight="28.0" onAction="#handleTipButtonAction"
+                                   promptText="0">
+                            <font>
+                                <Font name="Roboto-Regular" size="10.0"/>
+                            </font>
+                        </TextField>
+                        <Button fx:id="downvoteButton" minHeight="-Infinity"
+                                minWidth="-Infinity" mnemonicParsing="false"
+                                onAction="#handleDownvoteButtonAction" prefHeight="22.0"
+                                prefWidth="22.0" styleClass="icons, btn">
+                        </Button>
+                    </VBox>
+                    <Button mnemonicParsing="false" onAction="#handleTipButtonAction"
+                            styleClass="btn" text="Tip"/>
+                </HBox>
+                <GridPane hgap="2.0" styleClass="pane" vgap="2.0">
+                    <columnConstraints>
+                        <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="SOMETIMES"/>
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
+                        <ColumnConstraints fillWidth="false" halignment="RIGHT"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <Label minWidth="-Infinity" text="Size: ">
+                        <font>
+                            <Font name="Roboto-Regular" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="sizeAmountLabel" alignment="CENTER_RIGHT"
+                           maxWidth="1.7976931348623157E308" text="123.56" GridPane.columnIndex="1"
+                           GridPane.hgrow="ALWAYS">
+                        <font>
+                            <Font name="Roboto-Regular" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label minWidth="-Infinity" text="Value:" GridPane.rowIndex="1">
+                        <font>
+                            <Font name="Roboto-Regular" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="valueAmountLabel" alignment="CENTER_RIGHT"
+                           maxWidth="1.7976931348623157E308" text="456.99" GridPane.columnIndex="1"
+                           GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                        <font>
+                            <Font name="Roboto-Regular" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="sizeUnitLabel" alignment="CENTER_RIGHT" minWidth="-Infinity"
+                           text="KB" GridPane.columnIndex="2">
+                        <font>
+                            <Font name="Roboto-Regular" size="11.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="valueUnitLabel" alignment="CENTER_RIGHT" minWidth="-Infinity"
+                           text="MB" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                        <font>
+                            <Font name="Roboto-Regular" size="11.0"/>
+                        </font>
+                    </Label>
+                </GridPane>
+                <HBox minHeight="-Infinity" minWidth="-Infinity" styleClass="pane"/>
+                <HBox minHeight="-Infinity" minWidth="-Infinity" styleClass="pane"/>
+            </VBox>
+            <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" GridPane.columnIndex="1"
+                       GridPane.vgrow="ALWAYS"/>
+            <VBox maxWidth="-Infinity" spacing="4.0" styleClass="pane" GridPane.columnIndex="2">
+                <Label fx:id="locationLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308"
+                       minHeight="-Infinity" text="/generic/location/where/this/post/resides/"
+                       wrapText="true">
+                    <font>
+                        <Font name="Roboto-Regular" size="11.0"/>
+                    </font>
+                </Label>
+                <Hyperlink fx:id="titleHyperLink" alignment="TOP_LEFT" maxHeight="40.0" minHeight="32.0"
+                           onAction="#handleGotoPostAction" text="Title of post goes here"
+                           wrapText="true" VBox.vgrow="SOMETIMES">
+                    <font>
+                        <Font name="FreeSerif" size="24.0"/>
+                    </font>
+                </Hyperlink>
+                <Label fx:id="bodyLabel" alignment="TOP_LEFT"
+                       text="Text of post goes here. It could be quite long and should likely word wrap around until it finds a suitable length at which it can be cut off and have a clickable link that says something along the lines of &quot;read more&quot; or such. Perhaps even an indication of how much longer it is? I'm not really sure. Maybe I should just keep writing more and more and more and more text to see how far I can push it before it starts getting cut off the edge of the screen. Guess I need even more text than I had put previously, but this should surely be enough to push it all the way off the bottom of the screen."
+                       wrapText="true">
+                    <font>
+                        <Font name="Roboto-Regular" size="14.0"/>
+                    </font>
+                </Label>
+                <Hyperlink fx:id="readmoreHyperlink" disable="true" text="Read more..."
+                           visible="false"/>
+            </VBox>
+        </GridPane>
+        <Separator fx:id="commentsSeparator" GridPane.rowIndex="1"/>
+        <ScrollPane hbarPolicy="AS_NEEDED" styleClass="pane" vbarPolicy="NEVER" GridPane.hgrow="ALWAYS"
+                    GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+            <FlowPane fx:id="commentsPane" orientation="VERTICAL" prefHeight="157.0" styleClass="pane"/>
+        </ScrollPane>
+    </GridPane>
+</AnchorPane>

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diamonddeer.mainwindow.post.comment;
+package diamonddeer.ui.postcomment;
 
 import beryloctopus.Post;
 import diamonddeer.lib.TimeConverter;
-import diamonddeer.mainwindow.MainWindowController;
-import diamonddeer.mainwindow.PostViewer;
+import diamonddeer.ui.mainwindow.MainWindowController;
+import diamonddeer.ui.mainwindow.PostViewer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

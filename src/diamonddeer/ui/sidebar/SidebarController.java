@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.sidebar;
+package diamonddeer.ui.sidebar;
 
 import beryloctopus.Post;
 import diamonddeer.lib.ByteUnitConverter;

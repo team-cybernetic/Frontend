@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.post;
+package diamonddeer.ui.post;
 
 import beryloctopus.Post;
 import beryloctopus.ValueSender;
 import beryloctopus.exceptions.InsufficientFundsException;
 import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.lib.TimeConverter;
-import diamonddeer.mainwindow.PostViewer;
-import diamonddeer.mainwindow.post.comment.PostCommentController;
-import diamonddeer.mainwindow.post.comment.PostCommentLoader;
-import diamonddeer.mainwindow.post.comment.PostCommentUI;
+import diamonddeer.ui.mainwindow.PostViewer;
+import diamonddeer.ui.postcomment.PostCommentController;
+import diamonddeer.ui.postcomment.PostCommentLoader;
+import diamonddeer.ui.postcomment.PostCommentUI;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diamonddeer.mainwindow.post.comment;
+package diamonddeer.ui.postcomment;
 
 import javafx.scene.layout.Pane;
 

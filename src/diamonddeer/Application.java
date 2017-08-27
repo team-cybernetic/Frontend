@@ -20,7 +20,6 @@ import beryloctopus.BerylOctopus;
 import beryloctopus.BerylOctopusDummy1;
 import diamonddeer.lib.Debug;
 import diamonddeer.settings.SettingsManager;
-import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -28,8 +27,8 @@ import java.io.IOException;
 /**
  * @author Tootoot222
  */
-public class DiamondDeer extends Application {
-    private DiamondDeerController mainController;
+public class Application extends javafx.application.Application {
+    private UILoader uiLoader;
     private BerylOctopus model;
     private SettingsManager settingsManager;
 
@@ -44,9 +43,9 @@ public class DiamondDeer extends Application {
     public void start(Stage stage) throws Exception {
         try {
             this.model = new BerylOctopusDummy1();
-            this.mainController = new DiamondDeerController(stage);
             this.settingsManager = new SettingsManager();
-            mainController.setup(model, settingsManager);
+            this.uiLoader = new UILoader(stage, model, settingsManager);
+            uiLoader.load();
         } catch (IOException ex) {
             Debug.fatal("Failed to create main controller: %s", ex.toString());
             throw (ex);

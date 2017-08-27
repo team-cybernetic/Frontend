@@ -2,20 +2,20 @@ package diamonddeer;
 
 import beryloctopus.BerylOctopus;
 import beryloctopus.models.UserIdentity;
-import diamonddeer.mainwindow.MainWindowController;
-import diamonddeer.mainwindow.editor.EditorController;
-import diamonddeer.mainwindow.editor.EditorLoader;
-import diamonddeer.mainwindow.editor.EditorUI;
-import diamonddeer.mainwindow.post.PostController;
-import diamonddeer.mainwindow.post.PostLoader;
-import diamonddeer.mainwindow.post.PostUI;
-import diamonddeer.mainwindow.post.comment.PostCommentController;
-import diamonddeer.mainwindow.post.comment.PostCommentLoader;
-import diamonddeer.mainwindow.post.comment.PostCommentUI;
-import diamonddeer.mainwindow.sidebar.SidebarController;
-import diamonddeer.mainwindow.sidebar.SidebarLoader;
-import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.SettingsManager;
+import diamonddeer.ui.editor.EditorController;
+import diamonddeer.ui.editor.EditorLoader;
+import diamonddeer.ui.editor.EditorUI;
+import diamonddeer.ui.mainwindow.MainWindowController;
+import diamonddeer.ui.post.PostController;
+import diamonddeer.ui.post.PostLoader;
+import diamonddeer.ui.post.PostUI;
+import diamonddeer.ui.postcomment.PostCommentController;
+import diamonddeer.ui.postcomment.PostCommentLoader;
+import diamonddeer.ui.postcomment.PostCommentUI;
+import diamonddeer.ui.sidebar.SidebarController;
+import diamonddeer.ui.sidebar.SidebarLoader;
+import diamonddeer.ui.sidebar.SidebarUI;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * @author Tootoot222
  */
-public class DiamondDeerController implements PostLoader, EditorLoader, PostCommentLoader, SidebarLoader {
+public class UILoader implements PostLoader, EditorLoader, PostCommentLoader, SidebarLoader {
     private Stage mainStage;
 
     private Pane mainWindowPane;
@@ -37,33 +37,31 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
     private BerylOctopus model;
     private SettingsManager settingsManager;
 
-    public DiamondDeerController(Stage mainStage) {
+    public UILoader(Stage mainStage, BerylOctopus model, SettingsManager settingsManager) {
         this.mainStage = mainStage;
+        this.model = model;
+        this.settingsManager = settingsManager;
+    }
+
+    public void load() throws IOException, NoSuchAlgorithmException {
+        Scene scene = new Scene(loadMainWindow());
+        mainStage.setScene(scene);
+        mainStage.show();
     }
 
     private Parent loadMainWindow() throws IOException, NoSuchAlgorithmException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("mainwindow/MainWindow.fxml"));
+        loader.setLocation(getClass().getResource("ui/mainwindow/MainWindow.fxml"));
         this.mainWindowPane = loader.load();
         this.mainWindowController = loader.getController();
         mainWindowController.setup(model, new UserIdentity(), this, this, this, this, settingsManager);
         return (mainWindowPane);
     }
 
-    public void setup(BerylOctopus model, SettingsManager settingsManager) throws IOException, NoSuchAlgorithmException {
-        this.model = model;
-        this.settingsManager = settingsManager;
-
-        Scene scene = new Scene(loadMainWindow());
-
-        mainStage.setScene(scene);
-        mainStage.show();
-    }
-
     @Override
     public PostUI loadEmptyPost() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("mainwindow/post/Post.fxml"));
+        loader.setLocation(getClass().getResource("ui/post/Post.fxml"));
         Pane layout = loader.load();
         PostController controller = loader.getController();
         return (new PostUI(layout, controller));
@@ -72,7 +70,7 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
     @Override
     public PostCommentUI loadEmptyPostComment() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("mainwindow/post/comment/PostComment.fxml"));
+        loader.setLocation(getClass().getResource("ui/postcomment/PostComment.fxml"));
         Pane layout = loader.load();
         PostCommentController controller = loader.getController();
         return (new PostCommentUI(layout, controller));
@@ -80,7 +78,7 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
 
     public SidebarUI loadSidebar() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("mainwindow/sidebar/Sidebar.fxml"));
+        loader.setLocation(getClass().getResource("ui/sidebar/Sidebar.fxml"));
         AnchorPane layout = loader.load();
         SidebarController controller = loader.getController();
         return (new SidebarUI(layout, controller));
@@ -89,7 +87,7 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
     @Override
     public EditorUI loadEditor() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("mainwindow/editor/Editor.fxml"));
+        loader.setLocation(getClass().getResource("ui/editor/Editor.fxml"));
         Pane layout = loader.load();
         EditorController controller = loader.getController();
         return (new EditorUI(layout, controller));

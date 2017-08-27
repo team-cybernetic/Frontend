@@ -14,27 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow.sidebar;
+package diamonddeer.ui.editor;
 
-import javafx.scene.layout.AnchorPane;
+import java.io.IOException;
 
 /**
  * @author Tootoot222
  */
-public class SidebarUI {
-    private AnchorPane layout;
-    private SidebarController controller;
-
-    public SidebarUI(AnchorPane layout, SidebarController controller) {
-        this.layout = layout;
-        this.controller = controller;
-    }
-
-    public AnchorPane getLayout() {
-        return layout;
-    }
-
-    public SidebarController getController() {
-        return controller;
-    }
+public interface EditorLoader {
+    EditorUI loadEditor() throws IOException;
 }

@@ -14,24 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package diamonddeer.mainwindow;
+package diamonddeer.ui.mainwindow;
 
 import beryloctopus.BerylOctopus;
 import beryloctopus.Post;
 import beryloctopus.UserIdentity;
+import diamonddeer.Application;
 import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.lib.Debug;
-import diamonddeer.mainwindow.editor.EditorController;
-import diamonddeer.mainwindow.editor.EditorLoader;
-import diamonddeer.mainwindow.editor.EditorUI;
-import diamonddeer.mainwindow.post.PostController;
-import diamonddeer.mainwindow.post.PostLoader;
-import diamonddeer.mainwindow.post.PostUI;
-import diamonddeer.mainwindow.post.comment.PostCommentLoader;
-import diamonddeer.mainwindow.sidebar.SidebarController;
-import diamonddeer.mainwindow.sidebar.SidebarLoader;
-import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.PostSettings;
+import diamonddeer.ui.editor.EditorController;
+import diamonddeer.ui.editor.EditorLoader;
+import diamonddeer.ui.editor.EditorUI;
+import diamonddeer.ui.post.PostController;
+import diamonddeer.ui.post.PostLoader;
+import diamonddeer.ui.post.PostUI;
+import diamonddeer.ui.postcomment.PostCommentLoader;
+import diamonddeer.ui.sidebar.SidebarController;
+import diamonddeer.ui.sidebar.SidebarLoader;
+import diamonddeer.ui.sidebar.SidebarUI;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -177,8 +178,8 @@ public class MainWindowController implements Initializable, PostViewer {
     }
 
     private void loadFonts() {
-        Font.loadFont(MainWindowController.class.getResource("fonts/Roboto-Regular.ttf").toExternalForm(), 10);
-        Font.loadFont(MainWindowController.class.getResource("fonts/fontawesome-webfont.ttf").toExternalForm(), 10);
+        Font.loadFont(Application.class.getResource("assets/fonts/Roboto-Regular.ttf").toExternalForm(), 10);
+        Font.loadFont(Application.class.getResource("assets/fonts/fontawesome-webfont.ttf").toExternalForm(), 10);
     }
 
     public String getCurrentAddress() {
