@@ -19,7 +19,6 @@ package diamonddeer.mainwindow.editor;
 import javafx.scene.layout.Pane;
 
 /**
- *
  * @author Tootoot222
  */
 public class EditorUI {
@@ -38,7 +37,4 @@ public class EditorUI {
     public EditorController getController() {
         return controller;
     }
-
-    
-    
 }

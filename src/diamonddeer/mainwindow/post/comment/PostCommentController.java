@@ -9,14 +9,15 @@ import beryloctopus.Post;
 import diamonddeer.lib.TimeConverter;
 import diamonddeer.mainwindow.MainWindowController;
 import diamonddeer.mainwindow.PostViewer;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * FXML Controller class
@@ -47,12 +48,16 @@ public class PostCommentController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.defaultWidth = (int)Math.round(rootPane.getPrefWidth());
-        this.defaultHeight = (int)Math.round(rootPane.getPrefHeight());
+        this.defaultWidth = (int) Math.round(rootPane.getPrefWidth());
+        this.defaultHeight = (int) Math.round(rootPane.getPrefHeight());
     }
 
     public void setMainWindow(MainWindowController mainWindow) {
         this.mainWindow = mainWindow;
+    }
+
+    public Post getPost() {
+        return (post);
     }
 
     public void setPost(Post post) {
@@ -61,10 +66,6 @@ public class PostCommentController implements Initializable {
         setBody(new String(post.getContent())); //TODO: arbitrary content
         setUsername(post.getAuthor().getUsername());
         setDateTime(TimeConverter.dateTimeFromMillis(post.getTimestampMillis()));
-    }
-
-    public Post getPost() {
-        return (post);
     }
 
     public void setUsername(String username) {
@@ -79,17 +80,13 @@ public class PostCommentController implements Initializable {
         titleLabel.setText(title);
     }
 
-    public void setBody(String text) {
-        if (text != null) {
-            bodyLabel.setText(text);
-        } else {
-            setBodyVisible(false);
-        }
-    }
-
     public void setBodyVisible(boolean visible) {
         bodyLabel.setManaged(visible);
         bodyLabel.setVisible(visible);
+    }
+
+    public void setWidthFactor(int widthFactor) {
+        rootPane.setPrefWidth(defaultWidth * widthFactor);
     }
 
     /*
@@ -99,16 +96,20 @@ public class PostCommentController implements Initializable {
     }
 */
 
-    public void setWidthFactor(int widthFactor) {
-        rootPane.setPrefWidth(defaultWidth * widthFactor);
-    }
-
     public void setHeightFactor(int heightFactor) {
         rootPane.setPrefHeight(defaultHeight * heightFactor);
     }
 
     public String getBody() {
         return (bodyLabel.getText());
+    }
+
+    public void setBody(String text) {
+        if (text != null) {
+            bodyLabel.setText(text);
+        } else {
+            setBodyVisible(false);
+        }
     }
 
     public void setPostViewer(PostViewer postViewer) {
@@ -119,5 +120,4 @@ public class PostCommentController implements Initializable {
     private void handleTitleLabelAction(ActionEvent event) {
         postViewer.viewPost(post);
     }
-   
 }

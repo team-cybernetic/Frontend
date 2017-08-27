@@ -16,11 +16,10 @@
  */
 package diamonddeer.lib;
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
- *
  * @author Tootoot222
  */
 public class Debug {
@@ -42,7 +41,6 @@ public class Debug {
     //stackoverflow.com/questions/11306811/how-to-get-the-caller-class-in-java
 
     /**
-     *
      * @return Gets a String representation of the method which called
      */
     private static String getCallerClassName() {
@@ -57,9 +55,8 @@ public class Debug {
         }
         return null;
     }
-    
+
     /**
-     *
      * @return Gets a String representation of the parent of the caller
      */
     public static String getCallerCallerClassName() {
@@ -80,32 +77,30 @@ public class Debug {
     }
 
     /**
-     * 
      * @param level Translates the level to a string representation
      * @return Returns a String representation of the level
      */
     private static String levelToString(int level) {
         switch (level) {
-        case LOG:
-            return ("- LOG   -");
-        case INFO:
-            return ("* INFO  *");
-        case ERROR:
-            return ("! ERROR !");
-        case FATAL:
-            return ("!! FATAL !!");
-        case DEBUG:
-            return ("# DEBUG #");
-        default:
-            return (Integer.toString(logLevel));
+            case LOG:
+                return ("- LOG   -");
+            case INFO:
+                return ("* INFO  *");
+            case ERROR:
+                return ("! ERROR !");
+            case FATAL:
+                return ("!! FATAL !!");
+            case DEBUG:
+                return ("# DEBUG #");
+            default:
+                return (Integer.toString(logLevel));
         }
     }
 
     /**
-     *
-     * @param level The level the message is 
+     * @param level  The level the message is
      * @param format The format of the string to print Same as System.out.printf
-     * @param args Optional args. Similar to System.out.printf
+     * @param args   Optional args. Similar to System.out.printf
      */
     private static synchronized void printf(int level, String format,
                                             Object... args) {
@@ -126,57 +121,51 @@ public class Debug {
             System.out.println("Exiting...\n");
         }
     }
-    
+
     /**
-     *
      * @param format The format of the string to print Same as System.out.printf
-     * @param args Optional args. Similar to System.out.printf
+     * @param args   Optional args. Similar to System.out.printf
      */
     public static void log(String format, Object... args) {
         printf(LOG, format, args);
     }
 
-    
+
     /**
-     *
      * @param format The format of the string to print Same as System.out.printf
-     * @param args Optional args. Similar to System.out.printf
+     * @param args   Optional args. Similar to System.out.printf
      */
     public static void info(String format, Object... args) {
         printf(INFO, format, args);
     }
-   
+
     /**
-     *
      * @param format The format of the string to print Same as System.out.printf
-     * @param args Optional args. Similar to System.out.printf
+     * @param args   Optional args. Similar to System.out.printf
      */
     public static void error(String format, Object... args) {
         printf(ERROR, format, args);
     }
 
     /**
-     *
      * @param format The format of the string to print Same as System.out.printf
-     * @param args Optional args. Similar to System.out.printf
+     * @param args   Optional args. Similar to System.out.printf
      */
     public static void fatal(String format, Object... args) {
         printf(FATAL, format, args);
     }
 
     /**
-     *
      * @param format The format of the string to print Same as System.out.printf
-     * @param args Optional args. Similar to System.out.printf
+     * @param args   Optional args. Similar to System.out.printf
      */
     public static void debug(String format, Object... args) {
         printf(DEBUG, format, args);
     }
 
     /**
-     *
      * @param level Sets the default log level. Only messages <= than this
-     *      level will be printed
+     *              level will be printed
      */
     public static void setLogLevel(int level) {
         logLevel = level;

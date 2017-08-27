@@ -20,41 +20,25 @@ import beryloctopus.BerylOctopus;
 import beryloctopus.Post;
 import beryloctopus.UserIdentity;
 import diamonddeer.lib.ByteUnitConverter;
-import diamonddeer.mainwindow.post.PostUI;
-import diamonddeer.mainwindow.post.PostController;
-import diamonddeer.mainwindow.post.PostLoader;
-import diamonddeer.mainwindow.sidebar.SidebarLoader;
-import diamonddeer.settings.PostSettings;
 import diamonddeer.lib.Debug;
-import diamonddeer.lib.TimeConverter;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorLoader;
 import diamonddeer.mainwindow.editor.EditorUI;
+import diamonddeer.mainwindow.post.PostController;
+import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.comment.PostCommentLoader;
-import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import diamonddeer.mainwindow.sidebar.SidebarController;
+import diamonddeer.mainwindow.sidebar.SidebarLoader;
 import diamonddeer.mainwindow.sidebar.SidebarUI;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.ResourceBundle;
-import java.util.Set;
+import diamonddeer.settings.PostSettings;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -62,15 +46,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 
-/**
- *
- * @author Tootoot222
- */
-public class MainWindowController implements Initializable, PostViewer {
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ResourceBundle;
+import java.util.Set;
 
+public class MainWindowController implements Initializable, PostViewer {
     private BerylOctopus model;
     private PostLoader postLoader;
     private PostCommentLoader postCommentLoader;
@@ -81,35 +66,17 @@ public class MainWindowController implements Initializable, PostViewer {
     private Pane editorPane;
     private EditorController editorController;
     private SidebarController sidebarController;
-//    private PostRepository posts;
-//    private UserRepository users;
     private UserIdentity curUser;
     private LinkedList<String> previousAddress;
     private LinkedList<String> forwardAddress;
     private HashMap<String, PostUI> postsUI = new HashMap<>();
     private int earningsGlobal;
     private int earningsLocal;
-    
+
     @FXML
-    private Button homeButton;
-    @FXML
-    private Button optionsButton;
-    @FXML
-    private ToggleButton bookmarksToggle;
-    @FXML
-    private Button reloadButton;
-    @FXML
-    private Button backButton;
-    @FXML
-    private Button forwardButton;
-    @FXML    
     private HBox addressBarHBox;
     @FXML
     private TextField addressBarTextField;
-    @FXML
-    private MenuButton feedMenuButton;
-    @FXML
-    private TextField searchTextField;
     @FXML
     private Label earningsGlobalLabel;
     @FXML
@@ -119,17 +86,11 @@ public class MainWindowController implements Initializable, PostViewer {
     @FXML
     private ToggleButton rollupButton;
     @FXML
-    private Button postButton;
-    @FXML
     private ScrollPane sidebarPane;
     @FXML
     private AnchorPane rootPane;
     @FXML
-    private Button createGroupButton;
-    @FXML
     private Label statusLeftLabel;
-    @FXML
-    private StackPane rollButtonsStackPane;
     @FXML
     private ScrollPane addressBarScrollPane;
     @FXML
@@ -220,6 +181,10 @@ public class MainWindowController implements Initializable, PostViewer {
         Font.loadFont(MainWindowController.class.getResource("fonts/fontawesome-webfont.ttf").toExternalForm(), 10);
     }
 
+    public String getCurrentAddress() {
+        return (model.getCurrentPath().getFullPath());
+    }
+
     public void setCurrentAddress(String address) {
         try {
             previousAddress.add(0, getCurrentAddress());
@@ -228,10 +193,6 @@ public class MainWindowController implements Initializable, PostViewer {
             Debug.error("Exception while trying to change current address path: %s", ex.toString());
             //TODO: show some sort of prompt or window notifying the user of the problem
         }
-    }
-
-    public String getCurrentAddress() {
-        return (model.getCurrentPath().getFullPath());
     }
 
     private void addressBarClearText() {
@@ -300,7 +261,7 @@ public class MainWindowController implements Initializable, PostViewer {
         ObservableList<Node> children = addressBarGetAddressButtons();
         for (Node n : children) {
             if (n instanceof ToggleButton) {
-                ToggleButton tb = (ToggleButton)n;
+                ToggleButton tb = (ToggleButton) n;
                 if (except == null || !tb.equals(except)) {
                     tb.setSelected(false);
                 }
@@ -322,7 +283,7 @@ public class MainWindowController implements Initializable, PostViewer {
         newButton.setMinWidth(Control.USE_PREF_SIZE);
         newButton.setOnAction((event) -> {
             if (newButton.isSelected()) {
-                setCurrentAddress((String)newButton.getUserData());
+                setCurrentAddress((String) newButton.getUserData());
                 addressBarAddressButtonsUntoggleExcept(newButton);
                 updatePosts();
             } else {
@@ -330,7 +291,7 @@ public class MainWindowController implements Initializable, PostViewer {
             }
         });
         newButton.setOnMouseEntered((event) -> {
-            setStatus(String.format("Navigate to %s", (String)newButton.getUserData()));
+            setStatus(String.format("Navigate to %s", (String) newButton.getUserData()));
         });
         newButton.setOnMouseExited((event) -> {
             resetStatus();
@@ -342,7 +303,7 @@ public class MainWindowController implements Initializable, PostViewer {
     public void addressBarAddressButtonsCreate() {
         String[] split = model.getCurrentPathArray();
         if (split.length == 0) {
-            split = new String[] {""};
+            split = new String[]{""};
         }
         String sep = model.getPathSeparator();
         StringBuilder fullPath = new StringBuilder();
@@ -376,7 +337,7 @@ public class MainWindowController implements Initializable, PostViewer {
         earningsGlobal += change;
         setEarningsGlobal(earningsGlobal);
     }
-    
+
 
     @FXML
     private void handleHomeButtonAction(ActionEvent event) {
@@ -404,7 +365,7 @@ public class MainWindowController implements Initializable, PostViewer {
     @FXML
     private void handleBackButtonAction(ActionEvent event) {
         if (previousAddress.size() > 0) {
-            forwardAddress.add(0,getCurrentAddress());
+            forwardAddress.add(0, getCurrentAddress());
             addressBarEditEnd(previousAddress.remove());
             previousAddress.remove();
         }
@@ -460,7 +421,7 @@ public class MainWindowController implements Initializable, PostViewer {
         }
         newPostTextArea.setText("");
         newPostTextArea.setDisable(true);
-        this.mainContentPrevious = (Pane)mainContentPane.getContent();
+        this.mainContentPrevious = (Pane) mainContentPane.getContent();
         mainContentPane.setContent(editorPane);
     }
 
@@ -470,7 +431,7 @@ public class MainWindowController implements Initializable, PostViewer {
             newPostTextArea.setText(editorController.getTitle() + "\n" + editorController.getBody());
         }
         newPostTextArea.setDisable(false);
-        Pane p = (Pane)mainContentPane.getContent();
+        Pane p = (Pane) mainContentPane.getContent();
         mainContentPane.setContent(mainContentPrevious); //TODO: previous or postsPane?
         this.mainContentPrevious = p;
     }
@@ -484,7 +445,7 @@ public class MainWindowController implements Initializable, PostViewer {
         postsUI.put(post.getController().getPost().getTitle(), post); //horrible chaining
         postFlowPane.getChildren().add(post.getLayout());
     }
-    
+
     private void updatePosts() {
         try {
             postPaneClear();
@@ -540,20 +501,6 @@ public class MainWindowController implements Initializable, PostViewer {
             PostUI newPost = postLoader.loadEmptyPost();
             PostController postController = newPost.getController();
             populatePost(postController, thePost);
-            /*
-            Matcher widthMatcher = Pattern.compile(".*w:(?<width>[0-9]+).*").matcher(new String(content));
-            if (widthMatcher.matches()) {
-                int w = Integer.parseInt(widthMatcher.group("width"));
-                Debug.debug("width: %d", w);
-                postController.setWidthFactor(w);
-            }
-            Matcher heightMatcher = Pattern.compile(".*h:(?<height>[0-9]+).*").matcher(new String(content));
-            if (heightMatcher.matches()) {
-                int h = Integer.parseInt(heightMatcher.group("height"));
-                Debug.debug("height: %d", h);
-                postController.setHeightFactor(h);
-            }
-            // */
             clearAllInputFields();
             postPaneAdd(newPost);
         } catch (IOException ex) {
@@ -695,5 +642,4 @@ public class MainWindowController implements Initializable, PostViewer {
     private void handleAddressBarGoButtonAction(ActionEvent event) {
         addressBarEditConfirm();
     }
-    
 }

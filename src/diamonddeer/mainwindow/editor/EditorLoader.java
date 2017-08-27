@@ -19,9 +19,8 @@ package diamonddeer.mainwindow.editor;
 import java.io.IOException;
 
 /**
- *
  * @author Tootoot222
  */
 public interface EditorLoader {
-    public EditorUI loadEditor() throws IOException;
+    EditorUI loadEditor() throws IOException;
 }

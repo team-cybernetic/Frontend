@@ -5,11 +5,9 @@
  */
 package diamonddeer.mainwindow.post.comment;
 
-import diamonddeer.mainwindow.post.PostController;
 import javafx.scene.layout.Pane;
 
 /**
- *
  * @author Tootoot222
  */
 public class PostCommentUI {
@@ -28,6 +26,4 @@ public class PostCommentUI {
     public PostCommentController getController() {
         return controller;
     }
-
-
 }

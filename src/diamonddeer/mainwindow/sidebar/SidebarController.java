@@ -19,14 +19,13 @@ package diamonddeer.mainwindow.sidebar;
 import beryloctopus.Post;
 import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.lib.TimeConverter;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.Label;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 
 /**
  * FXML Controller class
@@ -42,14 +41,6 @@ public class SidebarController implements Initializable {
     @FXML
     private Label dateTimeLabel;
     @FXML
-    private Button upvoteButton;
-    @FXML
-    private TextField voteAmountTextField;
-    @FXML
-    private Button downvoteButton;
-    @FXML
-    private AnchorPane rootPane;
-    @FXML
     private Label sizeAmountLabel;
     @FXML
     private Label valueAmountLabel;
@@ -61,13 +52,7 @@ public class SidebarController implements Initializable {
     private Label bodyLabel;
     @FXML
     private Label titleLabel;
-    @FXML
-    private TitledPane RulesetTitledPane;
-    @FXML
-    private TitledPane UsersTitledPane;
-    @FXML
-    private TitledPane ContentTypeTitledPane;
-    
+
 
     /**
      * Initializes the controller class.
@@ -90,7 +75,6 @@ public class SidebarController implements Initializable {
         //setContentType(post.getContentType());
 
     }
-    
 
     public void setUsername(String username) {
         usernameLabel.setText(username);
@@ -113,12 +97,16 @@ public class SidebarController implements Initializable {
         valueUnitLabel.setText(sizeString[1]);
     }
 
+    public String getTitle() {
+        return titleLabel.getText();
+    }
+
     public void setTitle(String title) {
         titleLabel.setText(title + "/");
     }
-    
-    public String getTitle() {
-        return titleLabel.getText();
+
+    public String getBody() {
+        return bodyLabel.getText();
     }
 
     public void setBody(String text) {
@@ -128,9 +116,6 @@ public class SidebarController implements Initializable {
         } else {
             setBodyVisible(false);
         }
-    }
-    public String getBody() {
-        return bodyLabel.getText();
     }
 
     public void setBodyVisible(boolean visible) {

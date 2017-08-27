@@ -16,11 +16,9 @@
  */
 package diamonddeer.mainwindow.post;
 
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 /**
- *
  * @author Tootoot222
  */
 public class PostUI {
@@ -39,7 +37,4 @@ public class PostUI {
     public PostController getController() {
         return controller;
     }
-
-    
-    
 }

@@ -6,9 +6,9 @@ import diamonddeer.mainwindow.MainWindowController;
 import diamonddeer.mainwindow.editor.EditorController;
 import diamonddeer.mainwindow.editor.EditorLoader;
 import diamonddeer.mainwindow.editor.EditorUI;
-import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.PostController;
 import diamonddeer.mainwindow.post.PostLoader;
+import diamonddeer.mainwindow.post.PostUI;
 import diamonddeer.mainwindow.post.comment.PostCommentController;
 import diamonddeer.mainwindow.post.comment.PostCommentLoader;
 import diamonddeer.mainwindow.post.comment.PostCommentUI;
@@ -16,8 +16,6 @@ import diamonddeer.mainwindow.sidebar.SidebarController;
 import diamonddeer.mainwindow.sidebar.SidebarLoader;
 import diamonddeer.mainwindow.sidebar.SidebarUI;
 import diamonddeer.settings.SettingsManager;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,8 +23,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
 /**
- *
  * @author Tootoot222
  */
 public class DiamondDeerController implements PostLoader, EditorLoader, PostCommentLoader, SidebarLoader {
@@ -55,10 +55,9 @@ public class DiamondDeerController implements PostLoader, EditorLoader, PostComm
         this.settingsManager = settingsManager;
 
         Scene scene = new Scene(loadMainWindow());
-        
+
         mainStage.setScene(scene);
         mainStage.show();
-
     }
 
     @Override

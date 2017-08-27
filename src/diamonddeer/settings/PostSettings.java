@@ -19,11 +19,12 @@ package diamonddeer.settings;
 import javafx.beans.property.IntegerProperty;
 
 /**
- *
  * @author Tootoot222
  */
 public interface PostSettings {
-    public int getMaxPostColumns();
-    public void setMaxPostColumns(int newMaxPostColumns);
-    public IntegerProperty getMaxPostColumnsProperty();
+    int getMaxPostColumns();
+
+    void setMaxPostColumns(int newMaxPostColumns);
+
+    IntegerProperty getMaxPostColumnsProperty();
 }

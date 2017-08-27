@@ -17,10 +17,8 @@
 package diamonddeer.mainwindow.sidebar;
 
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 
 /**
- *
  * @author Tootoot222
  */
 public class SidebarUI {
@@ -39,7 +37,4 @@ public class SidebarUI {
     public SidebarController getController() {
         return controller;
     }
-
-    
-    
 }

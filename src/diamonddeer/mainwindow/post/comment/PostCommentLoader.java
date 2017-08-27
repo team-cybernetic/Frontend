@@ -8,9 +8,8 @@ package diamonddeer.mainwindow.post.comment;
 import java.io.IOException;
 
 /**
- *
  * @author Tootoot222
  */
 public interface PostCommentLoader {
-    public PostCommentUI loadEmptyPostComment() throws IOException;
+    PostCommentUI loadEmptyPostComment() throws IOException;
 }

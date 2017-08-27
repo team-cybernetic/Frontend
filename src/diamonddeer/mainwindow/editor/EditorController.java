@@ -5,24 +5,19 @@
  */
 package diamonddeer.mainwindow.editor;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.HTMLEditor;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * FXML Controller class
@@ -78,7 +73,8 @@ public class EditorController implements Initializable {
                 "Text Post", "User Profile Post");
         postSettingsContentTypeComboBox.setItems(postTypeList);
         postSettingsContentTypeComboBox.getSelectionModel().selectFirst();
-    }    
+    }
+
     public String getContentType() {
         return postSettingsContentTypeComboBox.getSelectionModel()
                 .getSelectedItem().toString();
@@ -136,16 +132,6 @@ public class EditorController implements Initializable {
         titleTextField.setText(text);
     }
 
-    public void setBody(String text) {
-        if (showingHTMLEditor) {
-            contentHTMLEditor.setHtmlText(text);
-        } else if (showingPlaintextEditor) {
-            contentTextArea.setText(text);
-        } else {
-        }
-
-    }
-
     public String getBody() {
         if (showingHTMLEditor) {
             return (contentHTMLEditor.getHtmlText());
@@ -156,11 +142,19 @@ public class EditorController implements Initializable {
         }
     }
 
+    public void setBody(String text) {
+        if (showingHTMLEditor) {
+            contentHTMLEditor.setHtmlText(text);
+        } else if (showingPlaintextEditor) {
+            contentTextArea.setText(text);
+        } else {
+        }
+    }
+
     public void clearAll() {
         contentHTMLEditor.setHtmlText("");
         contentTextArea.setText("");
         contentShowHTMLEditor();
         titleTextField.setText("");
     }
-    
 }

@@ -19,9 +19,8 @@ package diamonddeer.mainwindow.sidebar;
 import java.io.IOException;
 
 /**
- *
  * @author Tootoot222
  */
 public interface SidebarLoader {
-    public SidebarUI loadSidebar() throws IOException;
+    SidebarUI loadSidebar() throws IOException;
 }

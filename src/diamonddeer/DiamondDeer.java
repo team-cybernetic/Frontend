@@ -18,22 +18,28 @@ package diamonddeer;
 
 import beryloctopus.BerylOctopus;
 import beryloctopus.BerylOctopusDummy1;
-import diamonddeer.settings.SettingsManager;
 import diamonddeer.lib.Debug;
-import java.io.IOException;
+import diamonddeer.settings.SettingsManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 /**
- *
  * @author Tootoot222
  */
 public class DiamondDeer extends Application {
-
     private DiamondDeerController mainController;
     private BerylOctopus model;
     private SettingsManager settingsManager;
-    
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         try {
@@ -46,12 +52,4 @@ public class DiamondDeer extends Application {
             throw (ex);
         }
     }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
 }

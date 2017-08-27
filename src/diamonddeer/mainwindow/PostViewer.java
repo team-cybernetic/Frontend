@@ -8,9 +8,8 @@ package diamonddeer.mainwindow;
 import beryloctopus.Post;
 
 /**
- *
  * @author Tootoot222
  */
 public interface PostViewer {
-    public void viewPost(Post post);
+    void viewPost(Post post);
 }

@@ -20,7 +20,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 /**
- *
  * @author Tootoot222
  */
 public class SettingsManager implements PostSettings {
@@ -47,5 +46,4 @@ public class SettingsManager implements PostSettings {
     public IntegerProperty getMaxPostColumnsProperty() {
         return (maxPostColumns);
     }
-   
 }

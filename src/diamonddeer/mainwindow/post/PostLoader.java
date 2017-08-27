@@ -19,9 +19,8 @@ package diamonddeer.mainwindow.post;
 import java.io.IOException;
 
 /**
- *
  * @author Tootoot222
  */
 public interface PostLoader {
-    public PostUI loadEmptyPost() throws IOException;
+    PostUI loadEmptyPost() throws IOException;
 }

@@ -23,12 +23,8 @@ import diamonddeer.lib.ByteUnitConverter;
 import diamonddeer.lib.TimeConverter;
 import diamonddeer.mainwindow.PostViewer;
 import diamonddeer.mainwindow.post.comment.PostCommentController;
-import diamonddeer.mainwindow.post.comment.PostCommentUI;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import diamonddeer.mainwindow.post.comment.PostCommentLoader;
-import java.io.IOException;
+import diamonddeer.mainwindow.post.comment.PostCommentUI;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,6 +33,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 /**
  * FXML Controller class
  *
@@ -44,6 +44,11 @@ import javafx.scene.layout.FlowPane;
  */
 public class PostController implements Initializable {
 
+    private static PostCommentLoader postCommentLoader;
+    //@FXML
+    //private Label titleLabel;
+    @FXML
+    public Hyperlink titleHyperLink;
     private int defaultWidth;
     private int defaultHeight;
     private long size;
@@ -51,9 +56,6 @@ public class PostController implements Initializable {
     private Post post;
     private ValueSender tipSource;
     private PostViewer postViewer;
-
-    private static PostCommentLoader postCommentLoader;
-
     @FXML
     private Label usernameLabel;
     @FXML
@@ -66,10 +68,6 @@ public class PostController implements Initializable {
     private Button downvoteButton;
     @FXML
     private Label locationLabel;
-    //@FXML
-    //private Label titleLabel;
-    @FXML
-    public Hyperlink titleHyperLink;
     @FXML
     private Hyperlink readmoreHyperlink;
     @FXML
@@ -99,12 +97,12 @@ public class PostController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.defaultWidth = (int)Math.round(rootPane.getPrefWidth());
-        this.defaultHeight = (int)Math.round(rootPane.getPrefHeight());
+        this.defaultWidth = (int) Math.round(rootPane.getPrefWidth());
+        this.defaultHeight = (int) Math.round(rootPane.getPrefHeight());
         // TODO
         voteAmountTextField.textProperty().addListener((ObservableValue
-            <? extends String> observable, String oldValue, String newValue)
-            -> {
+                                                                <? extends String> observable, String oldValue, String newValue)
+                -> {
             if (!newValue.matches("\\-?\\d*") || newValue.length() > 8) {
                 if (newValue.length() > 8) {
                     newValue = newValue.substring(0, 8);
@@ -121,6 +119,10 @@ public class PostController implements Initializable {
 
     public void setTipSource(ValueSender valueSender) {
         this.tipSource = valueSender;
+    }
+
+    public Post getPost() {
+        return (post);
     }
 
     public void setPost(Post post) throws IOException {
@@ -143,12 +145,6 @@ public class PostController implements Initializable {
             commentController.setPostViewer(postViewer);
             addComment(comment);
         }
-
-
-    }
-
-    public Post getPost() {
-        return (post);
     }
 
     public void setUsername(String username) {
@@ -244,7 +240,7 @@ public class PostController implements Initializable {
             //TODO: warn invalid input
             return;
         }
-        if (tipAmount == 0){
+        if (tipAmount == 0) {
             //TODO: warn that tipping 0 doesn't mean anything
             return;
         }
