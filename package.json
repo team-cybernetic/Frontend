@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bulma": "^0.5.1",
+    "classnames": "^2.2.5",
     "font-awesome": "4.7.0",
     "promise-polyfill": "^6.0.2",
     "react": "15.6.1",

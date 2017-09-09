@@ -20,9 +20,9 @@ export default class PostStore {
             watchEvent.watch((error, response) => {
               if (!error) {
                 if (response.transactionHash === result.tx) {
-                  console.log("newpost response =", response);
-                  const newTitle = response.args.title;
-                  console.log(response.args.sender, "has created a new post, title:", newTitle);
+                  console.log('newpost response =', response);
+                  const newTitle = this.web3.toUtf8(response.args.title);
+                  console.log(response.args.sender, 'has created a new post, title:', newTitle);
                   this.getPost(newTitle).then(resolve);
                 }
               } else {
@@ -43,7 +43,7 @@ export default class PostStore {
           content,
           creator
         });
-      }).catch(() => {
+      }).catch((error) => {
         reject();
       });
     });
@@ -52,10 +52,10 @@ export default class PostStore {
   static getPosts() {
     return new Promise((resolve) => {
       this.postsContractInstance.getPostTitles.call().then((postTitles) => {
-        console.log("post titles:", postTitles);
+        console.log('post titles:', postTitles);
 
         let posts = [];
-        postTitles.forEach((title, index) => { //for each post title
+        postTitles.map((title) => this.web3.toUtf8(title)).forEach((title, index) => { //for each post title
           this.getPost(title).then((post) => {
             posts.push(post);
             if (index === postTitles.length - 1) {

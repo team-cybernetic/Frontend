@@ -16,7 +16,7 @@ function instantiateContract(web3, resolve) {
   const postsContract = contract(PostsContract);
   postsContract.setProvider(web3.currentProvider);
   postsContract.defaults({
-    gasLimit: "50000"
+    gasLimit: '50000'
   });
   postsContract.deployed().then((instance) => { //once the contract is surely deployed
     [
