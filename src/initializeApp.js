@@ -14,6 +14,9 @@ function instantiateContract(web3, resolve) {
 
   const postsContract = contract(PostsContract);
   postsContract.setProvider(web3.currentProvider);
+  postsContract.defaults({
+    gasLimit: "100000"
+  });
   postsContract.deployed().then((instance) => { //once the contract is surely deployed
     PostStore.initialize(web3, instance);
     WalletStore.initialize(web3, instance);

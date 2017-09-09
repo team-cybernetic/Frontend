@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PostStore from '../stores/PostStore';
+import WalletStore from '../stores/WalletStore';
 
 class Editor extends Component {
   constructor(props) {
