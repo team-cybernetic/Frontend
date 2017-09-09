@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import cx from 'classnames';
 import PostStore from '../stores/PostStore';
-import WalletStore from '../stores/WalletStore';
 
 const VALID_CONTENT_REGEX = /([0-9A-z][0-9A-z ]*)\n(\S.*)/;
 
