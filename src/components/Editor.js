@@ -34,7 +34,7 @@ class Editor extends Component {
   createPost() {
     PostStore.createPost(this.state.title, this.state.content).then((post) => {
       console.log(post);
-    });
+    }).catch(console.error);
   }
 
   updateField(name, event) {

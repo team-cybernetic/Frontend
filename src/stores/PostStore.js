@@ -1,3 +1,5 @@
+import GasEstimator from '../utils/GasEstimator';
+
 export default class PostStore {
   static postsContractInstance = null;
   static web3 = null;
@@ -8,33 +10,41 @@ export default class PostStore {
   }
 
   static createPost(title, content) {
-    return new Promise((resolve) => {
-      this.postsContractInstance.createPost(title, content).then((result) => {
-        const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: '0', toBlock: 'latest'})
-        watchEvent.watch(function(error, response) {
-          console.log("newpost error =", error);
-          console.log("newpost response =", response);
-          if (!error) {
-            if (response.transactionHash === result.tx) {
-              const newTitle = response.args.title;
-              console.log(response.args.sender, "has created a new post, title:", newTitle);
-
-              return this.postsContractInstance.getPost(newTitle).call().then((content, creator) => { //get the post content and creator
-                console.log("got a post :", { "title": title, "content": content, "creator": creator });
-
-                watchEvent.stopWatching(); //all done with this handler
-
-                resolve({
-                  title,
-                  content,
-                  creator
-                });
-              });
-            }
-          } else {
-            //TODO: getting the event triggered an error? not sure what actually might cause this
-          }
+    return new Promise((resolve, reject) => {
+      this.getPost(title).then((post) => {
+        reject('A post already exists with that title.');
+      }).catch(() => {
+        GasEstimator.estimate('createPost', [title, content]).then((gas) => {
+          this.postsContractInstance.createPost(title, content, { gas }).then((result) => {
+            const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: '0', toBlock: 'latest'})
+            watchEvent.watch((error, response) => {
+              if (!error) {
+                if (response.transactionHash === result.tx) {
+                  console.log("newpost response =", response);
+                  const newTitle = response.args.title;
+                  console.log(response.args.sender, "has created a new post, title:", newTitle);
+                  this.getPost(newTitle).then(resolve);
+                }
+              } else {
+                console.error(error);
+              }
+            });
+          }).catch(console.error);
         });
+      });
+    });
+  }
+
+  static getPost(title) {
+    return new Promise((resolve, reject) => {
+      this.postsContractInstance.getPost.call(title).then((content, creator) => { //get the post content and creator
+        resolve({
+          title,
+          content,
+          creator
+        });
+      }).catch(() => {
+        reject();
       });
     });
   }
@@ -45,14 +55,9 @@ export default class PostStore {
         console.log("post titles:", postTitles);
 
         let posts = [];
-        postTitles.each((title, index) => { //for each post title
-          this.postsContractInstance.getPost(title).call().then((content, creator) => { //get the post content and creator
-            console.log("got a post :", { "title": title, "content": content, "creator": creator });
-            posts.push({
-              title,
-              content,
-              creator
-            });
+        postTitles.forEach((title, index) => { //for each post title
+          this.getPost(title).then((post) => {
+            posts.push(post);
             if (index === postTitles.length - 1) {
               resolve(posts);
             }
