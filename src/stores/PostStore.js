@@ -82,6 +82,7 @@ export default class PostStore {
     const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
     this.newPostListeners[object] = watchEvent;
     watchEvent.watch((error, response) => {
+      console.log('fired');
       if (!error) {
         const newTitle = this.web3.toUtf8(response.args.title);
         this.getPost(newTitle).then(callback);
