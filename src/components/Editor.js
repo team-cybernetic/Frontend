@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import cx from 'classnames';
 import PostStore from '../stores/PostStore';
 
-const VALID_CONTENT_REGEX = /([0-9A-z][0-9A-z ]*)\n(\S.*)/;
+const VALID_CONTENT_REGEX = /(\S.*)\n(\S[\s\S]*)/;
 
 class Editor extends Component {
   constructor(props) {
@@ -19,7 +19,7 @@ class Editor extends Component {
         <div style={styles.earnings}>
           <p>Earnings</p>
           <p style={styles.earningsText}>Global: <span className='is-pulled-right'>0.54kB</span></p>
-          <p style={styles.earningsText}>Local: <span className='is-pulled-right'>0.54kB</span></p>
+          <p style={styles.earningsText}>Local: <span className='is-pulled-right'>0.12kB</span></p>
         </div>
         <textarea
           style={styles.textArea}

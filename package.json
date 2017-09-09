@@ -13,7 +13,8 @@
     "react-fontawesome": "1.6.1",
     "reset-css": "^2.2.1",
     "truffle-contract": "^1.1.8",
-    "truffle-solidity-loader": "0.0.8"
+    "truffle-solidity-loader": "0.0.8",
+    "xss": "^0.3.4"
   },
   "devDependencies": {
     "react-scripts": "1.0.13"
