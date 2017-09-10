@@ -31,7 +31,7 @@ const styles = {
     backgroundColor: 'white',
   },
   content: {
-    maxHeight: '250px',
+//    maxHeight: '250px',
     display: 'block',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

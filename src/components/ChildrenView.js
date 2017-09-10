@@ -68,6 +68,7 @@ const styles = {
     flexWrap: 'wrap',
     overflowY: 'auto',
     alignItems: 'flex-start',
+    alignContent: 'flex-start',
   },
   loader: {
     flex: 1,
