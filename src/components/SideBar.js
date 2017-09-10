@@ -13,6 +13,7 @@ const styles = {
   container: {
     flex: 1,
     backgroundColor: 'white',
+    borderLeft: '1px solid lightgrey',
   },
 };
 
