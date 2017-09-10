@@ -6,7 +6,7 @@ class Post extends Component {
     return (
       <div style={styles.container} className='card'>
         <div style={styles.content} className='card-content'>
-          <a href='#'>{this.props.post.title}</a>
+          <a href={'#' + this.props.post.title}>{this.props.post.title}</a>
           <br />
           {this.renderContent()}
         </div>
