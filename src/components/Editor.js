@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import cx from 'classnames';
 import PostStore from '../stores/PostStore';
 
-const VALID_CONTENT_REGEX = /(\S.*)\n(\S[\s\S]*)/;
+const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*(.*)\s*)?/;
 
 class Editor extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ class Editor extends Component {
         <textarea
           style={styles.textArea}
           className='textarea'
-          placeholder={'Clever Title\nWitty content...'}
+          placeholder={'Clever Title\n[Witty content...]'}
           value={this.state.textAreaValue}
           onChange={(e) => this.changeContent(e)} />
         <button
@@ -33,7 +33,8 @@ class Editor extends Component {
           onClick={() => this.createPost()}
           disabled={!this.isValid()}
         >
-          Post
+          Post<br />
+        {!this.hasContent() ? (this.isValid() ? "[title only]" : "") : ""}
         </button>
       </div>
     );
@@ -43,10 +44,15 @@ class Editor extends Component {
     return !!VALID_CONTENT_REGEX.exec(this.state.textAreaValue);
   }
 
+  hasContent() {
+    const matches = VALID_CONTENT_REGEX.exec(this.state.textAreaValue);
+    return (matches && matches[3]) ? true : false;
+  }
+
   createPost() {
     const matches = VALID_CONTENT_REGEX.exec(this.state.textAreaValue);
     const title = matches[1];
-    const content = matches[2];
+    const content = matches[3] ? matches[3] : '';
     this.setState({
       isPosting: true,
     });
@@ -92,6 +98,7 @@ const styles = {
     height: '100%',
     width: '90px',
     float: 'right',
+//    whiteSpace: 'normal',
   },
   textArea: {
     flex: 1,
