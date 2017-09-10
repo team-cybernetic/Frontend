@@ -59,16 +59,28 @@ export default class PostStore {
   static getPosts() {
     return new Promise((resolve) => {
       this.postsContractInstance.getPostTitles.call().then((postTitles) => {
+
         postTitles = postTitles.map((title) => this.web3.toUtf8(title));
 
         let posts = [];
         if (postTitles.length > 0) {
-          postTitles.forEach((title, index) => { //for each post title
+          let postCount = 0;
+          postTitles.forEach((title, index) => {
             this.getPost(title).then((post) => {
-              posts.push(post);
+              posts[index] = post;
+              postCount++;
+              if (postCount === postTitles.length) {
+                resolve(posts);
+              }
+                /*
+              posts.push(post); //the getpost() promises are async, which causes a race condition sometimes resulting in the posts being resolved out of order and then pushed onto the array
               if (index === postTitles.length - 1) {
                 resolve(posts);
               }
+                */
+            }).catch((err) => {
+                console.error(err);
+                posts[index] = null;
             });
           });
         } else {
