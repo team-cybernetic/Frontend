@@ -7,10 +7,13 @@ export default class GasEstimator {
     this.postsContractInstance = postsContractInstance;
   }
 
-  static estimate(methodName, args) {
-    return new Promise((resolve) => {
-      this.postsContractInstance[methodName].estimateGas.apply(this.postsContractInstance[methodName].estimateGas, args).then((gas) => {
+  static estimate(methodName, ...args) {
+    return new Promise((resolve, reject) => {
+      this.postsContractInstance[methodName].estimateGas(...args).then((gas) => {
         resolve(gas);
+      }).catch((error) => {
+          console.log("error while estimating gas for '", methodName, "'(", ...args, "):", error);
+          reject(error.message);
       });
     });
   }

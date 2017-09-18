@@ -13,7 +13,7 @@ export default class WalletStore {
     });
   }
 
-  static getDefaultAccount(title, content) {
+  static getDefaultAccount() {
     return this.web3.eth.defaultAccount;
   }
 }

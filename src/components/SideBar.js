@@ -12,7 +12,7 @@ class SideBar extends Component {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'grey',
     borderLeft: '1px solid lightgrey',
   },
 };

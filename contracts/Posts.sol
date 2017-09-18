@@ -1,57 +1,174 @@
 pragma solidity ^0.4.11;
 
 contract Posts {
+    /*
+    IPFS stores its hashes as a multihash -- the first two bytes represent
+    the hash function used (default SHA256) and the length of the hash,
+    which is typically 0x12 = SHA256 and 0x20 = 32 bytes (256 bits)
+    */
+    struct IpfsMultihash {
+        uint8 hashFunction; //first byte of multihash
+        uint8 hashLength; //second byte of multihash
+        bytes hash; //hashLength remaining bytes of multihash
+    }
+
+    uint256 postCount = 0;
+
     struct Post {
-        bytes32 title;
-        string content;
-        bool active;
-        address creator;
+        string title; //length limit enforced by ruleset, must be unique, immutable
+        uint256 number; //must be > 0 if post exists, unique, immutable
+        string contentType; //MIME-type of content
+        IpfsMultihash contentAddress; //required only if enforced by ruleset
+        address creator; //immutable
+        uint256 creationTime; //UNIX timestamp, accept user input bounded by block.timestamp, immutable
+        address groupAddress; //null when group has not been created for this post
+        uint256 balance; //amount of money owned by this post in this group
+        int256 permissions; //permission level of post
     }
 
-    mapping (bytes32 => Post) posts;
-    bytes32[] postTitles;
-    mapping (bytes32 => uint256) titlesMap;
+    mapping (string => Post) postsByTitle;
+    mapping (address => uint256[]) postNumbersByCreator;
+    mapping (uint256 => Post) postsByNumber;
+    uint256[] postNumbers;
 
-    event NewPost(address indexed sender, bytes32 indexed title);
+    event NewPost(address indexed creator, uint256 indexed number, string title);
 
-    function postExists(bytes32 title) public returns (bool) {
-        return (posts[title].active);
+    uint256 userCount = 0;
+
+    struct User {
+        string nickname; //length/uniqueness enforced by ruleset
+        uint256 number; //must be > 0 if user exists, unique, immutable
+        string profileType; //MIME-type of profile
+        IpfsMultihash profileAddress; //required only if enforced by ruleset
+        address addr; //public key, unique, immutable
+        uint256 joinTime; //UNIX timestamp when user first joined group, use block.timestamp, immutable
+        address directAddress; //null when user has not created/linked a private group (for direct messaging)
+        uint256 balance; //amount of money owned by this user in this group
+        int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
     }
 
-    function createPost(bytes32 title, string content) public {
-        require(!postExists(title)); //if we're trying to create a post which is already active, throw an error
+    mapping (address => User) usersByAddress; //maps ethereum addres (public key) to user objects
+    mapping (uint256 => User) usersByNumber;
 
-        posts[title] = Post({
+    function getPostByTitle(string _title) constant returns (
+        string title,
+        uint256 number,
+        string contentType,
+        uint8 ipfsHashFunction,
+        uint8 ipfsHashLength,
+        bytes ipfsHash,
+        address creator,
+        uint256 creationTime,
+        address groupAddress,
+        uint256 balance,
+        int256 permissions
+    ) {
+        Post memory p = postsByTitle[_title];
+        return (
+            p.title,
+            p.number,
+            p.contentType,
+            p.contentAddress.hashFunction,
+            p.contentAddress.hashLength,
+            p.contentAddress.hash,
+            p.creator,
+            p.creationTime,
+            p.groupAddress,
+            p.balance,
+            p.permissions
+        );
+    }
+
+    function getPostByNumber(uint256 _number) constant returns (
+        string title,
+        uint256 number,
+        string contentType,
+        uint8 ipfsHashFunction,
+        uint8 ipfsHashLength,
+        bytes ipfsHash,
+        address creator,
+        uint256 creationTime,
+        address groupAddress,
+        uint256 balance,
+        int256 permissions
+    ) {
+        Post memory p = postsByNumber[_number];
+        return (
+            p.title,
+            p.number,
+            p.contentType,
+            p.contentAddress.hashFunction,
+            p.contentAddress.hashLength,
+            p.contentAddress.hash,
+            p.creator,
+            p.creationTime,
+            p.groupAddress,
+            p.balance,
+            p.permissions
+        );
+    }
+
+    function getPostNumbersByCreator(address _creator) constant returns (uint256[]) {
+        return (postNumbersByCreator[_creator]);
+    }
+
+    function getPostNumbers() constant returns (uint256[]) {
+        return (postNumbers);
+    }
+
+    function postExists(string title) returns (bool) {
+        return (postsByTitle[title].number != 0);
+    }
+
+    function createPost(string title, string contentType, uint8 ipfsHashFunction, uint8 ipfsHashLength, bytes ipfsHash, uint256 creationTime) returns (uint256) {
+        //TODO: check title length via ruleset
+        //TODO: UTF-8 length != bytes().length
+        require(bytes(title).length <= 255);
+
+        require(!postExists(title));
+
+        require(ipfsHashLength != 0);
+
+        require(ipfsHashLength == ipfsHash.length);
+
+        //TODO: check if ipfs hash length matches expected size for hash function (function 0x12 should always be 0x20 bytes long)
+
+        uint256 ctLen = bytes(contentType).length;
+        require(ctLen > 0 && ctLen <= 255); //RFC 6838 limits mime types to 127 bytes for each of the major and minor types, plus the separating slash
+
+        if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) {
+            creationTime = block.timestamp;
+        }
+
+        address creator = msg.sender;
+
+        postCount++;
+
+        Post memory newPost = Post({
             title: title,
-            content: content,
-            active: true,
-            creator: msg.sender
+            number: postCount,
+            contentType: contentType,
+            contentAddress: IpfsMultihash({
+                hashFunction: ipfsHashFunction,
+                hashLength: ipfsHashLength,
+                hash: ipfsHash
+            }),
+            creator: creator,
+            creationTime: creationTime,
+            groupAddress: 0,
+            balance: 0, //TODO: default from ruleset
+            permissions: 0 //TODO: default from ruleset
         });
 
-        titlesMap[title] = postTitles.push(title) - 1; //capture the index for easy deleting
+        postsByTitle[title] = newPost;
+        postNumbersByCreator[creator].push(postCount);
+        postsByNumber[postCount] = newPost;
+        postNumbers.push(postCount);
 
-        NewPost(msg.sender, title);
+        NewPost(creator, postCount, title);
+
+        return (postCount);
     }
 
-   
-    function getPost(bytes32 title) public returns (string content, address creator) {
-        require(postExists(title)); //if post does not exist, error
-
-        Post memory p = posts[title];
-        return (p.content, p.creator);
-    }
-
-    function getPostTitles() public returns (bytes32[]) {
-        return (postTitles);
-    }
-
-    function deletePost(bytes32 title) public {
-        require(postExists(title)); 
-
-        delete posts[title];
-
-        delete postTitles[titlesMap[title]];
-
-        delete titlesMap[title];
-    }
 }
+
