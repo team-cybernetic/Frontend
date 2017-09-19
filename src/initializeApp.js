@@ -4,6 +4,7 @@ import contract from 'truffle-contract';
 import GasEstimator from './utils/GasEstimator';
 import PostStore from './stores/PostStore';
 import WalletStore from './stores/WalletStore';
+import Ipfs from './utils/Ipfs';
 
 function instantiateContract(web3, resolve) {
   /*
@@ -24,7 +25,7 @@ function instantiateContract(web3, resolve) {
       PostStore,
       WalletStore,
     ].forEach((toInitialize) => toInitialize.initialize(web3, instance));
-    resolve();
+    Ipfs.initialize().then(resolve);
   }).catch((error) => {
     console.error('Error deploying contract: ', error);
   });

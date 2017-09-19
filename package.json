@@ -6,6 +6,7 @@
     "bulma": "^0.5.1",
     "classnames": "^2.2.5",
     "font-awesome": "4.7.0",
+    "ipfs": "^0.26.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "promise-polyfill": "^6.0.2",
@@ -15,6 +16,7 @@
     "reset-css": "^2.2.1",
     "truffle-contract": "^1.1.8",
     "truffle-solidity-loader": "0.0.8",
+    "uuid": "^3.1.0",
     "xss": "^0.3.4"
   },
   "devDependencies": {
