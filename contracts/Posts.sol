@@ -5,6 +5,8 @@ contract Posts {
     IPFS stores its hashes as a multihash -- the first two bytes represent
     the hash function used (default SHA256) and the length of the hash,
     which is typically 0x12 = SHA256 and 0x20 = 32 bytes (256 bits)
+    The hash is typically base58 encoded (like how bitcoin addresses are encoded),
+    but the hash part actually is only 32 bytes long when un-base58 encoded
     */
     struct IpfsMultihash {
         uint8 hashFunction; //first byte of multihash
@@ -15,7 +17,7 @@ contract Posts {
     uint256 postCount = 0;
 
     struct Post {
-        string title; //length limit enforced by ruleset, must be unique, immutable
+        string title; //length enforced by ruleset, must be unique, immutable
         uint256 number; //must be > 0 if post exists, unique, immutable
         string contentType; //MIME-type of content
         IpfsMultihash contentAddress; //required only if enforced by ruleset
@@ -127,20 +129,28 @@ contract Posts {
 
         require(!postExists(title));
 
-        require(ipfsHashLength != 0);
+//        require(ipfsHashLength != 0); //permit content-less posts TODO: ruleset
 
         require(ipfsHashLength == ipfsHash.length);
 
         //TODO: check if ipfs hash length matches expected size for hash function (function 0x12 should always be 0x20 bytes long)
 
         uint256 ctLen = bytes(contentType).length;
-        require(ctLen > 0 && ctLen <= 255); //RFC 6838 limits mime types to 127 bytes for each of the major and minor types, plus the separating slash
 
-        if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) {
-            creationTime = block.timestamp;
+        if (ipfsHashLength > 0) { //if there's no content, don't bother checking if there's a content type given
+            require(ctLen > 0);
+        }
+        require(ctLen <= 255); //RFC 6838 limits mime types to 127 bytes for each of the major and minor types, plus the separating slash
+
+        if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) { //TODO ruleset? moving average across all posts in the last hour?
+            creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
         }
 
         address creator = msg.sender;
+
+        User memory usr = usersByAddress[creator];
+
+        //TODO: ruleset: award or fees
 
         postCount++;
 
@@ -168,6 +178,9 @@ contract Posts {
         NewPost(creator, postCount, title);
 
         return (postCount);
+    }
+
+    function userExistsByAddress(address addr) {
     }
 
 }
