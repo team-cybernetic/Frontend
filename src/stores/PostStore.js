@@ -24,9 +24,10 @@ export default class PostStore {
           let mimeType = "text/plain"; //TODO
           console.log(ipfsHash);
           GasEstimator.estimate('createPost', title, mimeType, ipfsHashFunction, ipfsHashLength, ipfsHash, moment().unix()).then((gas) => {
-            console.log("gas estimator estimates that this createPost call will cost", gas, "gas");
+            let actualGas = gas * 3;
+            console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
             const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
-            this.postsContractInstance.createPost(title, mimeType, ipfsHashFunction, ipfsHashLength, ipfsHash, moment().unix(), { gas }).then((result) => {
+            this.postsContractInstance.createPost(title, mimeType, ipfsHashFunction, ipfsHashLength, ipfsHash, moment().unix(), { gas: actualGas }).then((result) => {
               watchEvent.watch((error, response) => {
                 if (!error) {
                   if (response.transactionHash === result.tx) {

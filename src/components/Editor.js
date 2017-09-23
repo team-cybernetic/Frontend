@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import cx from 'classnames';
 import PostStore from '../stores/PostStore';
 
-const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*(.*)\s*)?/;
+const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*((.*\n?)+)\s*)?/;
 
 class Editor extends Component {
   constructor(props) {

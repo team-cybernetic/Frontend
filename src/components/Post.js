@@ -18,7 +18,7 @@ class Post extends Component {
 
   renderContent() {
     const html = {
-      __html: xss(this.props.post.ipfsHash).replace('\n', '<br />'),
+      __html: xss(this.props.post.ipfsHash).replace(/\n/g, '<br />'),
     }
     return (
       <span dangerouslySetInnerHTML={html}></span>
