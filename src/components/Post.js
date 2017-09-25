@@ -24,7 +24,7 @@ class Post extends Component {
   }
 
   renderContent() {
-    let content = xss(this.props.post.ipfsHash).replace(/\n/g, '<br />');
+    let content = xss(this.props.post.content).replace(/\n/g, '<br />');
     const html = {
       __html: content,
     }

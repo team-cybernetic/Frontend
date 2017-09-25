@@ -53,10 +53,11 @@ class Editor extends Component {
     const matches = VALID_CONTENT_REGEX.exec(this.state.textAreaValue);
     const title = matches[1];
     const content = matches[3] ? matches[3] : '';
+    const contentType = "text/plain";
     this.setState({
       isPosting: true,
     });
-    PostStore.createPost(title.trim(), content).then((post) => {
+    PostStore.createPost(title.trim(), content, contentType).then((post) => {
       console.log(post);
       this.setState({
         textAreaValue: '',
