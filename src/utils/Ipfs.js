@@ -41,9 +41,9 @@ export default class Ipfs {
 
   static catFile(multiHash) {
     return new Promise((resolve, reject) => {
-      console.log(multiHash);
-      if (!multiHash) {
+      if (!multiHash || multiHash.length < 3) {
         resolve('');
+        return;
       }
       this.ipfs.files.cat(multiHash, (err, stream) => {
         if (err) {
@@ -65,7 +65,6 @@ export default class Ipfs {
     let ipfsRaw = bs58.decode(multiHash); //returns a Buffer
     let ipfsRawHex = '';
     ipfsRaw.forEach((value, idx) => {
-      console.log(value, "=", value.toString(16));
       let strVal = value.toString(16); //but we need it in hex
       ipfsRawHex = ipfsRawHex + _.padStart(strVal, 2, '0'); //make sure they're always 2 character hex, 9 -> 09
     });
@@ -76,6 +75,9 @@ export default class Ipfs {
   }
 
   static assembleMultiHash(ipfsHashFunction, ipfsHashLength, ipfsHash) {
+    if (ipfsHash.length === 0 || ipfsHash === '0x') {
+      return ('');
+    }
     let multiHex = ipfsHashFunction.toString(16) + ipfsHashLength.toString(16) + ipfsHash.slice(2);
     return (bs58.encode(Buffer.from(multiHex, 'hex')));
   }
