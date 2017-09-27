@@ -1,0 +1,52 @@
+/* The main container element*/
+.Collapsible {
+  background-color: $base;
+}
+
+
+/* The content within the collapsable area*/
+.Collapsible__contentInner {
+  padding: 10px;
+  background: white;
+  font-size: 13px;
+
+  p {
+    margin-bottom: 10px;
+    line-height: 20px;
+  }
+
+}
+
+  .Collapsible__trigger {
+    display: block;
+    position: relative;
+    padding: 10px;
+    color: black;
+}
+
+.CustomTriggerCSS {
+  background-color: lightgrey;
+  cursor: pointer;
+}
+
+/*Fix these symbols eventually*/
+.CustomTriggerCSS::before {
+  content: "⯈		";
+}
+
+.CustomTriggerCSS--open {
+  background-color: lightgrey;
+  cursor: pointer;
+}
+
+.CustomTriggerCSS--open::before {
+  content: "⯆		";
+}
+
+
+.Collapsible__custom-sibling {
+  padding: 5px;
+  font-size: 12px;
+  background-color: #CBB700;
+  color: black;
+}
