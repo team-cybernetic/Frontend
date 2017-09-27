@@ -22,7 +22,7 @@ restore_contract_state() {
     mkdir -p build/contracts
     mv src/contracts/* build/contracts/
     rm -rf src/contracts
-    ln -s "../build/contracts/" "src/contracts"
+    ln -s "../build/contracts" "src/contracts"
 }
 
 restore_contract_state
