@@ -1,4 +1,4 @@
-import IPFS from 'ipfs';
+import 'ipfs';
 import uuidv4 from 'uuid/v4';
 import bs58 from 'bs58';
 import _ from 'lodash';
@@ -8,7 +8,7 @@ export default class Ipfs {
 
   static initialize() {
     return new Promise((resolve) => {
-      this.ipfs = new IPFS({
+      this.ipfs = new window.IPFS({
         repo: this.repoPath(),
       });
       this.ipfs.on('ready', resolve);

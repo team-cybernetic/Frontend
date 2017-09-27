@@ -7,7 +7,7 @@
     "bulma": "^0.5.1",
     "classnames": "^2.2.5",
     "font-awesome": "4.7.0",
-    "ipfs": "^0.26.0",
+    "ipfs": "file:lib/ipfs",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "multi-hash": "^0.1.1",
@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "./build.sh",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
