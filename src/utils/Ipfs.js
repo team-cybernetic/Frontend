@@ -1,6 +1,5 @@
 import uuidv4 from 'uuid/v4';
 import bs58 from 'bs58';
-import _ from 'lodash';
 
 export default class Ipfs {
   static ipfs;
@@ -76,14 +75,9 @@ export default class Ipfs {
 
   static extractMultiHash(multiHash) {
     let ipfsRaw = bs58.decode(multiHash); //returns a Buffer
-    let ipfsRawHex = '';
-    ipfsRaw.forEach((value, idx) => {
-      let strVal = value.toString(16); //but we need it in hex
-      ipfsRawHex = ipfsRawHex + _.padStart(strVal, 2, '0'); //make sure they're always 2 character hex, 9 -> 09
-    });
-    let ipfsHashFunction = ipfsRaw.slice(0, 1); //first byte is the function
-    let ipfsHashLength = ipfsRaw.slice(1, 2); //second byte is the length
-    let ipfsHash = '0x' + ipfsRawHex.slice(4); //all the rest of the bytes are the actual hash
+    let ipfsHashFunction = ipfsRaw[0];
+    let ipfsHashLength = ipfsRaw[1];
+    let ipfsHash = '0x' + ipfsRaw.slice(2).toString('hex');
     return [ipfsHashFunction, ipfsHashLength, ipfsHash];
   }
 
