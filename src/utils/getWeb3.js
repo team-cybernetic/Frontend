@@ -21,15 +21,26 @@ export default function getWeb3() {
         resolve(results);
       } else {
         // Fallback to localhost if no web3 injection.
-        let provider = new Web3.providers.HttpProvider('https://web3.ttt222.org');
+        console.log('No web3 instance injected');
 
+        var provider = new Web3.providers.HttpProvider('http://localhost:8545'); //prefer local node
         web3 = new Web3(provider);
+
+        if (web3.isConnected()) {
+            console.log("connected to local web3 node");
+        } else {
+            provider = new Web3.providers.HttpProvider('https://web3.ttt222.org'); //fallback to remote node
+            web3 = new Web3(provider);
+            if (web3.isConnected()) {
+                console.log("connected to remote web3 node");
+            } else {
+                console.log("unable to connect to any web3 nodes!");
+            }
+        }
 
         results = {
           web3: web3
         };
-
-        console.log('No web3 instance injected, using Local web3.');
 
         resolve(results);
       }

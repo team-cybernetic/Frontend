@@ -27,7 +27,7 @@ export default class PostStore {
             if (content) {
               [ipfsHashFunction, ipfsHashLength, ipfsHash] = Ipfs.extractMultiHash(hash);
             }
-            console.log("ipfsHash =", ipfsHash, ")\nipfsHashFunction =", ipfsHashFunction, "\nipfsHashLength =", ipfsHashLength, "\nactual ipfsHash length =", ipfsHash.length);
+            console.log("ipfsHash =", ipfsHash, "\nipfsHashFunction =", ipfsHashFunction, "\nipfsHashLength =", ipfsHashLength, "\nactual ipfsHash length =", ipfsHash.length);
             /*
             let ipfsHash = content ? this.web3.fromUtf8(content) : ""; //TODO: store content in ipfs, base58 decode hash, split into fields
             let ipfsHashFunction = 18; //0x12 -- TODO: get from ipfs hash
@@ -40,6 +40,7 @@ export default class PostStore {
               console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
               const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
               this.postsContractInstance.createPost(title, mimeType, ipfsHashFunction, ipfsHashLength, ipfsHash, moment().unix(), { gas: actualGas }).then((result) => {
+                console.log("post titled \"" + title + "\" created with txid:", result.tx);
                 watchEvent.watch((error, response) => {
                   if (!error) {
                     if (response.transactionHash === result.tx) {
@@ -88,19 +89,20 @@ export default class PostStore {
               permissions
             ]
         ) => {
-          Ipfs.catFile(ipfsHashLength > 0 ? Ipfs.assembleMultiHash(ipfsHashFunction, ipfsHashLength, ipfsHash) : '').then((content) => {
+          let multiHash = Ipfs.assembleMultiHash(ipfsHashFunction, ipfsHashLength, ipfsHash);
+          Ipfs.catFile(ipfsHashLength > 0 ? multiHash : '').then((content) => {
             const post = {
               title,
               number,
               contentType,
               content,
+              multiHash,
               creator,
               creationTime,
               groupAddress,
               balance,
               permissions,
             };
-            console.log("got a post:", post);
             this.cache[number] = post;
             resolve(post);
           });
@@ -120,10 +122,12 @@ export default class PostStore {
         let posts = [];
         if (postNumbers.length > 0) {
           let postCount = 0;
+          console.log("need to fetch", postNumbers.length, "existing posts:", postNumbers);
           postNumbers.forEach((number, index) => {
             this.getPostByNumber(number).then((post) => {
               posts[index] = post;
               postCount++;
+              console.log("post[" + postCount + "]:", posts[index]);
               if (postCount === postNumbers.length) {
                 resolve(posts);
               }
