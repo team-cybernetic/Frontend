@@ -20,6 +20,7 @@
     "reset-css": "^2.2.1",
     "truffle-contract": "^1.1.8",
     "truffle-solidity-loader": "0.0.8",
+    "uglify-js": "3.1.2",
     "uuid": "^3.1.0",
     "xss": "^0.3.4"
   },
