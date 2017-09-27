@@ -13,7 +13,7 @@ class SideBar extends Component {
 
         <button
         style={styles.joinButton}
-        // onClick={() => join / request group
+        /* onClick={() => join / request group */
         > Join Group </button>
 
 
@@ -25,7 +25,7 @@ class SideBar extends Component {
     transitionTime={200}
     easing="ease-in"
     trigger="Members">
-        // To be populated with actual data
+            { /* To be populated with actual data */ }
       <p>Admin <br />User <br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User</p>
     </Collapsible>
 
