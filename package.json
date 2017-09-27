@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bs58check": "^2.0.2",
+    "bs58": "^4.0.1",
     "bulma": "^0.5.1",
     "classnames": "^2.2.5",
     "font-awesome": "4.7.0",
