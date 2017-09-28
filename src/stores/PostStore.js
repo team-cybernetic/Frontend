@@ -11,8 +11,11 @@ export default class PostStore {
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
     this.postsContractInstance = postsContractInstance;
-    this.web3.eth.filter("pending").watch((error, result) => {
-      console.log("pending filter got a result:", result);
+    this.web3.eth.filter("pending").watch((error, txid) => {
+      console.log("pending filter got a txid:", txid);
+      this.web3.eth.getTransaction(txid, (error, result) => {
+        console.log("got transaction", txid, ":", result);
+      });
     });
   }
 
@@ -107,7 +110,7 @@ export default class PostStore {
             balance,
             permissions,
             ethMature: true,
-            contentMature: (ipfsHashLength == 0),
+            contentMature: (ipfsHashLength === 0),
           };
           this.cache[number] = post;
           resolve(post);

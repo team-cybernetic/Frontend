@@ -54,17 +54,11 @@ class Post extends Component {
   }
 
   renderCreator() {
-    if (!this.state.post.contentMature) {
-        <span style={styles.creator}>
-          Loading...
-        </span>
-    } else {
-      return (
-        <span style={styles.creator}>
-          Creator:&nbsp;{this.state.post.creator}
-        </span>
-      );
-    }
+    return (
+      <span style={styles.creator}>
+        Creator:&nbsp;{this.state.post.creator}
+      </span>
+    );
   }
 
   renderMultiHash() {
@@ -91,16 +85,26 @@ class Post extends Component {
   }
 
   renderContent() {
-    let content = xss(this.state.post.content).replace(/\n/g, '<br />');
-    const html = {
-      __html: content,
+    if (!this.state.post.contentMature) {
+      return (
+        <div>
+          <span>
+            Loading...
+          </span>
+        </div>
+      );
+    } else {
+      let content = xss(this.state.post.content).replace(/\n/g, '<br />');
+      const html = {
+        __html: content,
+      }
+      return (
+        <div>
+          {content.length ? <hr /> : ''}
+          <span dangerouslySetInnerHTML={html}></span>
+        </div>
+      );
     }
-    return (
-      <div>
-        {content.length ? <hr /> : ''}
-        <span dangerouslySetInnerHTML={html}></span>
-      </div>
-    );
   }
 
   renderTimestamp() {
