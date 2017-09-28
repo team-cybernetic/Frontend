@@ -3,35 +3,64 @@ import xss from 'xss';
 import moment from 'moment';
 
 class Post extends Component {
+
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      post: props.post,
+    };
+  }
+
   render() {
-    return (
-      <div style={styles.container} className='card'>
-        <div style={styles.content} className='card-content'>
-          <a href={'#' + this.props.post.title}>{this.props.post.title}</a><br />
-          {this.renderNumber()}<span style={styles.date}>Posted {this.renderTimestamp()}</span><br />
-          {this.renderCreator()}<br />
-          {this.renderMultiHash()}
-          {this.renderContent()}
+    //console.log("rendering post #" + this.state.post.number);
+    if (!this.state.post.mature) {
+      //console.log("post #" + this.state.post.number, "is immature!");
+      this.state.post.getPost.then((post) => {
+        //console.log("resolved post:", post);
+        this.setState({
+          post: Object.assign({}, this.state.post, post, {mature: true}),
+        });
+        //console.log("this.state.post =", this.state.post);
+      });
+      return (
+        <div style={styles.container} className='card'>
+          <div style={styles.content} className='card-content'>
+            {this.renderNumber()}Loading...
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      //console.log("post #" + this.state.post.number, "is mature");
+      return (
+        <div style={styles.container} className='card'>
+          <div style={styles.content} className='card-content'>
+            <a href={'#' + this.state.post.title}>{this.state.post.title}</a><br />
+            {this.renderNumber()}<span style={styles.date}>Posted {this.renderTimestamp()}</span><br />
+            {this.renderCreator()}<br />
+            {this.renderMultiHash()}
+            {this.renderContent()}
+          </div>
+        </div>
+      );
+    }
   }
 
   renderCreator() {
     return (
       <span style={styles.creator}>
-        Creator:&nbsp;{this.props.post.creator}
+        Creator:&nbsp;{this.state.post.creator}
       </span>
     );
   }
 
   renderMultiHash() {
-    if (this.props.post.multiHash) {
+    if (this.state.post.multiHash) {
       return (
         <span style={styles.multiHash}>
           IPFS:&nbsp;
-          <a href={"https://ipfs.io/ipfs/" + this.props.post.multiHash} target="_blank" style={styles.multiHashIpfs}>
-            {this.props.post.multiHash}
+          <a href={"https://ipfs.io/ipfs/" + this.state.post.multiHash} target="_blank" style={styles.multiHashIpfs}>
+            {this.state.post.multiHash}
           </a>
         </span>
       );
@@ -43,13 +72,13 @@ class Post extends Component {
   renderNumber() {
     return (
       <span style={styles.number}>
-        #{this.props.post.number.toString(10)} --&nbsp;
+        #{this.state.post.number.toString(10)} --&nbsp;
       </span>
     );
   }
 
   renderContent() {
-    let content = xss(this.props.post.content).replace(/\n/g, '<br />');
+    let content = xss(this.state.post.content).replace(/\n/g, '<br />');
     const html = {
       __html: content,
     }
@@ -62,8 +91,14 @@ class Post extends Component {
   }
 
   renderTimestamp() {
-    let m = moment(this.props.post.creationTime, "X");
+    let m = moment(this.state.post.creationTime, "X");
     return (m.calendar());
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      post: nextProps.post,
+    });
   }
 }
 

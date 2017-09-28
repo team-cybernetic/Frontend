@@ -102,6 +102,7 @@ export default class PostStore {
               groupAddress,
               balance,
               permissions,
+              mature: true,
             };
             this.cache[number] = post;
             resolve(post);
@@ -124,25 +125,39 @@ export default class PostStore {
           let postCount = 0;
           console.log("need to fetch", postNumbers.length, "existing posts:", postNumbers);
           postNumbers.forEach((number, index) => {
+            posts[index] = {
+              number: number,
+              mature: false,
+              unconfirmed: false,
+              getPost: this.getPostByNumber(number),
+            };
+            /*
             this.getPostByNumber(number).then((post) => {
-              posts[index] = post;
+              console.log("resolved post #" + number, ":", post);
+              Object.assign(posts[index], post);
+              posts[index].immature = false;
+              console.log("posts[" + index + "] =", posts[index]);
+              /*
               postCount++;
               console.log("post[" + postCount + "]:", posts[index]);
               if (postCount === postNumbers.length) {
                 resolve(posts);
               }
+              * /
                 /*
               posts.push(post); //the getpost() promises are async, which causes a race condition sometimes resulting in the posts being resolved out of order and then pushed onto the array
               if (index === postTitles.length - 1) {
                 resolve(posts);
               }
-                */
+                * /
             }).catch((err) => {
                 console.error(err);
                 posts[index] = null;
                 postCount++;
             });
+            */
           });
+          resolve(posts);
         } else {
           resolve(posts);
         }
