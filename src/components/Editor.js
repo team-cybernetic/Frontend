@@ -58,7 +58,7 @@ class Editor extends Component {
       isPosting: true,
     });
     PostStore.createPost(title.trim(), content, contentType).then((post) => {
-      console.log(post);
+      console.log("Created a post:", post);
       this.setState({
         textAreaValue: '',
         isPosting: false,

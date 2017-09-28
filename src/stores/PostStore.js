@@ -11,6 +11,9 @@ export default class PostStore {
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
     this.postsContractInstance = postsContractInstance;
+    this.web3.eth.filter("pending").watch((error, result) => {
+      console.log("pending filter got a result:", result);
+    });
   }
 
   static createPost(title, content, contentType) {
@@ -44,6 +47,7 @@ export default class PostStore {
                 watchEvent.watch((error, response) => {
                   if (!error) {
                     if (response.transactionHash === result.tx) {
+                      console.log("watchEvent match! fetching post...");
                       watchEvent.stopWatching();
                       this.getPostByNumber(response.args.number).then(resolve);
                     }
@@ -90,23 +94,23 @@ export default class PostStore {
             ]
         ) => {
           let multiHash = Ipfs.assembleMultiHash(ipfsHashFunction, ipfsHashLength, ipfsHash);
-          Ipfs.catFile(ipfsHashLength > 0 ? multiHash : '').then((content) => {
-            const post = {
-              title,
-              number,
-              contentType,
-              content,
-              multiHash,
-              creator,
-              creationTime,
-              groupAddress,
-              balance,
-              permissions,
-              mature: true,
-            };
-            this.cache[number] = post;
-            resolve(post);
-          });
+          const post = {
+            title,
+            number,
+            contentType,
+            getContent: Ipfs.catFile(ipfsHashLength > 0 ? multiHash : ''),
+            content: '',
+            multiHash,
+            creator,
+            creationTime,
+            groupAddress,
+            balance,
+            permissions,
+            ethMature: true,
+            contentMature: (ipfsHashLength == 0),
+          };
+          this.cache[number] = post;
+          resolve(post);
         }).catch((error) => {
           reject();
         });
@@ -117,45 +121,16 @@ export default class PostStore {
   static getPosts() {
     return new Promise((resolve) => {
       this.postsContractInstance.getPostNumbers.call().then((postNumbers) => {
-
-        //postTitles = postTitles.map((title) => this.web3.toUtf8(title));
-
         let posts = [];
         if (postNumbers.length > 0) {
-          let postCount = 0;
-          console.log("need to fetch", postNumbers.length, "existing posts:", postNumbers);
           postNumbers.forEach((number, index) => {
             posts[index] = {
               number: number,
-              mature: false,
+              ethMature: false,
+              contentMature: false,
               unconfirmed: false,
               getPost: this.getPostByNumber(number),
             };
-            /*
-            this.getPostByNumber(number).then((post) => {
-              console.log("resolved post #" + number, ":", post);
-              Object.assign(posts[index], post);
-              posts[index].immature = false;
-              console.log("posts[" + index + "] =", posts[index]);
-              /*
-              postCount++;
-              console.log("post[" + postCount + "]:", posts[index]);
-              if (postCount === postNumbers.length) {
-                resolve(posts);
-              }
-              * /
-                /*
-              posts.push(post); //the getpost() promises are async, which causes a race condition sometimes resulting in the posts being resolved out of order and then pushed onto the array
-              if (index === postTitles.length - 1) {
-                resolve(posts);
-              }
-                * /
-            }).catch((err) => {
-                console.error(err);
-                posts[index] = null;
-                postCount++;
-            });
-            */
           });
           resolve(posts);
         } else {

@@ -14,12 +14,12 @@ class Post extends Component {
 
   render() {
     //console.log("rendering post #" + this.state.post.number);
-    if (!this.state.post.mature) {
+    if (!this.state.post.ethMature) {
       //console.log("post #" + this.state.post.number, "is immature!");
       this.state.post.getPost.then((post) => {
         //console.log("resolved post:", post);
         this.setState({
-          post: Object.assign({}, this.state.post, post, {mature: true}),
+          post: Object.assign({}, this.state.post, post, {ethMature: true}),
         });
         //console.log("this.state.post =", this.state.post);
       });
@@ -31,6 +31,13 @@ class Post extends Component {
         </div>
       );
     } else {
+      if (!this.state.post.contentMature) {
+        this.state.post.getContent.then((content) => {
+          this.setState({
+            post: Object.assign({}, this.state.post, {content, contentMature: true}),
+          });
+        });
+      }
       //console.log("post #" + this.state.post.number, "is mature");
       return (
         <div style={styles.container} className='card'>
@@ -47,11 +54,17 @@ class Post extends Component {
   }
 
   renderCreator() {
-    return (
-      <span style={styles.creator}>
-        Creator:&nbsp;{this.state.post.creator}
-      </span>
-    );
+    if (!this.state.post.contentMature) {
+        <span style={styles.creator}>
+          Loading...
+        </span>
+    } else {
+      return (
+        <span style={styles.creator}>
+          Creator:&nbsp;{this.state.post.creator}
+        </span>
+      );
+    }
   }
 
   renderMultiHash() {
