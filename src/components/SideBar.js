@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
 import Collapsible from 'react-collapsible';
+import PostStore from '../stores/PostStore';
 import './style.css';
 
 class SideBar extends Component {
+    constructor(props) {
+    super(props);
+    this.state = {
+      isPosting: false,
+    }
+  }
+
   render() {
     return (
       <div style={styles.container}>
@@ -13,7 +21,7 @@ class SideBar extends Component {
 
         <button
         style={styles.joinButton}
-        /* onClick={() => join / request group */
+        onClick={() => this.testMethod()}
         > Join Group </button>
 
 
@@ -54,12 +62,32 @@ class SideBar extends Component {
 
       </div>
 
-
-
-
     );
   }
+  testMethod() {
+    const title = "Example Group"
+    const content = "This is an Example Group";
+    const contentType = "group";
+    this.setState({
+      isPosting: true,
+    });
+    PostStore.createPost(title.trim(), content, contentType).then((post) => {
+      console.log("Created a post:", post);
+      this.setState({
+        textAreaValue: '',
+        isPosting: false,
+      });
+    }).catch((error) => {
+      console.error(error);
+      this.setState({
+        isPosting: false,
+      });
+    });
+  }
 }
+
+
+
 
 const styles = {
   container: {

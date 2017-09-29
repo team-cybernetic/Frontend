@@ -1,7 +1,6 @@
 import Ipfs from '../utils/Ipfs';
 import PostContract from '../ethWrappers/PostContract';
 import Post from '../models/Post';
-import moment from 'moment';
 
 export default class PostStore {
   static postsContractInstance = null;
@@ -13,6 +12,7 @@ export default class PostStore {
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
     this.postsContractInstance = postsContractInstance;
+<<<<<<< HEAD
     const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
     watchEvent.watch((error, response) => {
       if (!error) {
@@ -25,6 +25,10 @@ export default class PostStore {
           delete this.transactionIdListeners[response.transactionHash];
         }
       }
+=======
+    this.web3.eth.filter("pending").watch((error, result) => {
+      console.log("pending filter got a result:", result);
+>>>>>>> parent of bcec3fd... Fixed accidental loading screen on creator rather than content
     });
   }
 
@@ -33,8 +37,7 @@ export default class PostStore {
       Ipfs.saveContent(content).then((multiHashString) => {
         console.log("ipfs hash: ", multiHashString);
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
-        const creationTime = moment().unix();
-        const post = new Post({ title, content, contentType, multiHashArray, multiHashString, creationTime});
+        const post = new Post({ title, content, contentType, multiHashArray, multiHashString });
         PostContract.createPost(post).then((transactionId) => {
           post.transactionId = transactionId;
           resolve(post);
@@ -49,11 +52,57 @@ export default class PostStore {
     });
   }
 
+<<<<<<< HEAD
   static getPost(id) {
     if (!this.cache[id]) {
       this.cache[id] = new Post({ id });
     }
     return this.cache[id];
+=======
+  static getPostByNumber(number) {
+    return new Promise((resolve, reject) => {
+      if (this.cache[number]) {
+        resolve(this.cache[number]);
+      } else {
+        this.postsContractInstance.getPostByNumber.call(number).then((
+            [
+              title,
+              number,
+              contentType,
+              ipfsHashFunction,
+              ipfsHashLength,
+              ipfsHash,
+              creator,
+              creationTime,
+              groupAddress,
+              balance,
+              permissions
+            ]
+        ) => {
+          let multiHash = Ipfs.assembleMultiHash(ipfsHashFunction, ipfsHashLength, ipfsHash);
+          const post = {
+            title,
+            number,
+            contentType,
+            getContent: Ipfs.catFile(ipfsHashLength > 0 ? multiHash : ''),
+            content: '',
+            multiHash,
+            creator,
+            creationTime,
+            groupAddress,
+            balance,
+            permissions,
+            ethMature: true,
+            contentMature: (ipfsHashLength == 0),
+          };
+          this.cache[number] = post;
+          resolve(post);
+        }).catch((error) => {
+          reject();
+        });
+      }
+    });
+>>>>>>> parent of bcec3fd... Fixed accidental loading screen on creator rather than content
   }
 
   static getPosts() {

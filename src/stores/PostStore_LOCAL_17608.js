@@ -1,7 +1,6 @@
 import Ipfs from '../utils/Ipfs';
 import PostContract from '../ethWrappers/PostContract';
 import Post from '../models/Post';
-import moment from 'moment';
 
 export default class PostStore {
   static postsContractInstance = null;
@@ -33,8 +32,7 @@ export default class PostStore {
       Ipfs.saveContent(content).then((multiHashString) => {
         console.log("ipfs hash: ", multiHashString);
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
-        const creationTime = moment().unix();
-        const post = new Post({ title, content, contentType, multiHashArray, multiHashString, creationTime});
+        const post = new Post({ title, content, contentType, multiHashArray, multiHashString });
         PostContract.createPost(post).then((transactionId) => {
           post.transactionId = transactionId;
           resolve(post);

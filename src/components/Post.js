@@ -61,6 +61,18 @@ class Post extends Component {
   }
 
   renderMultiHash() {
+    if (this.state.post.contentType) {
+      if (this.state.post.contentType === 'group') {
+        return (
+        <span style={styles.multiHash}>
+          IPFS:&nbsp;
+          <a href={"group"} target="_blank" style={styles.multiHashIpfs}>
+            {this.state.post.multiHashString}
+          </a>
+        </span>
+      );
+      }
+    }
     if (this.state.post.multiHashString) {
       return (
         <span style={styles.multiHash}>

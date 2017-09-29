@@ -11,9 +11,27 @@ export default class PostContract {
     this.web3.eth.filter("pending").watch((error, txid) => this.listenForPendingPostTransactions(error, txid));
   }
 
+  static setParent() {
+    var address = this.postsContractInstance.address;
+    return new Promise((resolve, reject) => {
+      GasEstimator.estimate('setParent').then((gas) => {
+        let actualGas = gas * 3;
+        console.log("gas estimator estimates that this setParent call will cost", gas, "gas, actualGas =", actualGas);
+        this.postsContractInstance.setParent(address,{ gas: actualGas }).then((result) => {
+          this.createdPostsAwaitingPromiseResolution[result.tx] = { resolve, reject };
+        }).catch((error) => {
+          console.error("Error while executing createPost contract function.", error);
+        });
+      }).catch((error) => {
+        console.error("Error while estimating gas.", error);
+      });
+    });
+  }
+
   static createPost({ title, content, contentType, multiHashArray, creationTime }) {
     return new Promise((resolve, reject) => {
       GasEstimator.estimate('createPost', title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime).then((gas) => {
+        console.log("double benchmark")
         let actualGas = gas * 3;
         console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
         this.postsContractInstance.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas: actualGas }).then((result) => {

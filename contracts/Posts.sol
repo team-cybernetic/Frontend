@@ -31,6 +31,7 @@ contract Posts {
     mapping (address => uint256[]) postNumbersByCreator;
     mapping (uint256 => Post) postsByNumber;
     uint256[] postNumbers;
+    address parentGroup;
 
     event NewPost(address indexed creator, uint256 indexed number, string title);
 
@@ -78,6 +79,14 @@ contract Posts {
             p.balance,
             p.permissions
         );
+    }
+
+    function getParent() constant returns (address) {
+        return parentGroup;
+    }
+
+    function setParent(address parent) {
+        parentGroup = parent;
     }
 
     function getPostNumbersByCreator(address _creator) constant returns (uint256[]) {

@@ -23,7 +23,8 @@ export default class Post {
     this.balance = balance || 0;
 
     if (!id) {
-      this.loadIdAndHeader(); //if this is the case, we know we just created the post so content is already populated
+      this.loadHeader(); //if this is the case, we know we just created the post so content is already populated
+      this.loadId();
     } else if (!multiHashString) {
       this.loadHeader();
     } else if (!content) {
