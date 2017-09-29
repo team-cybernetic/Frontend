@@ -15,11 +15,11 @@ class ChildrenView extends Component {
     PostStore.getPosts().then((posts) => {
       this.setState({ posts });
     });
-    PostStore.addNewPostListener(this, (newPost) => this.addToPosts(newPost))
+    this.listenerId = PostStore.addNewPostListener((newPost) => this.addToPosts(newPost));
   }
 
   componentWillUnmount() {
-    PostStore.removeNewPostListener(this);
+    PostStore.removeNewPostListener(this.listenerId);
   }
 
   render() {
@@ -56,7 +56,7 @@ class ChildrenView extends Component {
   }
 
   alreadyHavePost(post) {
-    return some(this.state.posts, { title: post.title });
+    return !!post.id && some(this.state.posts, { id: post.id }) || !!post.transactionId && some(this.state.posts, { transactionId: post.transactionId });
   }
 }
 

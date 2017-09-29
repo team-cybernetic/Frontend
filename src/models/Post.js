@@ -22,14 +22,22 @@ export default class Post {
     this.creator = creator || WalletStore.getDefaultAccount();
     this.balance = balance || 0;
 
-    if (!id) {
-      this.loadHeader(); //if this is the case, we know we just created the post so content is already populated
-      this.loadId();
-    } else if (!multiHashString) {
+    if (id && !multiHashString) {
       this.loadHeader();
     } else if (!content) {
       this.loadContent();
     }
+  }
+
+  set transactionId(newTransactionId) {
+    this._transactionId = newTransactionId;
+    if (!this.id && newTransactionId) {
+      this.loadId(); //if this is the case, we know we just created the post so content is already populated
+    }
+  }
+
+  get transactionId() {
+    return this._transactionId;
   }
 
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.

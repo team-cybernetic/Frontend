@@ -12,7 +12,7 @@ class Post extends Component {
   }
 
   componentWillMount() {
-    PostStore.addNewPostListener(this, (post) => {
+    this.listenerId = PostStore.addNewPostListener((post) => {
       if (this.state.post.id === post.id) {
         this.setState({ post });
       }
@@ -25,7 +25,7 @@ class Post extends Component {
   }
 
   componentWillUnmount() {
-    PostStore.removeNewPostListener(this);
+    PostStore.removeNewPostListener(this.listenerId);
   }
 
   render() {

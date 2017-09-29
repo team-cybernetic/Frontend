@@ -1,9 +1,9 @@
 import Ipfs from '../utils/Ipfs';
 import PostContract from '../ethWrappers/PostContract';
 import Post from '../models/Post';
-import moment from 'moment';
 
 export default class PostStore {
+  static currentPostListenerSequence = 0;
   static postsContractInstance = null;
   static web3 = null;
   static agnosticNewPostListeners = {};
@@ -17,8 +17,10 @@ export default class PostStore {
     watchEvent.watch((error, response) => {
       if (!error) {
         const id = response.args.number.c[0];
-        Object.keys(this.agnosticNewPostListeners).forEach((object) => {
-          this.agnosticNewPostListeners[object](this.getPost(id));
+        Object.keys(this.agnosticNewPostListeners).forEach((key) => {
+          const post = this.getPost(id);
+          post.transactionId = response.transactionHash;
+          this.agnosticNewPostListeners[key](post);
         });
         if (this.transactionIdListeners[response.transactionHash]) {
           this.transactionIdListeners[response.transactionHash](id);
@@ -33,10 +35,12 @@ export default class PostStore {
       Ipfs.saveContent(content).then((multiHashString) => {
         console.log("ipfs hash: ", multiHashString);
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
-        const creationTime = moment().unix();
-        const post = new Post({ title, content, contentType, multiHashArray, multiHashString, creationTime});
+        const post = new Post({ title, content, contentType, multiHashArray, multiHashString });
         PostContract.createPost(post).then((transactionId) => {
           post.transactionId = transactionId;
+          Object.keys(this.agnosticNewPostListeners).forEach((key) => {
+            this.agnosticNewPostListeners[key](post);
+          });
           resolve(post);
         }).catch((error) => {
           console.error("Error saving post to the blockchain.", error);
@@ -64,15 +68,16 @@ export default class PostStore {
     });
   }
 
-  static addNewPostListener(object, callback) {
-    this.agnosticNewPostListeners[object] = callback;
+  static addNewPostListener(callback) {
+    this.agnosticNewPostListeners[this.currentPostListenerSequence] = callback;
+    return this.currentPostListenerSequence++;
   }
 
   static addTransactionIdListener(transactionId, callback) {
     this.transactionIdListeners[transactionId] = callback;
   }
 
-  static removeNewPostListener(object) {
-    delete this.agnosticNewPostListeners[object];
+  static removeNewPostListener(key) {
+    delete this.agnosticNewPostListeners[key];
   }
 }
