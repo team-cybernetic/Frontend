@@ -132,13 +132,18 @@ class Post extends Component {
 
 const styles = {
   container: {
-    width: '250px',
-    margin: '20px',
+    width: '45%',
+    marginLeft: '3%',
+    marginRight: '1%',
+    marginTop: '1.5%',
+    marginBottom: '1.5%',
     backgroundColor: 'white',
   },
   content: {
     display: 'block',
     overflowWrap: 'break-word',
+    overflowY: 'hidden',
+    maxHeight: '500px',
   },
   date: {
     fontSize: 'small',
@@ -147,7 +152,7 @@ const styles = {
     fontSize: 'small',
   },
   multiHash: {
-    fontSize: 'small',
+    fontSize: 'x-small',
   },
   multiHashIpfs: {
   },

@@ -16,7 +16,6 @@
   }
 
 }
-
   .Collapsible__trigger {
     display: block;
     position: relative;
@@ -29,7 +28,6 @@
   cursor: pointer;
 }
 
-/*Fix these symbols eventually*/
 .CustomTriggerCSS::before {
   content: "⯈		";
 }
@@ -42,7 +40,6 @@
 .CustomTriggerCSS--open::before {
   content: "⯆		";
 }
-
 
 .Collapsible__custom-sibling {
   padding: 5px;
