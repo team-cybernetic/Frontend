@@ -4,6 +4,7 @@ import contract from 'truffle-contract';
 import GasEstimator from './utils/GasEstimator';
 import PostStore from './stores/PostStore';
 import WalletStore from './stores/WalletStore';
+import PostContract from './ethWrappers/PostContract';
 import Ipfs from './utils/Ipfs';
 
 function instantiateContract(web3, resolve) {
@@ -23,6 +24,7 @@ function instantiateContract(web3, resolve) {
     [
       GasEstimator,
       PostStore,
+      PostContract,
       WalletStore,
     ].forEach((toInitialize) => toInitialize.initialize(web3, instance));
     Ipfs.initialize().then(resolve);

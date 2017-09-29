@@ -28,7 +28,6 @@ contract Posts {
         int256 permissions; //permission level of post
     }
 
-    mapping (string => Post) postsByTitle;
     mapping (address => uint256[]) postNumbersByCreator;
     mapping (uint256 => Post) postsByNumber;
     uint256[] postNumbers;
@@ -51,35 +50,6 @@ contract Posts {
 
     mapping (address => User) usersByAddress; //maps ethereum addres (public key) to user objects
     mapping (uint256 => User) usersByNumber;
-
-    function getPostByTitle(string _title) constant returns (
-        string title,
-        uint256 number,
-        string contentType,
-        uint8 ipfsHashFunction,
-        uint8 ipfsHashLength,
-        bytes ipfsHash,
-        address creator,
-        uint256 creationTime,
-        address groupAddress,
-        uint256 balance,
-        int256 permissions
-    ) {
-        Post memory p = postsByTitle[_title];
-        return (
-            p.title,
-            p.number,
-            p.contentType,
-            p.contentAddress.hashFunction,
-            p.contentAddress.hashLength,
-            p.contentAddress.hash,
-            p.creator,
-            p.creationTime,
-            p.groupAddress,
-            p.balance,
-            p.permissions
-        );
-    }
 
     function getPostByNumber(uint256 _number) constant returns (
         string title,
@@ -118,16 +88,10 @@ contract Posts {
         return (postNumbers);
     }
 
-    function postExists(string title) returns (bool) {
-        return (postsByTitle[title].number != 0);
-    }
-
     function createPost(string title, string contentType, uint8 ipfsHashFunction, uint8 ipfsHashLength, bytes ipfsHash, uint256 creationTime) returns (uint256) {
         //TODO: check title length via ruleset
         //TODO: UTF-8 length != bytes().length
         require(bytes(title).length <= 255);
-
-        require(!postExists(title));
 
 //        require(ipfsHashLength != 0); //permit content-less posts TODO: ruleset
 
@@ -170,7 +134,6 @@ contract Posts {
             permissions: 0 //TODO: default from ruleset
         });
 
-        postsByTitle[title] = newPost;
         postNumbersByCreator[creator].push(postCount);
         postsByNumber[postCount] = newPost;
         postNumbers.push(postCount);

@@ -33,7 +33,7 @@ class ChildrenView extends Component {
   renderPosts() {
     return this.state.posts.map((post) => {
       return (
-        <Post key={post.number} post={post} />
+        <Post key={post.id} post={post} />
       );
     })
   }

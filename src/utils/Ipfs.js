@@ -38,20 +38,19 @@ export default class Ipfs {
     }
   }
 
-  static addFile(content) {
+  static saveContent(content) {
     return new Promise((resolve, reject) => {
       this.ipfs.files.add([new this.ipfs.types.Buffer(content)], {}, (error, res) => {
         if (error) {
           reject(error);
         } else {
-          //debugger;
           resolve(res[0].hash);
         }
       });
     });
   }
 
-  static catFile(multiHash) {
+  static getContent(multiHash) {
     return new Promise((resolve, reject) => {
       if (!multiHash || multiHash.length < 3) {
         resolve('');
@@ -59,7 +58,7 @@ export default class Ipfs {
       }
       this.ipfs.files.cat(multiHash, (err, stream) => {
         if (err) {
-          console.log("Error while catting file: ", err);
+          console.log("Error while getting content.", err);
           reject(err);
         }
         let res = '';
@@ -81,7 +80,7 @@ export default class Ipfs {
     return [ipfsHashFunction, ipfsHashLength, ipfsHash];
   }
 
-  static assembleMultiHash(ipfsHashFunction, ipfsHashLength, ipfsHash) {
+  static assembleMultiHash([ipfsHashFunction, ipfsHashLength, ipfsHash]) {
     if (ipfsHash.length === 0 || ipfsHash === '0x') {
       return ('');
     }
