@@ -30,12 +30,20 @@ class ChildrenView extends Component {
     );
   }
 
-  renderPosts() {
-    return this.state.posts.map((post) => {
+  renderChildren() {
+    return (this.state.posts.map((post) => {
       return (
-        <Post key={post.id ? post.id : post.transactionId} post={post} />
+          <Post key={post.id ? post.id : post.transactionId} post={post} />
       );
-    })
+    }));
+  }
+
+  renderPosts() {
+    return (
+      <div style={styles.children}>
+        {this.renderChildren()}
+      </div>
+    );
   }
 
   renderLoader() {
@@ -62,11 +70,13 @@ class ChildrenView extends Component {
 
 const styles = {
   container: {
-    flex: 1,
+    overflowY: 'scroll',
+    flex: '1 1 0%',
+  },
+  children: {
     display: 'flex',
-    flexFlow: 'row',
-    flexWrap: 'wrap',
-    overflowY: 'auto',
+    flexFlow: 'row-reverse',
+    flexWrap: 'wrap-reverse',
     alignItems: 'flex-start',
     alignContent: 'flex-start',
   },

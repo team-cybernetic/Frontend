@@ -33,10 +33,10 @@ class Post extends Component {
     if (this.state.post.multiHashString !== null) {
       return (
         <div style={styles.container} className='card'>
-          <div style={styles.content} className='card-content'>
-            {this.renderTitle()}<br />
-            {this.renderId()}<span style={styles.date}>Posted {this.renderTimestamp()}</span><br />
-            {this.renderCreator()}<br />
+          <div style={styles.cardContent} className='card-content'>
+            {this.renderTitle()}
+            {this.renderTimestamp()}
+            {this.renderCreator()}
             {this.renderMultiHash()}
             {this.renderContent()}
           </div>
@@ -45,7 +45,7 @@ class Post extends Component {
     } else {
       return (
         <div style={styles.container} className='card'>
-          <div style={styles.content} className='card-content'>
+          <div style={styles.cardContent} className='card-content'>
             {this.renderId()}Loading...
           </div>
         </div>
@@ -54,7 +54,7 @@ class Post extends Component {
   }
 
   getTargetPath(parentPath) {
-    return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + this.state.post.id + '-' + encodeURIComponent(this.state.post.title) + (this.state.post.groupAddress ? '/' : ''));
+    return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + (this.state.post.id ? this.state.post.id : '0') + '-' + encodeURIComponent(this.state.post.title) + (this.state.post.groupAddress ? '/' : ''));
   }
 
   handleTitleClick(e) {
@@ -66,14 +66,17 @@ class Post extends Component {
 
   renderTitle() {
     return (
-      <a onClick={this.handleTitleClick} href={this.getTargetPath()}>{this.state.post.title}</a>
+      <a onClick={this.handleTitleClick} href={this.getTargetPath()}>{this.renderId()}{this.state.post.title}</a>
     );
   }
 
   renderCreator() {
     return (
       <span style={styles.creator}>
-        Creator:&nbsp;{this.state.post.creator}
+        Creator:&nbsp;
+        <span style={styles.creatorHash}>
+          {this.state.post.creator}
+        </span>
       </span>
     );
   }
@@ -108,23 +111,25 @@ class Post extends Component {
   }
 
   renderContent() {
+    let content;
+    let loaded = true;
     if (this.state.post.content === undefined || this.state.post.content === null) {
-      return (
-        <div>
-          <span>
-            Loading...
-          </span>
-        </div>
-      );
+      content = "Loading...";
+      loaded = false;
     } else {
-      let content = xss(this.state.post.content).replace(/\n/g, '<br />');
+      content = this.state.post.content;
+    }
+    content = xss(content).replace(/\n/g, '<br />');
+    if (content.length) {
       const html = {
         __html: content,
       }
       return (
-        <div>
-          {content.length ? <hr /> : ''}
-          <span dangerouslySetInnerHTML={html}></span>
+        <div style={styles.contentWrapper}>
+          {loaded ? <hr style={styles.contentHr}/> : ''}
+          <div style={styles.content}>
+            <span dangerouslySetInnerHTML={html}></span>
+          </div>
         </div>
       );
     }
@@ -132,24 +137,48 @@ class Post extends Component {
 
   renderTimestamp() {
     let m = moment(this.state.post.creationTime, "X");
-    return (m.calendar());
+    return (
+      <span style={styles.timestamp}>
+        Posted&nbsp;
+        <span style={styles.date}>
+          {m.calendar()}
+        </span>
+      </span>
+    );
   }
 }
 
 const styles = {
   container: {
-    width: '45%',
-    marginLeft: '3%',
-    marginRight: '1%',
+    width: '46%',
+    marginLeft: '2%',
+    marginRight: '2%',
     marginTop: '1.5%',
     marginBottom: '1.5%',
     backgroundColor: 'white',
   },
+  contentWrapper: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
   content: {
-    display: 'block',
+    overflowY: 'auto',
+    minHeight: '0px',
+    flex: 1,
+  },
+  contentHr: {
+    flexShrink: 0,
+  },
+  cardContent: {
+    display: 'flex',
+    flexDirection: 'column',
     overflowWrap: 'break-word',
-    overflowY: 'hidden',
     maxHeight: '500px',
+    padding: '1rem',
+  },
+  timestamp: {
+    fontSize: 'small',
   },
   date: {
     fontSize: 'small',
@@ -158,12 +187,16 @@ const styles = {
     fontSize: 'small',
   },
   multiHash: {
-    fontSize: 'x-small',
+    fontSize: 'small',
   },
   multiHashIpfs: {
+    fontSize: 'x-small',
   },
   creator: {
     fontSize: 'small',
+  },
+  creatorHash: {
+    fontSize: 'x-small',
   },
 };
 
