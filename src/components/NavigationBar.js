@@ -5,16 +5,11 @@ class NavigationBar extends Component {
   render() {
     return (
       <div style={styles.outerBar}>
-        {this.renderIcon('gear')}
-        {this.renderIcon('bookmark')}
-        {this.renderIcon('arrow-left')}
-        {this.renderIcon('arrow-right')}
-        {this.renderIcon('refresh')}
-        {this.renderIcon('home')}
-        <div style={styles.navbarContainer}>
-          <input style={styles.navbarInput} type='text' />
+        <div style={styles.groupTitleWrapper}>
+          <span style={styles.groupTitle}>Group Title</span>
         </div>
         {this.renderIcon('plus')}
+        {this.renderIcon('gear')}
       </div>
     );
   }
@@ -29,26 +24,26 @@ class NavigationBar extends Component {
 const styles = {
   outerBar: {
     backgroundColor: 'lightgray',
-      display: 'flex',
-      flex: '1 1 auto',
-      paddingRight: '8px',
-      paddingLeft: '8px',
+    display: 'flex',
+    flex: '1 1 auto',
+    paddingRight: '8px',
+    paddingLeft: '8px',
   },
   icon: {
     padding: '16px 5px',
     fontSize: '1.3em',
   },
-  navbarContainer: {
-      display: 'flex',
-      flexGrow: '1',
-      marginRight: '8px',
+  groupTitleWrapper: {
+    display: 'flex',
+    flexGrow: '1',
+    justifyContent: 'center',
   },
-  navbarInput: {
-      marginTop: 'auto',
-      marginBottom: 'auto',
-      fontSize: 'large',
-      width: '100%',
-  }
+  groupTitle: {
+    textAlign: 'center',
+    fontSize: 'x-large',
+    fontWeight: 'bold',
+    margin: '4px',
+  },
 };
 
 export default NavigationBar;

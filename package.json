@@ -16,6 +16,7 @@
     "react-collapsible": "^2.0.3",
     "react-dom": "15.6.1",
     "react-fontawesome": "1.6.1",
+    "react-router-dom": "^4.2.2",
     "reset-css": "^2.2.1",
     "truffle-contract": "^1.1.8",
     "truffle-solidity-loader": "0.0.8",
