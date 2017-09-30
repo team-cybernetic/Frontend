@@ -53,7 +53,7 @@ class App extends Component {
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
             <ChildrenView key={path} path={path} />
-            <Editor path={path} />
+            <Editor key={path} path={path} />
           </div>
           <SideBar key={path} path={path} />
         </div>
