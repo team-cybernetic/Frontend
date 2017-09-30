@@ -16,7 +16,7 @@ export default class PostStore {
     const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
     watchEvent.watch((error, response) => {
       if (!error) {
-        const id = response.args.number.c[0];
+        const id = response.args.number.c[0]; //TODO: bigint to string?
         Object.keys(this.agnosticNewPostListeners).forEach((key) => {
           const post = this.getPost(id);
           post.transactionId = response.transactionHash;
@@ -33,7 +33,6 @@ export default class PostStore {
   static createPost(title, content, contentType) {
     return new Promise((resolve, reject) => {
       Ipfs.saveContent(content).then((multiHashString) => {
-        console.log("ipfs hash: ", multiHashString);
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
         const post = new Post({ title, content, contentType, multiHashArray, multiHashString });
         PostContract.createPost(post).then((transactionId) => {

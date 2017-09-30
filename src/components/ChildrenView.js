@@ -33,7 +33,7 @@ class ChildrenView extends Component {
   renderPosts() {
     return this.state.posts.map((post) => {
       return (
-        <Post key={post.id} post={post} />
+        <Post key={post.id ? post.id : post.transactionId} post={post} />
       );
     })
   }
@@ -56,7 +56,7 @@ class ChildrenView extends Component {
   }
 
   alreadyHavePost(post) {
-    return !!post.id && some(this.state.posts, { id: post.id }) || !!post.transactionId && some(this.state.posts, { transactionId: post.transactionId });
+    return (!!post.id && some(this.state.posts, { id: post.id })) || (!!post.transactionId && some(this.state.posts, { transactionId: post.transactionId }));
   }
 }
 

@@ -5,7 +5,7 @@ import PostContract from '../ethWrappers/PostContract';
 import Ipfs from '../utils/Ipfs';
 
 export default class Post {
-  constructor({ title, content, contentType, multiHashArray, multiHashString, creationTime, creator, balance, id, transactionId, permissions, groupAddress }) {
+  constructor({ title, content, contentType, multiHashArray, multiHashString = null, creationTime, creator, balance, id, transactionId, permissions, groupAddress }) {
     this.contentLoadListeners = [];
     this.headerLoadListeners = [];
     this.fullCreationLoadListeners = [];
@@ -22,7 +22,7 @@ export default class Post {
     this.creator = creator || WalletStore.getDefaultAccount();
     this.balance = balance || 0;
 
-    if (id && !multiHashString) {
+    if (id) {
       this.loadHeader();
     } else if (!content) {
       this.loadContent();
@@ -63,7 +63,8 @@ export default class Post {
       this.permissions = permissions;
       this.groupAddress = groupAddress;
       this.creationTime = creationTime || moment().unix();
-      this.creator = creator || WalletStore.getDefaultAccount();
+      this.creator = creator;
+      //this.creator = creator || WalletStore.getDefaultAccount(); //not sure if saying an unknown creator is a post made by yourself makes sense, displaying all 0s at least alerts the user to the problem
       this.balance = balance || 0;
       this.headerLoadListeners.forEach((listener) => listener());
       if (alsoLoadContent) {

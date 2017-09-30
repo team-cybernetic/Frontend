@@ -40,13 +40,17 @@ export default class Ipfs {
 
   static saveContent(content) {
     return new Promise((resolve, reject) => {
-      this.ipfs.files.add([new this.ipfs.types.Buffer(content)], {}, (error, res) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(res[0].hash);
-        }
-      });
+      if (content === '') {
+        resolve('');
+      } else {
+        this.ipfs.files.add([new this.ipfs.types.Buffer(content)], {}, (error, res) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(res[0].hash);
+          }
+        });
+      }
     });
   }
 
@@ -73,6 +77,9 @@ export default class Ipfs {
   }
 
   static extractMultiHash(multiHash) {
+    if (multiHash === '') {
+        return [0, 0, '0x'];
+    }
     let ipfsRaw = bs58.decode(multiHash); //returns a Buffer
     let ipfsHashFunction = ipfsRaw[0];
     let ipfsHashLength = ipfsRaw[1];

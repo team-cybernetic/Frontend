@@ -220,35 +220,6 @@
       "links": {},
       "address": "0x887a2cda04514ef77371b613c24f97dbd06e71e7",
       "updated_at": 1506702712857
-    },
-    "1504670019360": {
-      "events": {
-        "0xd8c86c7877c3f1f8a40af6cf64a11fe867af887f2a1ad31aac849e36730425b0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "name": "creator",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "name": "number",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "name": "title",
-              "type": "string"
-            }
-          ],
-          "name": "NewPost",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x2c4af8310f97f42bb42affd4b6af6043e788f922",
-      "updated_at": 1505577863520
     }
   },
   "schema_version": "0.0.5",

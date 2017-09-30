@@ -9,6 +9,7 @@ class Post extends Component {
     this.state = {
       post: props.post,
     };
+    this.handleTitleClick = this.handleTitleClick.bind(this);
   }
 
   componentWillMount() {
@@ -29,11 +30,11 @@ class Post extends Component {
   }
 
   render() {
-    if (this.state.post.multiHashString) {
+    if (this.state.post.multiHashString !== null) {
       return (
         <div style={styles.container} className='card'>
           <div style={styles.content} className='card-content'>
-            <a href={'#' + this.state.post.title}>{this.state.post.title}</a><br />
+            {this.renderTitle()}<br />
             {this.renderId()}<span style={styles.date}>Posted {this.renderTimestamp()}</span><br />
             {this.renderCreator()}<br />
             {this.renderMultiHash()}
@@ -52,6 +53,23 @@ class Post extends Component {
     }
   }
 
+  getTargetPath(parentPath) {
+    return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + this.state.post.id + '-' + encodeURIComponent(this.state.post.title) + (this.state.post.groupAddress ? '/' : ''));
+  }
+
+  handleTitleClick(e) {
+    e.preventDefault();
+    let newPath = this.getTargetPath(window.history.state.path);
+    let newState = Object.assign({}, window.history.state, { path: newPath });
+    window.history.pushState(newState, "Blokkchat: " + newPath, newPath);
+  }
+
+  renderTitle() {
+    return (
+      <a onClick={this.handleTitleClick} href={this.getTargetPath()}>{this.state.post.title}</a>
+    );
+  }
+
   renderCreator() {
     return (
       <span style={styles.creator}>
@@ -61,18 +79,6 @@ class Post extends Component {
   }
 
   renderMultiHash() {
-    if (this.state.post.contentType) {
-      if (this.state.post.contentType === 'group') {
-        return (
-        <span style={styles.multiHash}>
-          IPFS:&nbsp;
-          <a href={"group"} target="_blank" style={styles.multiHashIpfs}>
-            {this.state.post.multiHashString}
-          </a>
-        </span>
-      );
-      }
-    }
     if (this.state.post.multiHashString) {
       return (
         <span style={styles.multiHash}>
