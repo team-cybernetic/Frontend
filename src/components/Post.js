@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import xss from 'xss';
 import moment from 'moment';
 import PostStore from '../stores/PostStore';
+import { Link } from 'react-router-dom';
 
 class Post extends Component {
   constructor(props) {
@@ -9,7 +10,6 @@ class Post extends Component {
     this.state = {
       post: props.post,
     };
-    this.handleTitleClick = this.handleTitleClick.bind(this);
   }
 
   componentWillMount() {
@@ -57,16 +57,9 @@ class Post extends Component {
     return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + this.state.post.id + '-' + encodeURIComponent(this.state.post.title) + (this.state.post.groupAddress ? '/' : ''));
   }
 
-  handleTitleClick(e) {
-    e.preventDefault();
-    let newPath = this.getTargetPath(window.history.state.path);
-    let newState = Object.assign({}, window.history.state, { path: newPath });
-    window.history.pushState(newState, "Blokkchat: " + newPath, newPath);
-  }
-
   renderTitle() {
     return (
-      <a onClick={this.handleTitleClick} href={this.getTargetPath()}>{this.state.post.title}</a>
+      <Link to={`${this.getTargetPath()}`}>{this.state.post.title}</Link>
     );
   }
 

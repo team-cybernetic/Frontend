@@ -3,7 +3,7 @@ import PostContract from '../ethWrappers/PostContract';
 import Post from '../models/Post';
 
 export default class PostStore {
-  static currentPostListenerSequence = 0;
+  static currentPostListenerSequence = 1;
   static postsContractInstance = null;
   static web3 = null;
   static agnosticNewPostListeners = {};

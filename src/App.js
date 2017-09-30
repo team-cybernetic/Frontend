@@ -1,12 +1,34 @@
 import React, { Component } from 'react';
+import registerServiceWorker from './registerServiceWorker';
+import initializeApp from './initializeApp';
 import NavigationBar from './components/NavigationBar';
 import ChildrenView from './components/ChildrenView';
 import SideBar from './components/SideBar';
 import Editor from './components/Editor';
+import {
+  BrowserRouter as Router,
+  Route
+} from 'react-router-dom';
 
-class App extends Component {
+export default class InitializationWrapper extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true
+    };
+  }
+
+  componentWillMount() {
+    initializeApp().then(() => {
+      this.setState({
+        isLoading: false
+      });
+    });
+    registerServiceWorker();
+  }
+
   render() {
-    if (this.props.isLoading) {
+    if (this.state.isLoading) {
       return (
         <div style={styles.container}>
           Loading...
@@ -14,18 +36,29 @@ class App extends Component {
       );
     } else {
       return (
-        <div style={styles.container}>
-          <NavigationBar />
-          <div style={styles.content}>
-            <div style={styles.childrenAndEditor}>
-              <ChildrenView />
-              <Editor />
-            </div>
-            <SideBar />
-          </div>
-        </div>
+        <Router>
+          <Route path="/:path*" component={App} />
+        </Router>
       );
     }
+  }
+}
+
+class App extends Component {
+  render() {
+    const path = this.props.match.params.path;
+    return (
+      <div style={styles.container}>
+        <NavigationBar key={path} path={path} />
+        <div style={styles.content}>
+          <div style={styles.childrenAndEditor}>
+            <ChildrenView key={path} path={path} />
+            <Editor path={path} />
+          </div>
+          <SideBar key={path} path={path} />
+        </div>
+      </div>
+    );
   }
 }
 
@@ -46,5 +79,3 @@ const styles = {
     width: '70%',
   },
 };
-
-export default App;

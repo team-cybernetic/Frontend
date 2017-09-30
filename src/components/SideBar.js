@@ -14,8 +14,6 @@ class SideBar extends Component {
   render() {
     return (
       <div style={styles.container}>
-        <p style={styles.groupTitle}>Group Title</p>
-
         <p style={styles.groupDesc}>[ short description of group could go here. ]</p>
         <p style={styles.groupDesc}>x Members / x Earnings</p>
 
@@ -97,18 +95,12 @@ const styles = {
     margin: '0px',
     overflowY: 'auto',
   },
-  groupTitle: {
-    textAlign: 'center',
-    fontSize: 'x-large',
-    fontWeight: 'bold',
-    margin: '2px',
-    marginTop: '10px',
-  },
   groupDesc: {
     textAlign: 'center',
     fontSize: 'small',
     margin: '2px',
     marginBottom: '10px',
+    marginTop: '10px',
   },
   joinButton: {
     textAlign: 'center',

@@ -35,12 +35,6 @@ function instantiateContract(web3, resolve) {
 
 export default function initializeApp() {
   return new Promise((resolve) => {
-    if (window.history.state == null) {
-        window.history.pushState({ path: "/" }, "Blokkchat: /", "/");
-    }
-    window.onpopstate = (ev) => {
-      console.log("state popped to:", ev.state.path); //TODO: probably a better way of doing this state management
-    };
     getWeb3().then((results) => {
       instantiateContract(results.web3, resolve);
     }).catch((error) => {
