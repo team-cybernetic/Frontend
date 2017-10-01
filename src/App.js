@@ -47,15 +47,16 @@ export default class InitializationWrapper extends Component {
 class App extends Component {
   render() {
     const path = this.props.match.params.path;
+      console.log("App path:", path);
     return (
       <div style={styles.container}>
-        <NavigationBar key={path} path={path} />
+        <NavigationBar key={`navbar-${path}`} path={path} />
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
-            <ChildrenView key={path} path={path} />
-            <Editor key={path} path={path} />
+            <ChildrenView key={`children-${path}`} path={path} />
+            <Editor key={`editor-${path}`} path={path} />
           </div>
-          <SideBar key={path} path={path} />
+          <SideBar key={`sidebar-${path}`} path={path} />
         </div>
       </div>
     );
