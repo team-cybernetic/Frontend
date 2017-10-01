@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Collapsible from 'react-collapsible';
-import PostStore from '../stores/PostStore';
 import PostContract from '../ethWrappers/PostContract';
 import './style.css';
 
@@ -70,7 +69,6 @@ class SideBar extends Component {
 
   getCurPostNum() {
     var url = window.location.href;
-    var groups = [];
     url = url.substring(0,url.length - 1);
     var curGroup = url.substring(url.lastIndexOf('/') + 1, url.length);
     return curGroup.substring(0, curGroup.indexOf('-')).trim();

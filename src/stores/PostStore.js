@@ -24,7 +24,7 @@ export default class PostStore {
     for(var i = 0; i < groups.length; i++) {
       var addr = PostContract.getPost(groups[i]).address;
       if (addr != null) {
-        var newContract = this.web3.eth.contract(newContract.abi).at(addr);
+        newContract = this.web3.eth.contract(newContract.abi).at(addr);
       }
     }
     console.log(newContract);

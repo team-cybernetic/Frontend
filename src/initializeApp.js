@@ -1,6 +1,6 @@
 import PostsContract from './contracts/Posts.json'
 import getWeb3 from './utils/getWeb3'
-import contract from 'truffle-contract';
+import TruffleContract from 'truffle-contract';
 import GasEstimator from './utils/GasEstimator';
 import PostStore from './stores/PostStore';
 import WalletStore from './stores/WalletStore';
@@ -15,18 +15,18 @@ function instantiateContract(web3, resolve) {
     * state management library, but for convenience I've placed them here.
     */
 
-  const postsContract = contract(PostsContract);
+  const postsContract = TruffleContract(PostsContract);
   postsContract.setProvider(web3.currentProvider);
   postsContract.defaults({
     gasLimit: '5000000'
   });
-  postsContract.deployed().then((instance) => { //once the contract is surely deployed
+  postsContract.deployed().then((instance) => {
     [
       GasEstimator,
       PostStore,
-      PostContract,
       WalletStore,
     ].forEach((toInitialize) => toInitialize.initialize(web3, instance));
+    PostContract.initialize(web3, instance, postsContract);
     Ipfs.initialize().then(resolve);
   }).catch((error) => {
     console.error('Error deploying contract: ', error);
