@@ -8,7 +8,30 @@ export default class PostStore {
   static web3 = null;
   static agnosticNewPostListeners = {};
   static transactionIdListeners = {};
+  static rootAddress = '0x887a2cda04514ef77371b613c24f97dbd06e71e7';
   static cache = {};
+
+  static getContractPath() {
+    var url = window.location.href;
+    var groups = [];
+    url = url.substring(0,url.length - 1);
+    while(url.includes('-')) {
+      var curGroup = url.substring(url.lastIndexOf('/') + 1, url.length);
+      groups.push(curGroup.substring(0, curGroup.indexOf('-')).trim());
+      url = url.substring(0,url.lastIndexOf('/'));
+    }
+    var newContract = this.web3.eth.contract(this.postsContractInstance.abi).at(this.rootAddress);
+    for(var i = 0; i < groups.length; i++) {
+      var addr = PostContract.getPost(groups[i]).address;
+      if (addr != null) {
+        var newContract = this.web3.eth.contract(newContract.abi).at(addr);
+      }
+    }
+    console.log(newContract);
+    this.postsContractInstance = newContract;
+  }
+
+  
 
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
@@ -60,6 +83,7 @@ export default class PostStore {
   }
 
   static getPosts() {
+    this.getContractPath();
     return new Promise((resolve) => {
       PostContract.getPostIds().then((postIds) => {
         resolve(postIds.map((bigInt) => this.getPost(bigInt.c[0])));

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Collapsible from 'react-collapsible';
 import PostStore from '../stores/PostStore';
+import PostContract from '../ethWrappers/PostContract';
 import './style.css';
 
 class SideBar extends Component {
@@ -63,26 +64,20 @@ class SideBar extends Component {
     );
   }
   testMethod() {
-    const title = "Example Group"
-    const content = "This is an Example Group";
-    const contentType = "group";
-    this.setState({
-      isPosting: true,
-    });
-    PostStore.createPost(title.trim(), content, contentType).then((post) => {
-      console.log("Created a post:", post);
-      this.setState({
-        textAreaValue: '',
-        isPosting: false,
-      });
-    }).catch((error) => {
-      console.error(error);
-      this.setState({
-        isPosting: false,
-      });
-    });
+    var postNum = this.getCurPostNum();
+    PostContract.convertPost2Group(postNum);
   }
+
+  getCurPostNum() {
+    var url = window.location.href;
+    var groups = [];
+    url = url.substring(0,url.length - 1);
+    var curGroup = url.substring(url.lastIndexOf('/') + 1, url.length);
+    return curGroup.substring(0, curGroup.indexOf('-')).trim();
+  }
+  
 }
+
 
 
 
