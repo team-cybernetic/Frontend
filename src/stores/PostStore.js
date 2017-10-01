@@ -10,6 +10,7 @@ export default class PostStore {
   static transactionIdListeners = {};
   static rootAddress = '0x887a2cda04514ef77371b613c24f97dbd06e71e7';
   static cache = {};
+  static wow = 0;
 
   static getContractPath() {
     var url = window.location.href;
@@ -24,7 +25,7 @@ export default class PostStore {
     for(var i = 0; i < groups.length; i++) {
       var addr = PostContract.getPost(groups[i]).address;
       if (addr != null) {
-        newContract = this.web3.eth.contract(newContract.abi).at(addr);
+        var newContract = this.web3.eth.contract(newContract.abi).at(addr);
       }
     }
     console.log(newContract);
@@ -52,6 +53,8 @@ export default class PostStore {
       }
     });
   }
+
+
 
   static createPost(title, content, contentType) {
     return new Promise((resolve, reject) => {
@@ -83,7 +86,7 @@ export default class PostStore {
   }
 
   static getPosts() {
-    this.getContractPath();
+    console.log('getting posts...',this.wow++);
     return new Promise((resolve) => {
       PostContract.getPostIds().then((postIds) => {
         resolve(postIds.map((bigInt) => this.getPost(bigInt.c[0])));

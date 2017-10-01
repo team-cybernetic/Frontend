@@ -1,14 +1,17 @@
 import GasEstimator from '../utils/GasEstimator';
+import TruffleContract from 'truffle-contract';
+import PostsContract from '../contracts/Posts.json'
+import PostStore from '../stores/PostStore';
+import ChildView from '../components/ChildrenView';
 
 export default class PostContract {
-  static postsContract = null;
   static postsContractInstance = null;
   static web3 = null;
   static createdPostsAwaitingPromiseResolution = {};
+  static groupAddressSet = [];
 
-  static initialize(web3, postsContractInstance, postsContract) {
+  static initialize(web3, postsContractInstance) {
     this.web3 = web3;
-    this.postsContract = postsContract;
     this.postsContractInstance = postsContractInstance;
     this.web3.eth.filter("pending").watch((error, txid) => {
       this.listenForPendingPostTransactions(error, txid);
@@ -21,10 +24,12 @@ export default class PostContract {
       GasEstimator.estimate('setParent').then((gas) => {
         let actualGas = gas * 3;
         console.log("gas estimator estimates that this setParent call will cost", gas, "gas, actualGas =", actualGas);
-        this.postsContractInstance.setParent(address,{ gas: actualGas }).then((result) => {
-          this.createdPostsAwaitingPromiseResolution[result.tx] = { resolve, reject };
-        }).catch((error) => {
-          console.error("Error while executing createPost contract function.", error);
+        this.postsContractInstance.setParent(address,{ gas: actualGas }, (error, output) => {
+          if (error) {
+            console.error("Error while executing setGroupAddress contract function.", error);
+          } else {
+            resolve(output)
+          }
         });
       }).catch((error) => {
         console.error("Error while estimating gas.", error);
@@ -52,15 +57,55 @@ export default class PostContract {
     });
   }
 
-  static setGroupAddress({postNum, groupAddress}) {
+  /*static joinGroup(groupAddress) {
+    const postsContract = TruffleContract(PostsContract);
+    postsContract.setProvider(this.web3.currentProvider);
+    var newContract = postsContract.at(groupAddress);
+    PostStore.postsContractInstance = newContract;
+    this.postsContractInstance = newContract;
+    ChildView.state = {
+      posts: null,
+    };
+  }*/
+
+  //I have literally no idea why this/getgroupaddress don't work
+  //I spent ~8 hours debugging these and they just inexplicably do not work
+  static setGroupAddress(postNum, groupAddress) {
     return new Promise((resolve, reject) => {
       GasEstimator.estimate('setGroupAddress', postNum, groupAddress).then((gas) => {
-        let actualGas = gas * 3;
+        let actualGas = gas;
+        console.log("setgroupaddress is setting to ", groupAddress);
         console.log("gas estimator estimates that this setGroupAddress call will cost", gas, "gas, actualGas =", actualGas);
-        this.postsContractInstance.setGroupAddress(postNum, groupAddress, { gas: actualGas }).then((result) => {
-          this.createdPostsAwaitingPromiseResolution[result.tx] = { resolve, reject };
-        }).catch((error) => {
-          console.error("Error while executing createPost contract function.", error);
+        groupAddress = this.postsContractInstance.address;
+        console.log(postNum, groupAddress);
+        var p = this.postsContractInstance.setGroupAddress.call(postNum, groupAddress.valueOf(), { gas: actualGas * 30 });
+        p.then((result) => {
+          resolve(result);
+        });
+      }).catch((error) => {
+        console.error("Error while estimating gas.", error);
+      });
+    });
+  }
+  /*static setGroupAddress(postNum, groupAddress) {
+    this.groupAddressSet[postNum] = groupAddress;
+    return groupAddress;
+  }
+  static getGroupAddress(postNum) {
+    return this.groupAddressSet[postNum];
+  }*/
+
+  static getGroupAddress(postNum) {
+    console.log('trying group stuff');
+    return new Promise((resolve, reject) => {
+      GasEstimator.estimate('getGroupAddress', postNum).then((gas) => {
+        let actualGas = gas;
+        console.log("gas estimator estimates that this getGroupAddress call will cost", gas, "gas, actualGas =", actualGas);
+        console.log(postNum,actualGas);
+        var p = this.postsContractInstance.getGroupAddress.call(postNum, { gas: actualGas });
+        p.then((result) => {
+          console.log(result.toString());
+          resolve(result);
         });
       }).catch((error) => {
         console.error("Error while estimating gas.", error);
@@ -68,61 +113,32 @@ export default class PostContract {
     });
   }
 
-  static convertPost2Group({postNum}) {
-    console.log("converting post", postNum, "to group");
-    this.makeContract().then((newInstance) => {
-    }).catch((err) => {
-      console.log("Error while converting post to group:", err);
-    });
-  }
-
-  static makeContract() {
+  static convertPost2Group(postNum) {
     return new Promise((resolve, reject) => {
-      this.postsContract.new({gas: 4000000}).then((newInstance) => {
-        resolve(newInstance);
-      }).catch((err) => {
-        reject(err);
+      console.log("converting post", postNum, "to group");
+      const postsContract = TruffleContract(PostsContract);
+      postsContract.setProvider(this.web3.currentProvider);
+      console.log("postsContract: ", postsContract);
+      this.estimate(this.postsContractInstance.new).then((gas) => {
+          let actualGas = gas * 50;
+          postsContract.new({gas: actualGas}).then((res1) => {
+            console.log('post number ', postNum, ' created as a group with address ', res1.address);
+            this.setGroupAddress(postNum,res1.address)
+            resolve(res1.address);
+          }).catch((err) => {
+            console.log("ERROR: ", err);
+          });
+      }).catch((error) => {
+          console.error("Error while estimating gas.", error);
       });
     });
   }
 
-  static getAddress(txn) {
+  static estimate(input) {
     return new Promise((resolve, reject) => {
-        var trm = this.getTransactionReceiptMined(txn);
-        resolve(trm);
+      resolve(this.web3.eth.estimateGas({data:input}));
     });
   }
-
-   static getTransactionReceiptMined(txnHash, interval) { 
-    var transactionReceiptAsync;
-    interval = interval ? interval : 500;
-    transactionReceiptAsync = function(txnHash, resolve, reject) {
-        try {
-            var receipt = this.web3.eth.getTransactionReceipt(txnHash);
-            if (receipt == null) {
-                setTimeout(function () {
-                    transactionReceiptAsync(txnHash, resolve, reject);
-                }, interval);
-            } else {
-                resolve(receipt);
-            }
-        } catch(e) {
-            reject(e);
-        }
-    };
-
-    if (Array.isArray(txnHash)) {
-        var promises = [];
-        txnHash.forEach(function (oneTxHash) {
-            promises.push(this.web3.eth.getTransactionReceiptMined(oneTxHash, interval));
-        });
-        return Promise.all(promises);
-    } else {
-        return new Promise(function (resolve, reject) {
-                transactionReceiptAsync(txnHash, resolve, reject);
-            });
-    }
-}
 
   static getPost(id) {
     return this.postsContractInstance.getPostByNumber.call(id);

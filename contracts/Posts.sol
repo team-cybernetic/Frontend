@@ -85,6 +85,16 @@ contract Posts {
         );
     }
 
+    function setGroupAddress(uint256 postNum, address addr) {
+        Post targ = postsByNumber[postNum];
+        targ.groupAddress = addr;
+        postsByNumber[postNum] = targ;
+    }
+
+    function getGroupAddress(uint256 postNum) returns (address) {
+        return postsByNumber[postNum].groupAddress;
+    }
+
     function getParent() constant returns (address) {
         return parentGroup;
     }

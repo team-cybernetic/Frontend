@@ -15,15 +15,11 @@ class NavigationBar extends Component {
   }
 
   getGroupTitle() {
-    var url = window.location.href;
-    var groups = [];
-    url = url.substring(0,url.length - 1);
-    while(url.includes('-')) {
-      var curGroup = url.substring(url.lastIndexOf('/'), url.length);
-      groups.push(curGroup.substring(curGroup.indexOf('-') + 1, curGroup.length).trim());
-      url = url.substring(0,url.lastIndexOf('/'));
+    var url = this.props.path;
+    if(url === undefined) {
+      return 'root';
     }
-    return decodeURI(groups[0]);
+    return url.substring(url.indexOf('-') + 1).trim();
   }  
 
   renderIcon(name) {

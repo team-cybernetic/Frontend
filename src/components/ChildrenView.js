@@ -53,6 +53,7 @@ class ChildrenView extends Component {
   }
 
   addToPosts(post) {
+    console.log('adding post');
     if (!this.alreadyHavePost(post)) {
       let { posts } = this.state;
       if (posts === null) {

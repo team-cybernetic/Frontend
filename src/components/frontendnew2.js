@@ -64,25 +64,19 @@ class SideBar extends Component {
     );
   }
   testMethod() {
-    PostContract.setGroupAddress(4,'0x12345678').then((result) => {
-      console.log(result);
-    });
-    PostContract.getGroupAddress(4).then((result) => {
-      console.log('get',result.toString());
-    });
-    /*
     var postNum = this.getCurPostNum();
     console.log(postNum);
     var prom = PostContract.convertPost2Group(postNum);
     prom.then((addr) => {
       console.log('we got the address as', addr);
-      PostContract.joinGroup(addr);
-      var naddr = PostContract.getGroupAddress(postNum);
-      console.log('got the group address, its ', naddr);
+      //PostContract.joinGroup(addr);
+      PostContract.getGroupAddress(postNum).then((naddr) => {
+        console.log('got the group address, its ', naddr);
+      });
     }).catch((error) => {
           console.error("Error while executing testMethod contract function.", error);
     });
-    */
+
   }
 
   getCurPostNum() {
