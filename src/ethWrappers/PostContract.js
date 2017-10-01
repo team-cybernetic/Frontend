@@ -1,8 +1,7 @@
 import GasEstimator from '../utils/GasEstimator';
 import TruffleContract from 'truffle-contract';
-import PostsContract from '../contracts/Posts.json'
+import PostsContract from '../contracts/Posts.json';
 import PostStore from '../stores/PostStore';
-import ChildView from '../components/ChildrenView';
 
 export default class PostContract {
   static postsContractInstance = null;
@@ -57,7 +56,7 @@ export default class PostContract {
     });
   }
 
-  /*static joinGroup(groupAddress) {
+  static joinGroup(groupAddress) {
     const postsContract = TruffleContract(PostsContract);
     postsContract.setProvider(this.web3.currentProvider);
     var newContract = postsContract.at(groupAddress);
@@ -66,11 +65,11 @@ export default class PostContract {
     ChildView.state = {
       posts: null,
     };
-  }*/
+  }
 
   //I have literally no idea why this/getgroupaddress don't work
   //I spent ~8 hours debugging these and they just inexplicably do not work
-  static setGroupAddress(postNum, groupAddress) {
+  /*static setGroupAddress(postNum, groupAddress) {
     return new Promise((resolve, reject) => {
       GasEstimator.estimate('setGroupAddress', postNum, groupAddress).then((gas) => {
         let actualGas = gas;
@@ -86,15 +85,15 @@ export default class PostContract {
         console.error("Error while estimating gas.", error);
       });
     });
-  }
-  /*static setGroupAddress(postNum, groupAddress) {
+  }*/
+  static setGroupAddress(postNum, groupAddress) {
     this.groupAddressSet[postNum] = groupAddress;
     return groupAddress;
   }
   static getGroupAddress(postNum) {
     return this.groupAddressSet[postNum];
-  }*/
-
+  }
+/*
   static getGroupAddress(postNum) {
     console.log('trying group stuff');
     return new Promise((resolve, reject) => {
@@ -111,7 +110,7 @@ export default class PostContract {
         console.error("Error while estimating gas.", error);
       });
     });
-  }
+  }*/
 
   static convertPost2Group(postNum) {
     return new Promise((resolve, reject) => {
@@ -140,12 +139,24 @@ export default class PostContract {
     });
   }
 
+  updateOnClick(id) {
+  var addr = PostContract.getGroupAddress(id);
+  if (addr != undefined) {
+    PostContract.joinGroup(addr);
+    return;
+  } else {
+    var prom = PostContract.convertPost2Group(id);
+    prom.then((addr) => {
+      return;
+    });
+  }
+
   static getPost(id) {
     return this.postsContractInstance.getPostByNumber.call(id);
   }
 
   static getPostIds() {
-    return this.postsContractInstance.getPostNumbers.call()
+    return this.postsContractInstance.getPostNumbers.call();
   }
 
   static listenForPendingPostTransactions(error, transactionId) {

@@ -1,6 +1,8 @@
 import Ipfs from '../utils/Ipfs';
 import PostContract from '../ethWrappers/PostContract';
 import Post from '../models/Post';
+import TruffleContract from 'truffle-contract';
+import PostsContract from '../contracts/Posts.json';
 
 export default class PostStore {
   static currentPostListenerSequence = 1;
@@ -12,31 +14,20 @@ export default class PostStore {
   static cache = {};
   static wow = 0;
 
-  static getContractPath() {
-    var url = window.location.href;
-    var groups = [];
-    url = url.substring(0,url.length - 1);
-    while(url.includes('-')) {
-      var curGroup = url.substring(url.lastIndexOf('/') + 1, url.length);
-      groups.push(curGroup.substring(0, curGroup.indexOf('-')).trim());
-      url = url.substring(0,url.lastIndexOf('/'));
-    }
-    var newContract = this.web3.eth.contract(this.postsContractInstance.abi).at(this.rootAddress);
-    for(var i = 0; i < groups.length; i++) {
-      var addr = PostContract.getPost(groups[i]).address;
-      if (addr != null) {
-        var newContract = this.web3.eth.contract(newContract.abi).at(addr);
-      }
-    }
-    console.log(newContract);
-    this.postsContractInstance = newContract;
-  }
-
   
 
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
     this.postsContractInstance = postsContractInstance;
+    if(this.props !== undefined && this.props.path !== undefined) {
+      console.log(this.props.path);
+      var url = this.props.path;
+      url = url.substring(0,url.indexOf('-')).trim();
+      const postsContract = TruffleContract(this.PostsContract);
+      postsContract.setProvider(this.web3.currentProvider);
+      var newContract = postsContract.at(PostContract.getGroupAddress(url));
+      this.postsContractInstance = newContract;
+    }
     const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
     watchEvent.watch((error, response) => {
       if (!error) {
@@ -85,8 +76,8 @@ export default class PostStore {
     return this.cache[id];
   }
 
+
   static getPosts() {
-    console.log('getting posts...',this.wow++);
     return new Promise((resolve) => {
       PostContract.getPostIds().then((postIds) => {
         resolve(postIds.map((bigInt) => this.getPost(bigInt.c[0])));

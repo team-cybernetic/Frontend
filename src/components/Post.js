@@ -63,19 +63,6 @@ class Post extends Component {
       <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.state.post.title}</Link>
     );
   }
-  updateOnClick() {
-    console.log('I was just clicked by ',this.state.post.id);
-    var addr = PostContract.getGroupAddress(this.state.post.id);
-    if (addr != undefined) {
-      PostContract.joinGroup(addr);
-      return;
-    } else {
-      var prom = PostContract.convertPost2Group(this.state.post.id);
-      prom.then((addr) => {
-        PostContract.joinGroup(addr);
-        return;
-      });
-    }
   }
 
   renderCreator() {
