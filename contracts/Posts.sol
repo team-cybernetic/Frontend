@@ -52,6 +52,10 @@ contract Posts {
     mapping (address => User) usersByAddress; //maps ethereum addres (public key) to user objects
     mapping (uint256 => User) usersByNumber;
 
+    function Posts() payable {
+
+    }
+
     function getPostByNumber(uint256 _number) constant returns (
         string title,
         uint256 number,

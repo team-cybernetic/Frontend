@@ -6,13 +6,25 @@ class NavigationBar extends Component {
     return (
       <div style={styles.outerBar}>
         <div style={styles.groupTitleWrapper}>
-          <span style={styles.groupTitle}>Group Title</span>
+          <span style={styles.groupTitle}>{this.getGroupTitle()}</span>
         </div>
         {this.renderIcon('plus')}
         {this.renderIcon('gear')}
       </div>
     );
   }
+
+  getGroupTitle() {
+    var url = window.location.href;
+    var groups = [];
+    url = url.substring(0,url.length - 1);
+    while(url.includes('-')) {
+      var curGroup = url.substring(url.lastIndexOf('/'), url.length);
+      groups.push(curGroup.substring(curGroup.indexOf('-') + 1, curGroup.length).trim());
+      url = url.substring(0,url.lastIndexOf('/'));
+    }
+    return decodeURI(groups[0]);
+  }  
 
   renderIcon(name) {
     return (
