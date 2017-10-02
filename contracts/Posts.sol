@@ -34,6 +34,7 @@ contract Posts {
     address parentGroup;
 
     event NewPost(address indexed creator, uint256 indexed number, string title);
+    event NewGroup(uint256 indexed postNumber, address groupAddress);
 
     uint256 userCount = 0;
 
@@ -86,13 +87,26 @@ contract Posts {
     }
 
     function setGroupAddress(uint256 postNum, address addr) {
-        Post targ = postsByNumber[postNum];
-        targ.groupAddress = addr;
-        postsByNumber[postNum] = targ;
+        require(postNum <= postCount); //bad input
+
+        Post memory p = postsByNumber[postNum];
+        require(p.number != 0); //post deleted
+
+        //TODO: ruleset check permissions to add associate a group to this post
+
+        //TODO: check if addr is a valid contract?
+
+        p.groupAddress = addr;
+        postsByNumber[postNum] = p;
     }
 
     function getGroupAddress(uint256 postNum) returns (address) {
-        return postsByNumber[postNum].groupAddress;
+        require(postNum <= postCount); //bad input
+
+        Post memory p = postsByNumber[postNum];
+        require(p.number != 0); //post deleted
+
+        return p.groupAddress;
     }
 
     function getParent() constant returns (address) {

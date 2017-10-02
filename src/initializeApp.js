@@ -1,4 +1,4 @@
-import PostsContract from './contracts/Posts.json'
+import RootGroupContractJson from './contracts/Posts.json'
 import getWeb3 from './utils/getWeb3'
 import TruffleContract from 'truffle-contract';
 import GasEstimator from './utils/GasEstimator';
@@ -8,38 +8,32 @@ import PostContract from './ethWrappers/PostContract';
 import Ipfs from './utils/Ipfs';
 
 function instantiateContract(web3, resolve) {
-  /*
-  * SMART CONTRACT EXAMPLE
-    *
-    * Normally these functions would be called in the context of a
-    * state management library, but for convenience I've placed them here.
-    */
-
-  const postsContract = TruffleContract(PostsContract);
-  postsContract.setProvider(web3.currentProvider);
-  postsContract.defaults({
-    gasLimit: '5000000'
-  });
-  postsContract.deployed().then((instance) => {
-    [
-      GasEstimator,
-      PostStore,
-      WalletStore,
-    ].forEach((toInitialize) => toInitialize.initialize(web3, instance));
-    PostContract.initialize(web3, instance, postsContract);
-    Ipfs.initialize().then(resolve);
-  }).catch((error) => {
-    console.error('Error deploying contract: ', error);
+  return new Promise((resolve, reject) => {
+    const groupContract = TruffleContract(RootGroupContractJson);
+    groupContract.setProvider(web3.currentProvider);
+    groupContract.defaults({
+      gasLimit: '5000000'
+    });
+    groupContract.deployed().then((rootInstance) => {
+      console.log("groupContract root instance deployed at address:", rootInstance.address);
+      [
+        GasEstimator,
+        PostStore,
+        WalletStore,
+      ].forEach((toInitialize) => toInitialize.initialize(web3, rootInstance));
+      PostContract.initialize(web3, rootInstance, groupContract);
+      Ipfs.initialize().then(resolve);
+    }).catch((error) => {
+      console.error('Error deploying contract: ', error);
+      reject(error);
+    });
   });
 }
 
 export default function initializeApp() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     getWeb3().then((results) => {
-      instantiateContract(results.web3, resolve);
-    }).catch((error) => {
-      console.error('Error finding web3: ', error.message);
-      resolve();
-    });
+      instantiateContract(results.web3).then(resolve).catch(reject);
+    }).catch(reject);
   });
 }

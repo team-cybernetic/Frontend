@@ -5,6 +5,7 @@ import NavigationBar from './components/NavigationBar';
 import ChildrenView from './components/ChildrenView';
 import SideBar from './components/SideBar';
 import Editor from './components/Editor';
+import PostContract from './ethWrappers/PostContract';
 import {
   BrowserRouter as Router,
   Route
@@ -23,6 +24,8 @@ export default class InitializationWrapper extends Component {
       this.setState({
         isLoading: false
       });
+    }).catch((error) => {
+      console.error("Error while initializing app:", error);
     });
     registerServiceWorker();
   }
@@ -46,17 +49,49 @@ export default class InitializationWrapper extends Component {
 
 class App extends Component {
   render() {
-    const path = this.props.match.params.path;
-      console.log("App path:", path);
+    var path = this.props.match.url;
+    //var path = this.props.match.params.path;
+    if (path === undefined || path === '' || typeof(path) !== 'string') {
+      path = '/';
+    } else if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+    console.log("App path:", path);
+    const PATH = /^(\/(.*\/)?)(.*)$/;
+    let gm = PATH.exec(path);
+    let groupPath = gm[1];
+    let post = gm[3];
+    let postNum;
+    let postTitle;
+    const PARENT = /^(.*\/).+\/?$/;
+    let rm = PARENT.exec(path);
+    let par = rm[1];
+    if (post) {
+      const POST = /^([0-9]+)(-(.*))?$/;
+      let pm = POST.exec(post);
+      postNum = pm[1];
+      postTitle = pm[3];
+    }
+    var pathState = {
+      path,
+      'parent': par,
+      groupPath,
+      isGroup: !postNum,
+      post,
+      postNum,
+      postTitle,
+    };
+    console.log("pathState:", pathState);
+    PostContract.navigateTo(groupPath);
     return (
       <div style={styles.container}>
-        <NavigationBar key={`navbar-${path}`} path={path} />
+        <NavigationBar key={`navbar-${path}`} pathState={pathState} />
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
-            <ChildrenView key={`children-${path}`} path={path} />
-            <Editor key={`editor-${path}`} path={path} />
+            <ChildrenView key={`children-${path}`} pathState={pathState} />
+            <Editor key={`editor-${path}`} pathState={pathState} />
           </div>
-          <SideBar key={`sidebar-${path}`} path={path} />
+          <SideBar key={`sidebar-${path}`} pathState={pathState} />
         </div>
       </div>
     );

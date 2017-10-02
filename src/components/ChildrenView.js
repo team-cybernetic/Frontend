@@ -30,20 +30,20 @@ class ChildrenView extends Component {
     );
   }
 
-  renderChildren() {
-    return (this.state.posts.map((post) => {
-      return (
-          <Post key={post.id ? post.id : post.transactionId} post={post} />
-      );
-    }));
-  }
-
   renderPosts() {
     return (
       <div style={styles.children}>
         {this.renderChildren()}
       </div>
     );
+  }
+
+  renderChildren() {
+    return (this.state.posts.map((post) => {
+      return (
+          <Post key={post.id ? post.id : post.transactionId} post={post} />
+      );
+    }));
   }
 
   renderLoader() {

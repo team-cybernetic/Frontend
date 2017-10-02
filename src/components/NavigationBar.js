@@ -15,11 +15,14 @@ class NavigationBar extends Component {
   }
 
   getGroupTitle() {
+    return (this.props.pathState.path);
+    /*
     var url = this.props.path;
     if(url === undefined) {
       return 'root';
     }
     return url.substring(url.indexOf('-') + 1).trim();
+    */
   }  
 
   renderIcon(name) {

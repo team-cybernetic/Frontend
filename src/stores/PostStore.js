@@ -10,7 +10,6 @@ export default class PostStore {
   static web3 = null;
   static agnosticNewPostListeners = {};
   static transactionIdListeners = {};
-  static rootAddress = '0x887a2cda04514ef77371b613c24f97dbd06e71e7';
   static cache = {};
   static wow = 0;
 
@@ -19,8 +18,9 @@ export default class PostStore {
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
     this.postsContractInstance = postsContractInstance;
-    if(this.props !== undefined && this.props.path !== undefined) {
-      console.log(this.props.path);
+    /*
+    if(this.props !== undefined && this.props.pathState !== undefined) {
+      console.log(this.props.pathState.path);
       var url = this.props.path;
       url = url.substring(0,url.indexOf('-')).trim();
       const postsContract = TruffleContract(this.PostsContract);
@@ -28,8 +28,9 @@ export default class PostStore {
       var newContract = postsContract.at(PostContract.getGroupAddress(url));
       this.postsContractInstance = newContract;
     }
-    const watchEvent = this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'});
-    watchEvent.watch((error, response) => {
+    */
+    //TODO: this only watches the root contract, make it use PostContract for current group instead
+    this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'}).watch((error, response) => {
       if (!error) {
         const id = response.args.number.c[0]; //TODO: bigint to string?
         Object.keys(this.agnosticNewPostListeners).forEach((key) => {
@@ -60,11 +61,11 @@ export default class PostStore {
           resolve(post);
         }).catch((error) => {
           console.error("Error saving post to the blockchain.", error);
-          reject("Error saving post to the blockchain.");
+          reject(error);
         });
       }).catch((error) => {
         console.error("Error saving content to IPFS.", error);
-        reject("Error saving content to IPFS.");
+        reject(error);
       });
     });
   }
@@ -77,9 +78,9 @@ export default class PostStore {
   }
 
 
-  static getPosts() {
+  static getPosts(path) {
     return new Promise((resolve) => {
-      PostContract.getPostIds().then((postIds) => {
+      PostContract.getPostIds(path).then((postIds) => {
         resolve(postIds.map((bigInt) => this.getPost(bigInt.c[0])));
       }).catch(console.error);
     });

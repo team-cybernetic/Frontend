@@ -7,15 +7,16 @@ import './style.css';
 class SideBar extends Component {
     constructor(props) {
     super(props);
-    this.state = {
-      isPosting: false,
-    }
+  }
+
+  getPostContent() {
+    return ("TODO");
   }
 
   render() {
     return (
       <div style={styles.container}>
-        <p style={styles.groupDesc}>[ short description of group could go here. ]</p>
+        <p style={styles.groupDesc}>{this.getPostContent()}</p>
         <p style={styles.groupDesc}>x Members / x Earnings</p>
 
         <button
@@ -64,12 +65,17 @@ class SideBar extends Component {
     );
   }
   testMethod() {
-    PostContract.setGroupAddress(4,'0x12345678').then((result) => {
+
+    /*
+    PostContract.setGroupAddress(1,'0x12345678').then((result) => {
       console.log(result);
     });
-    PostContract.getGroupAddress(4).then((result) => {
+    */
+    /*
+    PostContract.getGroupAddress(1).then((result) => {
       console.log('get',result.toString());
     });
+    */
     /*
     var postNum = this.getCurPostNum();
     console.log(postNum);

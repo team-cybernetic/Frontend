@@ -55,14 +55,13 @@ class Post extends Component {
   }
 
   getTargetPath(parentPath) {
-    return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + (this.state.post.id ? this.state.post.id : '0') + '-' + encodeURIComponent(this.state.post.title) + (this.state.post.groupAddress ? '/' : ''));
+    return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + (this.state.post.id ? this.state.post.id : '0') + '-' + encodeURIComponent(this.state.post.title) + ((!!this.state.post.groupAddress && this.state.post.groupAddress !== '0x' && this.state.post.groupAddress !== '0x0000000000000000000000000000000000000000') ? '/' : ''));
   }
 
   renderTitle() {
     return (
       <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.state.post.title}</Link>
     );
-  }
   }
 
   renderCreator() {
