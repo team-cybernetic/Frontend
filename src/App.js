@@ -65,7 +65,10 @@ class App extends Component {
     let postTitle;
     const PARENT = /^(.*\/).+\/?$/;
     let rm = PARENT.exec(path);
-    let par = rm[1];
+    let par;
+    if(rm) {
+      par = rm[1];
+    }
     if (post) {
       const POST = /^([0-9]+)(-(.*))?$/;
       let pm = POST.exec(post);

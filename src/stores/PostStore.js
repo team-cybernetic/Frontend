@@ -11,24 +11,12 @@ export default class PostStore {
   static agnosticNewPostListeners = {};
   static transactionIdListeners = {};
   static cache = {};
-  static wow = 0;
 
   
 
   static initialize(web3, postsContractInstance) {
     this.web3 = web3;
     this.postsContractInstance = postsContractInstance;
-    /*
-    if(this.props !== undefined && this.props.pathState !== undefined) {
-      console.log(this.props.pathState.path);
-      var url = this.props.path;
-      url = url.substring(0,url.indexOf('-')).trim();
-      const postsContract = TruffleContract(this.PostsContract);
-      postsContract.setProvider(this.web3.currentProvider);
-      var newContract = postsContract.at(PostContract.getGroupAddress(url));
-      this.postsContractInstance = newContract;
-    }
-    */
     //TODO: this only watches the root contract, make it use PostContract for current group instead
     this.postsContractInstance.NewPost({}, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'}).watch((error, response) => {
       if (!error) {

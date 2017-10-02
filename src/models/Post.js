@@ -64,7 +64,6 @@ export default class Post {
       this.groupAddress = groupAddress;
       this.creationTime = creationTime || moment().unix();
       this.creator = creator;
-      //this.creator = creator || WalletStore.getDefaultAccount(); //not sure if saying an unknown creator is a post made by yourself makes sense, displaying all 0s at least alerts the user to the problem
       this.balance = balance || 0;
       this.headerLoadListeners.forEach((listener) => listener());
       if (alsoLoadContent) {
