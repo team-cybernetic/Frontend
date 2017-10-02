@@ -1,5 +1,4 @@
 import GasEstimator from '../utils/GasEstimator';
-import TruffleContract from 'truffle-contract';
 
 export default class PostContract {
   static groupContract = null;
@@ -21,74 +20,89 @@ export default class PostContract {
   }
 
   static navigateTo(path) { //TODO: all of this
-    if (path === undefined || path === '' || path === '/') {
-      console.log("navigating to root");
-      this.groupContractCurrentInstance = this.groupContractRootInstance;
-    } else {
-      var absolute = false;
-      if (path.startsWith('/')) {
-        console.log("navigating to absolute path:", path);
-        path = path.slice(1);
-        absolute = true;
+    return new Promise((resolve, reject) => {
+      if (path === undefined || path === '' || path === '/') {
+        console.log("navigating to root");
+        this.groupContractCurrentInstance = this.groupContractRootInstance;
+        resolve(this.groupContractCurrentInstance);
       } else {
-        console.log("navigating to relative path:", path);
-      }
-      var matches;
-      var nums = [];
-      do {
-        matches = this.POST_TITLE_STRIPPER.exec(path);
-        if (!matches) {
-          break;
+        var absolute = false;
+        if (path.startsWith('/')) {
+          console.log("navigating to absolute path:", path);
+          path = path.slice(1);
+          absolute = true;
+        } else {
+          console.log("navigating to relative path:", path);
         }
-        nums.push(matches[1]);
-        /*
-        let num = matches[1];
-        let title = matches[3];
-        let desc = 'post #' + num + (title ? ', titled "' + title + '"' : '');
-        console.log("PostContract.navigateTo needs to get group address for " + desc);
-        this.postsContractInstance.getGroupAddress.call(num).then((addr) => {
-          console.log("got group address for " + desc + ":", addr);
-        });
-        */
-      } while (matches);
-      console.log("nums:", nums);
-      if (absolute) {
-        this.navigateTo('/');
-      }
-      if (nums.length > 1) {
-        this.resolvePostNumber(nums,absolute?this.groupContractRootInstance:this.groupContractCurrentInstance).then((result) => {
-            console.log('success ', result);
-          }).catch((error) => {
-            console.error(error);
+        var matches;
+        var nums = [];
+        do {
+          matches = this.POST_TITLE_STRIPPER.exec(path);
+          if (!matches) {
+            break;
+          }
+          nums.push(matches[1]);
+          /*
+          let num = matches[1];
+          let title = matches[3];
+          let desc = 'post #' + num + (title ? ', titled "' + title + '"' : '');
+          console.log("PostContract.navigateTo needs to get group address for " + desc);
+          this.postsContractInstance.getGroupAddress.call(num).then((addr) => {
+            console.log("got group address for " + desc + ":", addr);
           });
-        nums.forEach((num) => {
-          return this.navigateTo(num);
+          */
+        } while (matches);
+        console.log("nums:", nums);
+        if (absolute) {
+          this.navigateTo('/');
+        }
+        this.resolvePostNumber(nums, absolute ? this.groupContractRootInstance : this.groupContractCurrentInstance).then((result) => {
+          console.log('successfully resolved nums ', nums, ':', result);
+          this.groupContractCurrentInstance = result;
+          resolve(result);
+        }).catch((error) => {
+          console.error('error while resolving nums ', nums, ':', error);
+          reject(error);
         });
-      } else {
-        if (nums.length === 1) {
-          let num = nums[0];
-          this.groupContractCurrentInstance.getGroupAddress.call(num).then((addr) => {
-            console.log("groupAddress for post", num, ":", addr);
-            return new Promise((resolve, reject) => {
-              if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
-                resolve(addr);
-              } else {
-                reject();
-              }
+
+        /*
+        if (nums.length > 1) {
+          this.resolvePostNumber(nums,absolute?this.groupContractRootInstance:this.groupContractCurrentInstance).then((result) => {
+              console.log('success ', result);
+            }).catch((error) => {
+              console.error(error);
             });
-          }).then((addr) => {
-            console.log("post", num, "has group address:", addr);
-          }).catch(() => {
-            console.log("post", num, " has no group!");
+          nums.forEach((num) => {
+            return this.navigateTo(num);
           });
         } else {
-          console.error("nums length === 0??");
+          if (nums.length === 1) {
+            let num = nums[0];
+            this.groupContractCurrentInstance.getGroupAddress.call(num).then((addr) => {
+              console.log("groupAddress for post", num, ":", addr);
+              return new Promise((resolve, reject) => {
+                if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
+                  resolve(addr);
+                } else {
+                  reject();
+                }
+              });
+            }).then((addr) => {
+              console.log("post", num, "has group address:", addr);
+            }).catch(() => {
+              console.log("post", num, " has no group!");
+            });
+          } else {
+            console.error("nums length === 0??");
+          }
         }
+        */
       }
-    }
+    });
   }
 
-  static resolvePostNumber(nums, curInstance) {
+  static resolvePostNumber(nums, instance) {
+      /*
     if (nums.length == 1) {
       let num = nums[0];
           this.curInstance.getGroupAddress.call(num).then((addr) => {
@@ -106,32 +120,46 @@ export default class PostContract {
             console.log("post", num, " has no group!");
           });
     } else {
-      return new Promise((resolve, reject) => {
+    */
+
+    return new Promise((resolve, reject) => {
+      console.log("nums:", nums);
       var curNum = nums.shift();
-      this.instance.getGroupAddress.call(curNum).then((addr) => {
+      console.log("popped num", curNum);
+      if (curNum === undefined) {
+        reject("curNum is undefined!");
+        return;
+      }
+      instance.getGroupAddress.call(curNum).then((addr) => {
+        console.log("got address for ", curNum, ":", addr);
         return new Promise((resolve, reject) => {
-            var tempContract = TruffleContract(curInstance);
-            tempContract.setProvider(this.web3.currentProvider);
-            tempContract.defaults({
-              gasLimit: '5000000'
-            });
-            tempContract.at(addr).then(function(cntrct) {
-              if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
-                resolve(this.resolvePostNumber(curNum, cntrct));
+          console.log("promise for ", curNum);
+          if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
+            this.groupContract.at(addr).then((cntrct) => {
+              console.log("got contract for ", curNum, ":", cntrct);
+              if (nums.length > 0) {
+                resolve(this.resolvePostNumber(nums, cntrct));
               } else {
-                reject();
+                resolve(cntrct);
               }
-              });
+            }).catch((error) => {
+              console.error("error while getting contract at address", addr, ":", error);
+              reject(error);
             });
-          }).then((addr) => {
-            console.log("post", curNum, "has group address:", addr);
-          }).catch(() => {
-            console.log("post", curNum, " has no group!");
+          } else {
+            console.log("post ", curNum, "has no group address!");
+          }
         });
-      }).catch(() => {
-            console.log("post has no group!");
+      }).catch((error) => {
+        console.log("post", curNum, " has no group:", error);
+      }).then((cntr) => {
+        console.log("cntr:", cntr);
+        resolve(cntr);
       });
-    }
+    }).catch((error) => {
+      console.log("top level error:", error);
+    });
+    //}
   }
 
 

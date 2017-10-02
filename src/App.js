@@ -15,7 +15,7 @@ export default class InitializationWrapper extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true
+      isLoading: true,
     };
   }
 
@@ -34,7 +34,7 @@ export default class InitializationWrapper extends Component {
     if (this.state.isLoading) {
       return (
         <div style={styles.container}>
-          Loading...
+          Loading App...
         </div>
       );
     } else {
@@ -48,56 +48,84 @@ export default class InitializationWrapper extends Component {
 }
 
 class App extends Component {
-  render() {
-    var path = this.props.match.url;
-    //var path = this.props.match.params.path;
-    if (path === undefined || path === '' || typeof(path) !== 'string') {
-      path = '/';
-    } else if (!path.startsWith('/')) {
-      path = '/' + path;
-    }
-    console.log("App path:", path);
-    const PATH = /^(\/(.*\/)?)(.*)$/;
-    let gm = PATH.exec(path);
-    let groupPath = gm[1];
-    let post = gm[3];
-    let postNum;
-    let postTitle;
-    const PARENT = /^(.*\/).+\/?$/;
-    let rm = PARENT.exec(path);
-    let par;
-    if(rm) {
-      par = rm[1];
-    }
-    if (post) {
-      const POST = /^([0-9]+)(-(.*))?$/;
-      let pm = POST.exec(post);
-      postNum = pm[1];
-      postTitle = pm[3];
-    }
-    var pathState = {
-      path,
-      'parent': par,
-      groupPath,
-      isGroup: !postNum,
-      post,
-      postNum,
-      postTitle,
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoadingGroup: true,
     };
-    console.log("pathState:", pathState);
-    PostContract.navigateTo(groupPath);
-    return (
-      <div style={styles.container}>
-        <NavigationBar key={`navbar-${path}`} pathState={pathState} />
-        <div style={styles.content}>
-          <div style={styles.childrenAndEditor}>
-            <ChildrenView key={`children-${path}`} pathState={pathState} />
-            <Editor key={`editor-${path}`} pathState={pathState} />
-          </div>
-          <SideBar key={`sidebar-${path}`} pathState={pathState} />
+  }
+
+  componentWillReceiveProps() {
+    this.state = {
+      isLoadingGroup: true,
+    };
+  }
+
+
+  render() {
+    if (this.state.isLoadingGroup) {
+      var path = this.props.match.url;
+      //var path = this.props.match.params.path;
+      if (path === undefined || path === '' || typeof(path) !== 'string') {
+        path = '/';
+      } else if (!path.startsWith('/')) {
+        path = '/' + path;
+      }
+      console.log("App path:", path);
+      const PATH = /^(\/(.*\/)?)(.*)$/;
+      let gm = PATH.exec(path);
+      let groupPath = gm[1];
+      let post = gm[3];
+      let postNum;
+      let postTitle;
+      const PARENT = /^(.*\/).+\/?$/;
+      let rm = PARENT.exec(path);
+      let par;
+      if(rm) {
+        par = rm[1];
+      }
+      if (post) {
+        const POST = /^([0-9]+)(-(.*))?$/;
+        let pm = POST.exec(post);
+        postNum = pm[1];
+        postTitle = pm[3];
+      }
+      var pathState = {
+        path,
+        'parent': par,
+        groupPath,
+        isGroup: !postNum,
+        post,
+        postNum,
+        postTitle,
+      };
+      console.log("pathState:", pathState);
+      PostContract.navigateTo(groupPath).then((contractInstance) => {
+        this.setState({
+          isLoadingGroup: false,
+          pathState,
+        });
+      });
+      return (
+        <div style={styles.container}>
+          Loading group...
         </div>
-      </div>
-    );
+      );
+    } else {
+      return (
+        <div style={styles.container}>
+          <NavigationBar key={`navbar-${path}`} pathState={this.state.pathState} />
+          <div style={styles.content}>
+            <div style={styles.childrenAndEditor}>
+              <ChildrenView key={`children-${path}`} pathState={this.state.pathState} />
+              <Editor key={`editor-${path}`} pathState={this.state.pathState} />
+            </div>
+            <SideBar key={`sidebar-${path}`} pathState={this.state.pathState} />
+          </div>
+        </div>
+      );
+    }
   }
 }
 
