@@ -39,6 +39,7 @@ class Post extends Component {
             {this.renderTimestamp()}
             {this.renderCreator()}
             {this.renderMultiHash()}
+            {this.renderGroup()}
             {this.renderContent()}
           </div>
         </div>
@@ -71,6 +72,17 @@ class Post extends Component {
         <span style={styles.creatorHash}>
           {this.state.post.creator}
         </span>
+      </span>
+    );
+  }
+
+  renderGroup() {
+    return (
+      <span style={styles.multiHash}>
+        Group:&nbsp;
+        <a style={styles.multiHashIpfs}>
+          {this.state.post.groupAddress}
+        </a>
       </span>
     );
   }
