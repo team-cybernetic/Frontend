@@ -61,7 +61,7 @@ class Post extends Component {
 
   renderTitle() {
     return (
-      <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.state.post.title}</Link>
+      <Link to={`${this.getTargetPath(this.props.parent)}`}>{this.renderId()}{this.state.post.title}</Link>
     );
   }
 

@@ -41,7 +41,7 @@ class ChildrenView extends Component {
   renderChildren() {
     return (this.state.posts.map((post) => {
       return (
-          <Post key={post.id ? post.id : post.transactionId} post={post} />
+          <Post key={post.id ? post.id : post.transactionId} post={post} parent={this.props.pathState.groupPath} />
       );
     }));
   }
