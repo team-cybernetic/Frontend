@@ -1,8 +1,6 @@
 import Ipfs from '../utils/Ipfs';
 import PostContract from '../ethWrappers/PostContract';
 import Post from '../models/Post';
-import TruffleContract from 'truffle-contract';
-import PostsContract from '../contracts/Posts.json';
 
 export default class PostStore {
   static currentPostListenerSequence = 1;
@@ -59,10 +57,12 @@ export default class PostStore {
   }
 
   static getPost(id) {
-    if (!this.cache[id]) {
-      this.cache[id] = new Post({ id });
+    const cacheId = PostContract.getCurrentPathArray().toString() + ',' + id;
+    if (!this.cache[cacheId]) {
+      console.log("no cached post ", cacheId);
+      this.cache[cacheId] = new Post({ id });
     }
-    return this.cache[id];
+    return this.cache[cacheId];
   }
 
 

@@ -6,7 +6,7 @@ export default class PostContract {
   static groupContractCurrentInstance = null;
   static web3 = null;
   static createdPostsAwaitingPromiseResolution = {};
-  static groupAddressSet = [];
+  static currentPath = [];
   static POST_TITLE_STRIPPER = /([0-9]+)(-([^/]+))?\/?/g;
 
   static initialize(web3, groupContractRootInstance, groupContract) {
@@ -19,10 +19,11 @@ export default class PostContract {
     });
   }
 
-  static navigateTo(path) { //TODO: all of this
+  static navigateTo(path) {
     return new Promise((resolve, reject) => {
       if (path === undefined || path === '' || path === '/') {
         console.log("navigating to root");
+        this.currentPath = [];
         this.groupContractCurrentInstance = this.groupContractRootInstance;
         resolve(this.groupContractCurrentInstance);
       } else {
@@ -36,133 +37,87 @@ export default class PostContract {
         }
         var matches;
         var nums = [];
+        var numsCopy = [];
         do {
           matches = this.POST_TITLE_STRIPPER.exec(path);
           if (!matches) {
             break;
           }
           nums.push(matches[1]);
-          /*
-          let num = matches[1];
-          let title = matches[3];
-          let desc = 'post #' + num + (title ? ', titled "' + title + '"' : '');
-          console.log("PostContract.navigateTo needs to get group address for " + desc);
-          this.postsContractInstance.getGroupAddress.call(num).then((addr) => {
-            console.log("got group address for " + desc + ":", addr);
-          });
-          */
+          numsCopy.push({num: matches[1], title: matches[2]});
         } while (matches);
         console.log("nums:", nums);
+        
         if (absolute) {
-          this.navigateTo('/');
+          var down = true;
+          if (nums.length >= this.currentPath.length) {
+            for (let i = 0; i < this.currentPath.length; i++) {
+              if (this.currentPath[i] !== nums[i]) {
+                down = false;
+                break;
+              }
+            }
+          } else {
+            down = false;
+          }
+          console.log("down:", down);
+          if (!down) {
+            this.groupContractCurrentInstance = this.groupContractRootInstance;
+            this.currentPath = [];
+          }
         }
-        this.resolvePostNumber(nums, absolute ? this.groupContractRootInstance : this.groupContractCurrentInstance).then((result) => {
-          console.log('successfully resolved nums ', nums, ':', result);
-          this.groupContractCurrentInstance = result;
-          resolve(result);
+        console.log("currentPath:", this.currentPath);
+
+        this.resolvePostNumber(nums, this.groupContractCurrentInstance).then(({contract, num}) => {
+          for (var i = 0; i < numsCopy.length - nums.length; i++) {
+            console.log("successfully navigated to group", numsCopy[i]);
+            this.currentPath.push(numsCopy[i].num);
+          }
+          console.log("currentPath new:", this.currentPath);
+          console.log('successfully resolved nums', nums, '; numsCopy:', numsCopy, 'num ', num, ':', contract);
+          this.groupContractCurrentInstance = contract;
+          resolve({contract, num});
         }).catch((error) => {
           console.error('error while resolving nums ', nums, ':', error);
           reject(error);
         });
-
-        /*
-        if (nums.length > 1) {
-          this.resolvePostNumber(nums,absolute?this.groupContractRootInstance:this.groupContractCurrentInstance).then((result) => {
-              console.log('success ', result);
-            }).catch((error) => {
-              console.error(error);
-            });
-          nums.forEach((num) => {
-            return this.navigateTo(num);
-          });
-        } else {
-          if (nums.length === 1) {
-            let num = nums[0];
-            this.groupContractCurrentInstance.getGroupAddress.call(num).then((addr) => {
-              console.log("groupAddress for post", num, ":", addr);
-              return new Promise((resolve, reject) => {
-                if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
-                  resolve(addr);
-                } else {
-                  reject();
-                }
-              });
-            }).then((addr) => {
-              console.log("post", num, "has group address:", addr);
-            }).catch(() => {
-              console.log("post", num, " has no group!");
-            });
-          } else {
-            console.error("nums length === 0??");
-          }
-        }
-        */
       }
     });
   }
 
   static resolvePostNumber(nums, instance) {
-      /*
-    if (nums.length == 1) {
-      let num = nums[0];
-          this.curInstance.getGroupAddress.call(num).then((addr) => {
-            console.log("groupAddress for post", num, ":", addr);
-            return new Promise((resolve, reject) => {
-              if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
-                resolve(addr);
-              } else {
-                reject();
-              }
-            });
-          }).then((addr) => {
-            console.log("post", num, "has group address:", addr);
-          }).catch(() => {
-            console.log("post", num, " has no group!");
-          });
-    } else {
-    */
-
     return new Promise((resolve, reject) => {
-      console.log("nums:", nums);
       var curNum = nums.shift();
-      console.log("popped num", curNum);
       if (curNum === undefined) {
-        reject("curNum is undefined!");
         return;
       }
       instance.getGroupAddress.call(curNum).then((addr) => {
-        console.log("got address for ", curNum, ":", addr);
-        return new Promise((resolve, reject) => {
-          console.log("promise for ", curNum);
-          if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
-            this.groupContract.at(addr).then((cntrct) => {
-              console.log("got contract for ", curNum, ":", cntrct);
-              if (nums.length > 0) {
-                resolve(this.resolvePostNumber(nums, cntrct));
-              } else {
-                resolve(cntrct);
-              }
-            }).catch((error) => {
-              console.error("error while getting contract at address", addr, ":", error);
-              reject(error);
-            });
-          } else {
-            console.log("post ", curNum, "has no group address!");
-          }
-        });
+        console.log("got address for", curNum, ":", addr);
+        if (addr !== '0x' && addr !== '0x0000000000000000000000000000000000000000' && addr !== 0) {
+          this.groupContract.at(addr).then((contract) => {
+            console.log("got contract for", curNum, ":", contract);
+            if (nums.length > 0) {
+              this.resolvePostNumber(nums, contract).then(resolve).catch(reject);
+            } else {
+              console.log("singleton resolved:", contract);
+              resolve({contract: contract});
+            }
+          }).catch((error) => {
+            console.error("error while getting contract at address", addr, ":", error);
+            reject(error);
+          });
+        } else {
+          console.log("post", curNum, "has no group address!");
+          resolve({contract: instance, num: curNum});
+        }
       }).catch((error) => {
-        console.log("post", curNum, " has no group:", error);
-      }).then((cntr) => {
-        console.log("cntr:", cntr);
-        resolve(cntr);
+        console.log("Failed to get group for post", curNum, ":", error);
+        reject(error);
       });
     }).catch((error) => {
       console.log("top level error:", error);
     });
-    //}
   }
-
-
 
   static setParent() {
     var address = this.groupContractCurrentInstance.address;
@@ -237,6 +192,10 @@ export default class PostContract {
 
   static getPostIds() {
     return this.groupContractCurrentInstance.getPostNumbers.call();
+  }
+
+  static getCurrentPathArray() {
+    return (this.currentPath);
   }
 
   static listenForPendingPostTransactions(error, transactionId) {
