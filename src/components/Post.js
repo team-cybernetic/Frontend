@@ -3,6 +3,7 @@ import xss from 'xss';
 import moment from 'moment';
 import PostStore from '../stores/PostStore';
 import { Link } from 'react-router-dom';
+import PostContract from '../ethWrappers/PostContract';
 
 class Post extends Component {
   constructor(props) {
@@ -164,10 +165,18 @@ class Post extends Component {
   renderButton() {
     return (
     <button
-        style={styles.joinButton}
-        onClick={() => PostContract.convertPostToGroup(this.state.post.id)}
+        style={this.styles.joinButton}
+        onClick={() => this.createGroup(this.state.post.id)}
         > Convert To Group </button>
     );
+  }
+
+  createGroup(id) {
+    console.log(id);
+    PostContract.convertPostToGroup(id).then((result) => {
+      console.log(result);
+      this.forceUpdate(); 
+    });
   }
 
   renderTimestamp() {
