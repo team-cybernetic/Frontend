@@ -41,6 +41,7 @@ class Post extends Component {
             {this.renderMultiHash()}
             {this.renderGroup()}
             {this.renderContent()}
+            {this.renderButton()}
           </div>
         </div>
       );
@@ -139,6 +140,15 @@ class Post extends Component {
         </div>
       );
     }
+  }
+
+  renderButton() {
+    return (
+    <button
+        style={styles.joinButton}
+        onClick={() => PostContract.convertPostToGroup(this.state.post.id)}
+        > Convert To Group </button>
+    );
   }
 
   renderTimestamp() {

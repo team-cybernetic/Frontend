@@ -1,5 +1,7 @@
 import GasEstimator from '../utils/GasEstimator';
 
+import TruffleContract from 'truffle-contract';
+
 export default class PostContract {
   static groupContract = null;
   static groupContractRootInstance = null;
@@ -223,6 +225,31 @@ export default class PostContract {
         reject(error);
       });
     });
+  }
+  static convertPostToGroup(postNum) {
+    console.log("creating post...", postNum);
+    this.groupContractCurrentInstance.getGroupAddress.call(postNum).then((addr) => {
+    console.log("converting post", postNum, "to group");
+    return new Promise((resolve, reject) => {
+      this.estimate(this.groupContractCurrentInstance.new).then((gas) => {
+          let actualGas = gas * 50;
+          console.log('attempting create group...');
+          this.groupContract.new({gas:actualGas}).then((res1) => {
+            console.log('post number ', postNum, ' created as a group with address ', res1.address);
+            this.setGroupAddress(postNum,res1.address)
+            resolve(res1.address);
+          }).catch((err) => {
+            console.log("ERROR: ", err);
+          });
+      }).catch((error) => {
+          console.error("Error while estimating gas.", error);
+      });
+    }).catch((error) => {
+          console.error("Error with promise.", error);
+      });
+  }).catch((error) => {
+          console.error("Error with promise.", error);
+      });
   }
 
   static estimate(input) {
