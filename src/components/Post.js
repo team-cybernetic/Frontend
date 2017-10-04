@@ -3,7 +3,6 @@ import xss from 'xss';
 import moment from 'moment';
 import PostStore from '../stores/PostStore';
 import { Link } from 'react-router-dom';
-import PostContract from '../ethWrappers/PostContract';
 
 class Post extends Component {
   constructor(props) {
@@ -33,8 +32,8 @@ class Post extends Component {
   render() {
     if (this.state.post.multiHashString !== null) {
       return (
-        <div style={styles.container} className='card'>
-          <div style={styles.cardContent} className='card-content'>
+        <div style={this.styles.container} className='card'>
+          <div style={this.styles.cardContent} className='card-content'>
             {this.renderTitle()}
             {this.renderTimestamp()}
             {this.renderCreator()}
@@ -47,8 +46,8 @@ class Post extends Component {
       );
     } else {
       return (
-        <div style={styles.container} className='card'>
-          <div style={styles.cardContent} className='card-content'>
+        <div style={this.styles.container} className='card'>
+          <div style={this.styles.cardContent} className='card-content'>
             {this.renderId()}Loading...
           </div>
         </div>
@@ -56,21 +55,43 @@ class Post extends Component {
     }
   }
 
-  getTargetPath(parentPath) {
-    return ((parentPath ? (parentPath.endsWith('/') ? parentPath : parentPath + '/') : '/') + (this.state.post.id ? this.state.post.id : '0') + '-' + encodeURIComponent(this.state.post.title) + ((!!this.state.post.groupAddress && this.state.post.groupAddress !== '0x' && this.state.post.groupAddress !== '0x0000000000000000000000000000000000000000') ? '/' : ''));
+  getTargetPath() {
+    let post = this.state.post;
+
+    if (!post) {
+      return;
+    }
+
+    if (!post.id) {
+      return;
+    }
+
+    var parentPath = this.props.parent;
+    if (!parentPath) {
+      parentPath = '/';
+    }
+
+    var trailingSlash = '';
+    /*
+    if (!!this.state.post.groupAddress && this.state.post.groupAddress !== '0x' && this.state.post.groupAddress !== '0x0000000000000000000000000000000000000000') {
+      trailingSlash = '/';
+    }
+    */
+
+    return (parentPath + post.id + '-' + encodeURIComponent(this.state.post.title) + trailingSlash);
   }
 
   renderTitle() {
     return (
-      <Link to={`${this.getTargetPath(this.props.parent)}`}>{this.renderId()}{this.state.post.title}</Link>
+      <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.state.post.title}</Link>
     );
   }
 
   renderCreator() {
     return (
-      <span style={styles.creator}>
+      <span style={this.styles.creator}>
         Creator:&nbsp;
-        <span style={styles.creatorHash}>
+        <span style={this.styles.creatorHash}>
           {this.state.post.creator}
         </span>
       </span>
@@ -79,11 +100,9 @@ class Post extends Component {
 
   renderGroup() {
     return (
-      <span style={styles.multiHash}>
+      <span style={this.styles.multiHash}>
         Group:&nbsp;
-        <a style={styles.multiHashIpfs}>
-          {this.state.post.groupAddress}
-        </a>
+        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.state.post.groupAddress}</Link>
       </span>
     );
   }
@@ -91,9 +110,9 @@ class Post extends Component {
   renderMultiHash() {
     if (this.state.post.multiHashString) {
       return (
-        <span style={styles.multiHash}>
+        <span style={this.styles.multiHash}>
           IPFS:&nbsp;
-          <a href={"https://ipfs.io/ipfs/" + this.state.post.multiHashString} target="_blank" style={styles.multiHashIpfs}>
+          <a href={"https://ipfs.io/ipfs/" + this.state.post.multiHashString} target="_blank" style={this.styles.multiHashIpfs}>
             {this.state.post.multiHashString}
           </a>
         </span>
@@ -104,13 +123,13 @@ class Post extends Component {
   renderId() {
     if (this.state.post.id) {
       return (
-        <span style={styles.number}>
+        <span style={this.styles.number}>
           #{this.state.post.id} --&nbsp;
         </span>
       );
     } else {
       return (
-        <span style={styles.number}>
+        <span style={this.styles.number}>
           Pending --&nbsp;
         </span>
       );
@@ -132,9 +151,9 @@ class Post extends Component {
         __html: content,
       }
       return (
-        <div style={styles.contentWrapper}>
-          {loaded ? <hr style={styles.contentHr}/> : ''}
-          <div style={styles.content}>
+        <div style={this.styles.contentWrapper}>
+          {loaded ? <hr style={this.styles.contentHr}/> : ''}
+          <div style={this.styles.content}>
             <span dangerouslySetInnerHTML={html}></span>
           </div>
         </div>
@@ -154,66 +173,78 @@ class Post extends Component {
   renderTimestamp() {
     let m = moment(this.state.post.creationTime, "X");
     return (
-      <span style={styles.timestamp}>
+      <span style={this.styles.timestamp}>
         Posted&nbsp;
-        <span style={styles.date}>
+        <span style={this.styles.date}>
           {m.calendar()}
         </span>
       </span>
     );
   }
-}
 
-const styles = {
-  container: {
-    width: '46%',
-    marginLeft: '2%',
-    marginRight: '2%',
-    marginTop: '1.5%',
-    marginBottom: '1.5%',
-    backgroundColor: 'white',
-  },
-  contentWrapper: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  content: {
-    overflowY: 'auto',
-    minHeight: '0px',
-    flex: 1,
-  },
-  contentHr: {
-    flexShrink: 0,
-  },
-  cardContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    overflowWrap: 'break-word',
-    maxHeight: '500px',
-    padding: '1rem',
-  },
-  timestamp: {
-    fontSize: 'small',
-  },
-  date: {
-    fontSize: 'small',
-  },
-  number: {
-    fontSize: 'small',
-  },
-  multiHash: {
-    fontSize: 'small',
-  },
-  multiHashIpfs: {
-    fontSize: 'x-small',
-  },
-  creator: {
-    fontSize: 'small',
-  },
-  creatorHash: {
-    fontSize: 'x-small',
-  },
-};
+  styles = {
+    container:
+      this.props.sidebar ?
+        {
+          width: '96%',
+          marginLeft: '2%',
+          marginRight: '2%',
+          marginTop: '1.5%',
+          marginBottom: '1.5%',
+          backgroundColor: 'white',
+        }
+      :
+        {
+          width: '46%',
+          marginLeft: '2%',
+          marginRight: '2%',
+          marginTop: '1.5%',
+          marginBottom: '1.5%',
+          backgroundColor: 'white',
+        },
+    contentWrapper: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    content: {
+      overflowY: 'auto',
+      minHeight: '0px',
+      flex: 1,
+    },
+    contentHr: {
+      flexShrink: 0,
+    },
+    cardContent: {
+      display: 'flex',
+      flexDirection: 'column',
+      overflowWrap: 'break-word',
+      maxHeight: '500px',
+      padding: '1rem',
+    },
+    timestamp: {
+      fontSize: 'small',
+    },
+    date: {
+      fontSize: 'small',
+    },
+    number: {
+      fontSize: 'small',
+    },
+    multiHash: {
+      fontSize: 'small',
+    },
+    multiHashIpfs: {
+      fontSize: 'x-small',
+    },
+    creator: {
+      fontSize: 'small',
+    },
+    creatorHash: {
+      fontSize: 'x-small',
+    },
+  };
+
+}
 
 export default Post;

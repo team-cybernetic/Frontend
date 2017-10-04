@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import FontAwesome from 'react-fontawesome';
+import { Link } from 'react-router-dom';
 
 class NavigationBar extends Component {
   render() {
@@ -8,14 +9,33 @@ class NavigationBar extends Component {
         <div style={styles.groupTitleWrapper}>
           <span style={styles.groupTitle}>{this.getGroupTitle()}</span>
         </div>
+        {this.renderParentButton()}
         {this.renderIcon('plus')}
         {this.renderIcon('gear')}
       </div>
     );
   }
 
+  parentPath() {
+    if (this.props.isLoading || !this.props.pathState.parent) {
+      return ('');
+    } else {
+      return (this.props.pathState.parent);
+    }
+  }
+
+  renderParentButton() {
+    return (
+      <Link to={`${this.parentPath()}`} >{this.renderIcon('level-up')}</Link>
+    );
+  }
+
   getGroupTitle() {
-    return (this.props.pathState.path);
+    if (this.props.isLoading) {
+      return ("Loading...");
+    } else {
+      return (this.props.pathState.path);
+    }
     /*
     var url = this.props.path;
     if(url === undefined) {

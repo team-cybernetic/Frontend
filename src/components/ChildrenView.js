@@ -12,13 +12,23 @@ class ChildrenView extends Component {
   }
 
   componentWillMount() {
-    PostStore.getPosts().then((posts) => {
-      this.setState({ posts });
-    });
+    console.log("children view mounting");
     this.listenerId = PostStore.addNewPostListener((newPost) => this.addToPosts(newPost));
   }
 
+  componentWillUpdate(nextProps, nextState) {
+      console.log("children view props updated -- getting posts");
+    if (this.props.isLoading && !nextProps.isLoading) {
+      console.log(nextProps);
+      console.log(nextState);
+      PostStore.getPosts().then((posts) => {
+        this.setState({ posts });
+      });
+    }
+  }
+
   componentWillUnmount() {
+    console.log("children view unmounting");
     PostStore.removeNewPostListener(this.listenerId);
   }
 
@@ -39,11 +49,19 @@ class ChildrenView extends Component {
   }
 
   renderChildren() {
-    return (this.state.posts.map((post) => {
+    if (!this.props.isLoading) {
+      return (this.state.posts.map((post) => {
+        return (
+          <Post key={this.props.pathState.groupPath + (post.id ? post.id : post.transactionId)} post={post} parent={this.props.pathState.groupPath} />
+        );
+      }));
+    } else {
       return (
-          <Post key={post.id ? post.id : post.transactionId} post={post} parent={this.props.pathState.groupPath} />
+        <div style={styles.loading}>
+          Loading...
+        </div>
       );
-    }));
+    }
   }
 
   renderLoader() {
@@ -53,7 +71,6 @@ class ChildrenView extends Component {
   }
 
   addToPosts(post) {
-    console.log('adding post');
     if (!this.alreadyHavePost(post)) {
       let { posts } = this.state;
       if (posts === null) {
@@ -86,6 +103,9 @@ const styles = {
     border: 0,
     fontSize: '3em',
     alignSelf: 'center',
+  },
+  loading: {
+    margin: 'auto',
   },
 };
 
