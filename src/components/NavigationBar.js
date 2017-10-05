@@ -17,7 +17,7 @@ class NavigationBar extends Component {
   }
 
   parentPath() {
-    if (this.props.isLoading || !this.props.pathState.parent) {
+    if (!this.props.isLoaded || !this.props.pathState.parent) {
       return ('');
     } else {
       return (this.props.pathState.parent);
@@ -31,10 +31,10 @@ class NavigationBar extends Component {
   }
 
   getGroupTitle() {
-    if (this.props.isLoading) {
-      return ("Loading...");
-    } else {
+    if (this.props.isLoaded) {
       return (this.props.pathState.path);
+    } else {
+      return ("Loading...");
     }
     /*
     var url = this.props.path;

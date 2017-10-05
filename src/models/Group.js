@@ -1,23 +1,20 @@
 import Ipfs from '../utils/Ipfs';
-import PostContract from '../ethWrappers/PostContract';
-import Post from '../models/Post';
-import moment from 'moment';
+import GroupContract from '../ethWrappers/GroupContract';
 import GasEstimator from '../utils/GasEstimator';
+import Post from './Post';
+import moment from 'moment';
 
-//not used anymore, kept around for a little bit so we can make sure to copy everything out we need
-export default class PostStore {
-  groupContract = null;
-  transactionIdListeners = {};
-  agnosticNewPostListeners = {};
-  currentPostListenerSequence = 0;
-  cache = {};
-
-  
-
-  constructor(groupContract) {
-    this.groupContract = groupContract;
-    this.groupContract.watchForEvent('NewPost', {}, (error, response) => {
+export default class Group {
+  constructor(web3, contractInstance) {
+    this.cache = {};
+    this.web3 = web3;
+    this.contractInstance = contractInstance;
+    this.groupContract = new GroupContract(this.web3, this.contractInstance);
+    this.groupContract.registerNewPostEventListener((error, response) => {
       if (!error) {
+        console.log("Group NewPost event listener got a new post:", response);
+        /*
+        //TODO
         const id = response.args.number.c[0]; //TODO: bigint to string?
         Object.keys(this.agnosticNewPostListeners).forEach((key) => {
           const post = this.getPost(id);
@@ -28,11 +25,13 @@ export default class PostStore {
           this.transactionIdListeners[response.transactionHash](id);
           delete this.transactionIdListeners[response.transactionHash];
         }
+        */
       }
     });
+
   }
 
-  createPost(title, content, contentType) {
+  createPost({title, content, contentType}) {
     return new Promise((resolve, reject) => {
       Ipfs.saveContent(content).then((multiHashString) => {
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
@@ -41,15 +40,18 @@ export default class PostStore {
         GasEstimator.estimate('createPost', title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime).then((gas) => {
           let actualGas = gas * 3;
           console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
-          const contractInstance = this.groupContract.getContractInstance();
-          contractInstance.contract.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas: actualGas }, (error, transactionId) => {
+          this.contractInstance.contract.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas: actualGas }, (error, transactionId) => {
             if (!error) {
+              /*
+              //TODO
               this.createdPostsAwaitingPromiseResolution[transactionId] = { resolve, reject };
               post.transactionId = transactionId;
               Object.keys(this.agnosticNewPostListeners).forEach((key) => {
                 this.agnosticNewPostListeners[key](post);
               });
+              
               resolve(post);
+              */
             } else {
               console.error("Error while executing createPost contract function:", error);
               reject(error);
@@ -66,7 +68,6 @@ export default class PostStore {
     });
   }
 
-  //async
   getPost(id) {
     if (!this.cache[id]) {
       this.cache[id] = new Post(this.groupContract, { id });
@@ -75,41 +76,46 @@ export default class PostStore {
     return (this.cache[id]);
   }
 
-  //sync
-  /*
-  loadPost(id) {
+  getPosts() {
     return new Promise((resolve, reject) => {
-      if (!this.cache[id]) {
-        //needs to check if not already loading to prevent two calls to loadPost() from returning the partial post on the second call
-        this.cache[id] = new Post({ id });
-        this.cache[id].load().then(() => {
-          resolve(this.cache[id]);
-        });
-      } else {
-        resolve(this.cache[id]);
-      }
+      this.groupContract.getPostIds().then((postIds) => {
+        console.log("Group getPosts postIds:", postIds);
+        resolve(postIds.map((bigInt) => {
+          return (this.getPost(bigInt.toString()));
+        }));
+      }).catch((error) => {
+        reject(error);
+      });
     });
+  }
+
+  /*
+  createPost(post) {
+    return (this.postStore.createPost(post));
+  }
+
+  getPost(id) {
+    return (this.postStore.getPost(id));
+  }
+
+  getPosts() {
+    return (this.postStore.loadPostNumbers());
+  }
+
+  getContractInstance() {
+    return (this.contractInstance);
   }
   */
 
-  loadPostNumbers() {
+  getGroupAddressOfPost(id) {
     return new Promise((resolve, reject) => {
-      PostContract.getPostIds().then((postIds) => {
-        resolve(postIds.map((bigInt) => this.getPost(bigInt.c[0])));
-      }).catch(reject);
+      let post = this.getPost(id);
+      post.loadHeader().then(() => {
+        resolve(post.groupAddress);
+      }).catch((error) => {
+        reject(error);
+      });
     });
   }
-
-  addNewPostListener(callback) {
-    this.agnosticNewPostListeners[++this.currentPostListenerSequence] = callback;
-    return (this.currentPostListenerSequence);
-  }
-
-  addTransactionIdListener(transactionId, callback) {
-    this.transactionIdListeners[transactionId] = callback;
-  }
-
-  removeNewPostListener(key) {
-    delete this.agnosticNewPostListeners[key];
-  }
 }
+

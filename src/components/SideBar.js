@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Post from './Post';
 import Collapsible from 'react-collapsible';
-import PostStore from '../stores/PostStore';
+//import PostStore from '../stores/PostStore';
 import './style.css';
 
 class SideBar extends Component {
@@ -9,14 +9,37 @@ class SideBar extends Component {
     super(props);
     this.state = {
       post: null,
+      group: null,
+      isLoaded: undefined,
     };
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  setContent(isLoaded, group, post, pathState) {
+    if (isLoaded) {
+      console.log("Sidebar loaded!");
+      this.setState({
+        isLoaded,
+        group,
+        post,
+        pathState,
+      });
+    } else {
+      console.log("Sidebar loading...");
+    }
+  }
+
+  componentWillMount() {
+    this.setContent(this.props.isLoaded, this.props.group, this.props.post, this.props.pathState);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setContent(nextProps.isLoaded, nextProps.group, nextProps.post, nextProps.pathState);
+    /*
+    if (!this.props.isLoaded || !this.props.post) {
     console.log("sidebar next state:", nextState, this.state);
     if (!nextState.post && !this.state.post) {
       console.log("sidebar next props:", nextProps);
-      if (nextProps.isLoading) {
+      if (!nextProps.isLoaded) {
         console.log("sidebar loading");
       } else {
         console.log("sidebar loaded");
@@ -24,23 +47,21 @@ class SideBar extends Component {
           console.log("sidebar loading group");
         } else {
           console.log("sidebar loading post");
+          /*
           let post = PostStore.getPost(nextProps.pathState.postNum);
           post.waitForContentLoad().then(() => {
             console.log("sidebar post loaded");
             this.setState({ post });
           });
+          * /
         }
       }
     }
+    */
   }
 
   renderPost() {
-    if (this.props.isLoading) {
-      console.log("sidebar render loading");
-      return (
-        <p style={styles.groupDesc}>Loading...</p>
-      );
-    } else {
+    if (this.props.isLoaded) {
       if (this.props.pathState.isGroup) {
         console.log("sidebar render group TODO");
       } else if (this.state.post) {
@@ -55,13 +76,16 @@ class SideBar extends Component {
           <p style={styles.groupDesc}>Loading post...</p>
         );
       }
+    } else {
+      console.log("sidebar render loading");
+      return (
+        <p style={styles.groupDesc}>Loading...</p>
+      );
     }
   }
 
   getPostContent() {
-    if (this.props.isLoading) {
-      return ("Loading...");
-    } else {
+    if (this.props.isLoaded) {
       let id = this.props.pathState.postNum;
       if (id) {
         console.log("sidebar rendering post:", id);
@@ -85,6 +109,8 @@ class SideBar extends Component {
       } else {
         console.log("sidebar not rendering a post, rendering group:", this.props.pathState.group);
       }
+    } else {
+      return ("Loading...");
     }
     return ("TODO");
   }

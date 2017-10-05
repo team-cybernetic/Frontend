@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import cx from 'classnames';
-import PostStore from '../stores/PostStore';
 
 const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*((.*\n?)+)\s*)?/;
 
@@ -57,7 +56,7 @@ class Editor extends Component {
     this.setState({
       isPosting: true,
     });
-    PostStore.createPost(title.trim(), content, contentType).then((post) => {
+    this.props.group.createPost({title: title.trim(), content, contentType}).then((post) => {
       this.setState({
         textAreaValue: '',
         isPosting: false,

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import xss from 'xss';
 import moment from 'moment';
-import PostStore from '../stores/PostStore';
 import { Link } from 'react-router-dom';
 
 class Post extends Component {
@@ -13,6 +12,10 @@ class Post extends Component {
   }
 
   componentWillMount() {
+    this.props.post.loadHeader().then(() => this.forceUpdate());
+    this.props.post.loadContent().then(() => this.forceUpdate());
+    /*
+     //TODO
     this.listenerId = PostStore.addNewPostListener((post) => {
       if (this.state.post.id === post.id) {
         this.setState({ post });
@@ -23,13 +26,17 @@ class Post extends Component {
       this.state.post.waitForHeaderLoad().then(() => this.forceUpdate());
       this.state.post.waitForContentLoad().then(() => this.forceUpdate());
     }
+    */
   }
 
   componentWillUnmount() {
-    PostStore.removeNewPostListener(this.listenerId);
+    //TODO
+    //PostStore.removeNewPostListener(this.listenerId);
   }
 
   render() {
+    if (this.props.selected)
+      console.log("Post UI", this.props.post.id, "is selected");
     if (this.state.post.multiHashString !== null) {
       return (
         <div style={this.styles.container} className='card'>
@@ -190,7 +197,7 @@ class Post extends Component {
           marginRight: '2%',
           marginTop: '1.5%',
           marginBottom: '1.5%',
-          backgroundColor: 'white',
+          backgroundColor: this.props.selected ? 'yellow' : 'white',
         },
     contentWrapper: {
       flex: 1,

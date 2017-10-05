@@ -5,7 +5,8 @@ import NavigationBar from './components/NavigationBar';
 import ChildrenView from './components/ChildrenView';
 import SideBar from './components/SideBar';
 import Editor from './components/Editor';
-import PostContract from './ethWrappers/PostContract';
+import GroupTree from './models/GroupTree';
+import PathParser from './utils/PathParser';
 import {
   BrowserRouter as Router,
   Route
@@ -15,14 +16,14 @@ export default class InitializationWrapper extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
+      isLoaded: false,
     };
   }
 
   componentWillMount() {
     initializeApp().then(() => {
       this.setState({
-        isLoading: false
+        isLoaded: true
       });
     }).catch((error) => {
       console.error("Error while initializing app:", error);
@@ -31,7 +32,7 @@ export default class InitializationWrapper extends Component {
   }
 
   render() {
-    if (this.state.isLoading) {
+    if (!this.state.isLoaded) {
       return (
         <div style={styles.container}>
           Loading App...
@@ -52,86 +53,71 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoadingGroup: true,
+      isGroupLoaded: false,
+      group: null,
+      post: null,
+      pathState: null,
     };
   }
 
-  componentWillReceiveProps() {
-    this.state = {
-      isLoadingGroup: true,
-    };
+  browseTo(path) {
+    const parsedPath = PathParser.parse(path);
+    if (!parsedPath.equals(this.state.pathState)) {
+      let isGroupLoaded = this.state.pathState && parsedPath.sameGroup(this.state.pathState);
+      if (this.state.pathState)
+        console.log("App testing if", this.state.pathState.cleanGroupPath, "==", parsedPath.cleanGroupPath);
+      this.setState({
+        isGroupLoaded,
+      });
+      if (this.state.pathState)
+        console.log("App testing if", this.state.pathState.cleanGroupPath, "==", parsedPath.cleanGroupPath, ":", parsedPath.sameGroup(this.state.pathState) ? 'true' : 'false', " -- which means that isGroupLoaded ==", isGroupLoaded ? 'true' : 'false');
+      console.log("App path changed from", this.state.pathState, "to", parsedPath);
+      GroupTree.getGroup(parsedPath).then(({group, post}) => {
+        console.log("App successfully resolved group for", path, "with post:", post);
+        this.setState({
+          isGroupLoaded: true,
+          group,
+          post,
+          pathState: parsedPath,
+        });
+      }).catch((errorState) => {
+        //{error, group, partialPath} = errorState;
+        //let error = errorState.error;
+        let group = errorState.group;
+        let partialPath = errorState.partialPath;
+        console.log("App failed to navigate fully to", path, ":", errorState);
+        this.setState({
+          isGroupLoaded: true,
+          group,
+          post: undefined,
+          pathState: partialPath,
+        });
+      });
+    }
+    this.setState({
+      pathState: parsedPath,
+    });
+  }
+
+  componentWillMount() {
+    this.browseTo(this.props.match.url);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.browseTo(nextProps.match.url);
   }
 
 
   render() {
-    var path = this.props.match.url;
-    //var path = this.props.match.params.path;
-    if (path === undefined || path === '' || typeof(path) !== 'string') {
-      path = '/';
-    } else if (!path.startsWith('/')) {
-      path = '/' + path;
-    }
-    console.log("App path:", path);
-    const PATH = /^(\/(.*\/)?)(.*)$/;
-    let gm = PATH.exec(path);
-    let groupPath = gm[1];
-    let post = gm[3];
-    let postNum;
-    let postTitle;
-    const PARENT = /^(.*\/).+\/?$/;
-    let rm = PARENT.exec(path);
-    let par;
-    if(rm) {
-      par = rm[1];
-    }
-    if (post) {
-      const POST = /^([0-9]+)(-(.*))?$/;
-      let pm = POST.exec(post);
-      postNum = pm[1];
-      postTitle = pm[3];
-    }
-    var pathState = {
-      path,
-      'parent': par,
-      groupPath,
-      isGroup: !postNum,
-      hasGroup: undefined,
-      post,
-      postNum,
-      postTitle,
-    };
-    console.log("pathState:", pathState);
-    if (this.state.isLoadingGroup) {
-      PostContract.navigateTo(groupPath).then(({contract, num}) => {
-        console.log("num = ", num);
-        if (num) {
-          console.log("post", num, "failed to resolve group, but we have its parent contract now:", contract);
-          pathState.hasGroup = false;
-        } else {
-          if (pathState.isGroup) {
-            pathState.hasGroup = true;
-          } //undefined for a post
-        }
-        console.log("app navigated, setting loading = false");
-        console.log("pathState passed:", pathState);
-        this.setState({
-          isLoadingGroup: false,
-          pathState,
-        });
-      }).catch((error, instance, num) => {
-        if (!error) {
-        }
-      });
-    }
     return (
       <div style={styles.container}>
-        <NavigationBar key={`navbar-${path}`} isLoading={this.state.isLoadingGroup} pathState={this.state.pathState} />
+        <NavigationBar key={`navbar-${this.state.pathState.path}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
-            <ChildrenView key={`children-${path}`} isLoading={this.state.isLoadingGroup} pathState={this.state.pathState} />
-            <Editor key={`editor-${path}`} isLoading={this.state.isLoadingGroup} pathState={this.state.pathState} />
+            <ChildrenView key={`children-${this.state.pathState.cleanGroupPath}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
+            <Editor key={`editor-${this.state.pathState.cleanGroupPath}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
           </div>
-          <SideBar key={`sidebar-${path}`} isLoading={this.state.isLoadingGroup} pathState={this.state.pathState} />
+          <SideBar key={`sidebar-${this.state.pathState.cleanGroupPath}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
         </div>
       </div>
     );

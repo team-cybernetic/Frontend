@@ -27,12 +27,12 @@ export default function getWeb3() {
         web3 = new Web3(provider);
 
         if (web3.isConnected()) {
-            console.log("connected to local web3 node");
+            console.log("connected to local web3 node, version", web3.version.api);
         } else {
             provider = new Web3.providers.HttpProvider('https://web3.ttt222.org'); //fallback to remote node
             web3 = new Web3(provider);
             if (web3.isConnected()) {
-                console.log("connected to remote web3 node");
+                console.log("connected to remote web3 node, version", web3.version.api);
             } else {
                 console.log("unable to connect to any web3 nodes!");
             }

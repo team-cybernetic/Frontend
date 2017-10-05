@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import Post from './Post';
-import PostStore from '../stores/PostStore';
+//import PostStore from '../stores/PostStore';
 import { some } from 'lodash';
 
 class ChildrenView extends Component {
   constructor(props) {
     super(props);
+    console.log("creating new children view");
     this.state = {
       posts: null,
     };
@@ -13,61 +14,58 @@ class ChildrenView extends Component {
 
   componentWillMount() {
     console.log("children view mounting");
-    this.listenerId = PostStore.addNewPostListener((newPost) => this.addToPosts(newPost));
+    this.loadPosts(this.props.isLoaded, this.props.group);
+    //TODO: add listener to group
+    //this.listenerId = PostStore.addNewPostListener((newPost) => this.addToPosts(newPost));
   }
 
-  componentWillUpdate(nextProps, nextState) {
-      console.log("children view props updated -- getting posts");
-    if (this.props.isLoading && !nextProps.isLoading) {
-      console.log(nextProps);
-      console.log(nextState);
-      PostStore.getPosts().then((posts) => {
-        this.setState({ posts });
-      });
-    }
+  componentWillReceiveProps(nextProps) {
+    console.log("children view props updated -- getting posts");
+    this.loadPosts(nextProps.isLoaded, nextProps.group);
   }
 
   componentWillUnmount() {
     console.log("children view unmounting");
-    PostStore.removeNewPostListener(this.listenerId);
+    //TODO: remove listener from group
+    //PostStore.removeNewPostListener(this.listenerId);
+  }
+
+  loadPosts(isLoaded, group) {
+    if (isLoaded) {
+      console.log("children view done loading, getting posts");
+      group.getPosts().then((posts) => {
+        console.log("children view got these posts from group:", posts);
+        this.setState({ posts });
+      });
+    } else {
+      console.log("children view still loading, not getting posts yet");
+    }
   }
 
   render() {
     return (
       <div style={styles.container}>
-        {this.state.posts === null ? this.renderLoader() : this.renderPosts()}
+        <div style={styles.children}>
+          {this.renderPosts()}
+        </div>
       </div>
     );
   }
 
   renderPosts() {
-    return (
-      <div style={styles.children}>
-        {this.renderChildren()}
-      </div>
-    );
-  }
-
-  renderChildren() {
-    if (!this.props.isLoading) {
+    if (this.props.isLoaded && this.state.posts) {
       return (this.state.posts.map((post) => {
+        if (this.props.post && (this.props.post.id === post.id))
+          console.log("post", post.id, "should be selected");
         return (
-          <Post key={this.props.pathState.groupPath + (post.id ? post.id : post.transactionId)} post={post} parent={this.props.pathState.groupPath} />
+          <Post key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)} post={post} selected={this.props.post && (this.props.post.id === post.id)} parent={this.props.pathState.groupPath} />
         );
       }));
     } else {
       return (
-        <div style={styles.loading}>
-          Loading...
-        </div>
+        <button style={styles.loader} className='button is-loading'></button>
       );
     }
-  }
-
-  renderLoader() {
-    return (
-      <button style={styles.loader} className='button is-loading'></button>
-    );
   }
 
   addToPosts(post) {
