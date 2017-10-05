@@ -3,6 +3,7 @@ import Post from './Post';
 import Collapsible from 'react-collapsible';
 //import PostStore from '../stores/PostStore';
 import './style.css';
+import { Route, Redirect } from 'react-router'
 
 class SideBar extends Component {
   constructor(props) {
@@ -168,30 +169,8 @@ class SideBar extends Component {
     );
   }
   testMethod() {
-
-    /*
-    PostContract.setGroupAddress(1,'0x12345678').then((result) => {
-      console.log(result);
-    });
-    */
-    /*
-    PostContract.getGroupAddress(1).then((result) => {
-      console.log('get',result.toString());
-    });
-    */
-    /*
-    var postNum = this.getCurPostNum();
-    console.log(postNum);
-    var prom = PostContract.convertPost2Group(postNum);
-    prom.then((addr) => {
-      console.log('we got the address as', addr);
-      PostContract.joinGroup(addr);
-      var naddr = PostContract.getGroupAddress(postNum);
-      console.log('got the group address, its ', naddr);
-    }).catch((error) => {
-          console.error("Error while executing testMethod contract function.", error);
-    });
-    */
+    console.log('attempting navigation');
+    window.location = this.props.pathState.parent + this.state.post.id + '/';
   }
 }
 
