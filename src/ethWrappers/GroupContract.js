@@ -22,6 +22,10 @@ export default class GroupContract {
 
   }
 
+  isAddressValid(addr) {
+    return (this.web3.isAddress(addr) && addr !== '0x0000000000000000000000000000000000000000' && addr !== '0000000000000000000000000000000000000000');
+  }
+
   getContractInstance() {
     return (this.contractInstance);
   }

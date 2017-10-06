@@ -58,7 +58,7 @@ class ChildrenView extends Component {
         if (this.props.post && (this.props.post.id === post.id))
           console.log("post", post.id, "should be selected");
         return (
-          <Post key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)} post={post} selected={this.props.post && (this.props.post.id === post.id)} parent={this.props.pathState.groupPath} />
+          <Post key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)} post={post} selected={this.props.post && (this.props.post.id === post.id)} group={this.props.group} parent={this.props.pathState.groupPath} />
         );
       }));
     } else {

@@ -17,7 +17,6 @@ function instantiateContract(web3, resolve) {
     groupContract.deployed().then((rootInstance) => {
       console.log("groupContract root instance deployed at address:", rootInstance.address);
       [
-        GasEstimator,
         WalletStore,
       ].forEach((toInitialize) => toInitialize.initialize(web3, rootInstance));
       GroupTree.initialize(web3, rootInstance, groupContract);

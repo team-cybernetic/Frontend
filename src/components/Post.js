@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
-import PostContract from '../ethWrappers/PostContract';
 
 class Post extends Component {
   constructor(props) {
@@ -47,8 +46,8 @@ class Post extends Component {
             {this.renderCreator()}
             {this.renderMultiHash()}
             {this.renderGroup()}
-            {this.renderContent()}
             {this.renderButton()}
+            {this.renderContent()}
           </div>
         </div>
       );
@@ -180,7 +179,7 @@ class Post extends Component {
 
   createGroup(id) {
     console.log(id);
-    PostContract.convertPostToGroup(id).then((result) => {
+    this.props.group.convertPostToGroup(id).then((result) => {
       console.log(result);
       this.forceUpdate(); 
     });

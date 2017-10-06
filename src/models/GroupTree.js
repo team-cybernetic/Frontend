@@ -24,7 +24,7 @@ export default class GroupTree {
   static initialize(web3, contractRootInstance, contractTC) {
     this.web3 = web3;
     this.groupContractTC = contractTC;
-    this.treeRoot = new Group(this.web3, contractRootInstance);
+    this.treeRoot = new Group(this.web3, contractRootInstance, contractTC);
   }
 
   /**
@@ -99,7 +99,7 @@ export default class GroupTree {
           console.log("got a valid address!");
           this.groupContractTC.at(addr).then((contractInstance) => {
             console.log("got contractInstance for", nextStep, ":", contractInstance);
-            var nextGroup = new Group(this.web3, contractInstance);
+            var nextGroup = new Group(this.web3, contractInstance, this.groupContractTC);
             if (pathToWalk.length > 0) {
               this.walkTree(pathToWalk, [/*TODO*/], nextGroup).then(resolve).catch(reject);
             } else {
