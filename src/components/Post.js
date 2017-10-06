@@ -35,8 +35,6 @@ class Post extends Component {
   }
 
   render() {
-    if (this.props.selected)
-      console.log("Post UI", this.props.post.id, "is selected");
     if (this.state.post.multiHashString !== null) {
       return (
         <div style={this.styles.container} className='card'>
@@ -197,9 +195,10 @@ class Post extends Component {
     );
   }
 
-  styles = {
-    container:
-      this.props.sidebar ?
+  get styles() {
+    return {
+      container:
+        this.props.sidebar ?
         {
           width: '96%',
           marginLeft: '2%',
@@ -208,7 +207,7 @@ class Post extends Component {
           marginBottom: '1.5%',
           backgroundColor: 'white',
         }
-      :
+        :
         {
           width: '46%',
           marginLeft: '2%',
@@ -217,49 +216,49 @@ class Post extends Component {
           marginBottom: '1.5%',
           backgroundColor: this.props.selected ? 'yellow' : 'white',
         },
-    contentWrapper: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    content: {
-      overflowY: 'auto',
-      minHeight: '0px',
-      flex: 1,
-    },
-    contentHr: {
-      flexShrink: 0,
-    },
-    cardContent: {
-      display: 'flex',
-      flexDirection: 'column',
-      overflowWrap: 'break-word',
-      maxHeight: '500px',
-      padding: '1rem',
-    },
-    timestamp: {
-      fontSize: 'small',
-    },
-    date: {
-      fontSize: 'small',
-    },
-    number: {
-      fontSize: 'small',
-    },
-    multiHash: {
-      fontSize: 'small',
-    },
-    multiHashIpfs: {
-      fontSize: 'x-small',
-    },
-    creator: {
-      fontSize: 'small',
-    },
-    creatorHash: {
-      fontSize: 'x-small',
-    },
+      contentWrapper: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+      },
+      content: {
+        overflowY: 'auto',
+        minHeight: '0px',
+        flex: 1,
+      },
+      contentHr: {
+        flexShrink: 0,
+      },
+      cardContent: {
+        display: 'flex',
+        flexDirection: 'column',
+        overflowWrap: 'break-word',
+        maxHeight: '500px',
+        padding: '1rem',
+      },
+      timestamp: {
+        fontSize: 'small',
+      },
+      date: {
+        fontSize: 'small',
+      },
+      number: {
+        fontSize: 'small',
+      },
+      multiHash: {
+        fontSize: 'small',
+      },
+      multiHashIpfs: {
+        fontSize: 'x-small',
+      },
+      creator: {
+        fontSize: 'small',
+      },
+      creatorHash: {
+        fontSize: 'x-small',
+      },
+    }
   };
-
 }
 
 export default Post;
