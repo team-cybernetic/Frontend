@@ -16,26 +16,11 @@ export default class Group {
     this.newPostListeners = [];
     this.registerNewPostEventListener((error, result) => {
       if (!error) {
-        console.log("Group NewPost event listener got a new post:", result);
         const id = result.args.number.toString();
         const post = this.getPost(id, result.transactionHash);
         this.fireNewPostListeners(post);
-        /*
-        //TODO
-        const id = response.args.number.c[0]; //TODO: bigint to string?
-        Object.keys(this.agnosticNewPostListeners).forEach((key) => {
-          const post = this.getPost(id);
-          post.transactionId = response.transactionHash;
-          this.agnosticNewPostListeners[key](post);
-        });
-        if (this.transactionIdListeners[response.transactionHash]) {
-          this.transactionIdListeners[response.transactionHash](id);
-          delete this.transactionIdListeners[response.transactionHash];
-        }
-        */
       }
     });
-
   }
 
   createPost({title, content, contentType}) {
@@ -49,7 +34,6 @@ export default class Group {
           this.contractInstance.contract.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas: actualGas }, (error, transactionId) => {
             if (!error) {
               this.groupContract.waitForPendingTransaction(transactionId).then((txid) => {
-                console.log("waited and got a pending transaction:", txid);
                 const post = this.getPost(undefined, txid);
                 post.populate({
                   title,
@@ -61,27 +45,11 @@ export default class Group {
                   creationTime,
                   transactionId: txid,
                 });
-                console.log("firing new post listeners with new post:", post);
                 this.fireNewPostListeners(post);
                 resolve(post);
               }).catch((error) => {
                 reject(error);
               });
-
-
-
-
-
-              /*
-              //TODO
-              this.createdPostsAwaitingPromiseResolution[transactionId] = { resolve, reject };
-              post.transactionId = transactionId;
-              Object.keys(this.agnosticNewPostListeners).forEach((key) => {
-                this.agnosticNewPostListeners[key](post);
-              });
-              
-              resolve(post);
-              */
             } else {
               console.error("Error while executing createPost contract function:", error);
               reject(error);
@@ -136,15 +104,6 @@ export default class Group {
         return (null);
       }
     }
-
-    /*
-    if (!this.cache[id]) {
-      this.cache[id] = new Post(this, { id });
-      this.cache[id].load();
-    }
-    return (this.cache[id]);
-    */
-
   }
 
   loadPost(id) {
@@ -216,17 +175,17 @@ export default class Group {
     return new Promise((resolve, reject) => {
       this.gasEstimator.estimate('setGroupAddress', postNum, groupAddress).then((gas) => {
         let actualGas = gas * 3;
-        console.log("setgroupaddress is setting post", postNum, "group to", groupAddress);
+        console.log("Group.setGroupAddressOfPost is setting post", postNum, "group to", groupAddress);
         console.log("gas estimator estimates that this setGroupAddressOfPost call will cost", gas, "gas, actualGas =", actualGas);
         this.contractInstance.setGroupAddress(postNum, groupAddress.valueOf(), { gas: actualGas }).then((result) => {
-          console.log("PostContract.setGroupAddressOfPost result:", result);
+          console.log("Group.setGroupAddressOfPost result:", result);
           resolve(result);
         }).catch((error) => {
-          console.error("PostContract.setGroupAddressOfPost Error while setting group address:", error);
+          console.error("Group.setGroupAddressOfPost Error while setting group address:", error);
           reject(error);
         });
       }).catch((error) => {
-        console.error("PostContract.setGroupAddressOfPost Error while estimating gas:", error);
+        console.error("Group.setGroupAddressOfPost Error while estimating gas:", error);
         reject(error);
       });
     });
@@ -234,6 +193,10 @@ export default class Group {
 
   registerNewPostEventListener(callback) {
     return (this.groupContract.registerNewPostEventListener(callback));
+  }
+
+  registerNewGroupEventListener(callback) {
+    return (this.groupContract.registerNewGroupEventListener(callback));
   }
 
   registerEventListener(eventName, callback) {
@@ -245,17 +208,23 @@ export default class Group {
   }
 
   registerNewPostListener(callback) {
-    console.log("registering new post listener:", callback);
     this.newPostListeners.push(callback);
-    console.log("now there's", this.newPostListeners.length, "of them");
     return ({
       num: this.newPostListeners.length,
     });
   }
 
+  unregisterNewPostListener(handle) {
+    if (handle) {
+      let {num} = handle;
+      if (this.newPostListeners) {
+        delete (this.newPostListeners[num - 1]);
+      }
+    }
+  }
+
   fireNewPostListeners(post) {
     this.newPostListeners.forEach((listener, idx) => {
-      console.log("firing new post listener", idx);
       listener(post);
     });
   }

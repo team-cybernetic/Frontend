@@ -3,6 +3,7 @@
 export default class GroupContract {
 
   static EVENT_NEW_POST = 'NewPost';
+  static EVENT_NEW_GROUP = 'NewGroup';
   static EVENT_PENDING = '_pending';
   static EVENT_LATEST = '_latest';
 
@@ -13,7 +14,6 @@ export default class GroupContract {
     this.latestTransactionListeners = [[]];
     this.eventListeners = [[]];
     this.web3.eth.filter("pending").watch((error, txid) => {
-      console.log("got a pending", txid);
       this.fireEventListener(GroupContract.EVENT_PENDING, error, txid);
       this.firePendingTransactionListeners(error, txid);
     });
@@ -24,7 +24,9 @@ export default class GroupContract {
     this.watchForEvent(GroupContract.EVENT_NEW_POST, {}, (error, response) => {
       this.fireEventListener(GroupContract.EVENT_NEW_POST, error, response);
     });
-
+    this.watchForEvent(GroupContract.EVENT_NEW_GROUP, {}, (error, response) => {
+      this.fireEventListener(GroupContract.EVENT_NEW_GROUP, error, response);
+    });
   }
 
   isAddressValid(addr) {
@@ -85,6 +87,10 @@ export default class GroupContract {
 
   registerNewPostEventListener(callback) {
     return (this.registerEventListener(GroupContract.EVENT_NEW_POST, callback));
+  }
+
+  registerNewGroupEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_NEW_GROUP, callback));
   }
 
   fireEventListener(eventName, error, response) {

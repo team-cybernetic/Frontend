@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import Post from './Post';
 import Collapsible from 'react-collapsible';
-//import PostStore from '../stores/PostStore';
 import './style.css';
-import { Route, Redirect } from 'react-router'
 
 class SideBar extends Component {
   constructor(props) {

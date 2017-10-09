@@ -85,7 +85,7 @@ export default class GroupTree {
   }
 
   static isAddressValid(addr) {
-    return (this.web3.isAddress(addr) && !this.isAddressNull());
+    return (this.web3.isAddress(addr) && !this.isAddressNull(addr));
   }
 
   static walkTree(pathToWalk, pathWalked, currentGroup) {

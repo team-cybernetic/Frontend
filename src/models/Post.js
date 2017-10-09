@@ -1,4 +1,3 @@
-import moment from 'moment';
 import Ipfs from '../utils/Ipfs';
 
 export default class Post {

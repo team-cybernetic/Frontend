@@ -4,13 +4,6 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 
 class Post extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      post: props.post,
-    };
-  }
-
   componentWillMount() {
     let post = this.props.post;
     post.waitForConfirmation().then(() => {
@@ -22,38 +15,24 @@ class Post extends Component {
         });
       });
     });
-    /*
-    if (post.id) {
-      post.loadHeader().then(() => {
-        this.forceUpdate()
-      });
-      post.loadContent().then(() => {
-        this.forceUpdate()
-      });
-    } else {
-      post.waitForConfirmation().then(() => {
-        this.forceUpdate()
-      });
-    }
-    */
-    /*
-     //TODO
-    this.listenerId = PostStore.addNewPostListener((post) => {
-      if (this.state.post.id === post.id) {
-        this.setState({ post });
+    this.groupListenerHandle = this.props.group.registerNewGroupEventListener((error, result) => {
+      console.log("NewGroup event:", error, result);
+      if (!error) {
+        let id = result.args.postNumber.toString();
+        console.log("testing", id, "vs", this.props.post.id);
+        if (id === this.props.post.id) {
+          let addr = result.args.groupAddress;
+          this.props.post.populate({ groupAddress: addr });
+          this.forceUpdate();
+        }
       }
     });
-    if (this.state.post) {
-      this.state.post.waitForFullCreation().then(() => this.forceUpdate());
-      this.state.post.waitForHeaderLoad().then(() => this.forceUpdate());
-      this.state.post.waitForContentLoad().then(() => this.forceUpdate());
-    }
-    */
   }
 
   componentWillUnmount() {
-    //TODO
-    //PostStore.removeNewPostListener(this.listenerId);
+    if (this.groupListenerHandle) {
+      this.props.group.unregisterEventListener(this.groupListenerHandle);
+    }
   }
 
   render() {

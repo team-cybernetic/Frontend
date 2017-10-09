@@ -112,15 +112,15 @@ contract Posts {
   function setGroupAddress(uint256 postNum, address addr) {
     require(postNum <= postCount); //bad input
 
-    Post memory p = postsByNumber[postNum];
-    require(p.number != 0); //post deleted
+    require(postsByNumber[postNum].number != 0); //post deleted
 
     //TODO: ruleset check permissions to add associate a group to this post
 
     //TODO: check if addr is a valid contract?
 
-    p.groupAddress = addr;
-    postsByNumber[postNum] = p;
+    postsByNumber[postNum].groupAddress = addr;
+
+    NewGroup(postNum, addr);
   }
 
   function getGroupAddress(uint256 postNum) returns (address) {
