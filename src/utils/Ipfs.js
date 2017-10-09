@@ -40,7 +40,7 @@ export default class Ipfs {
 
   static saveContent(content) {
     return new Promise((resolve, reject) => {
-      if (content === '') {
+      if (content === '' || content === undefined || content === null) {
         resolve('');
       } else {
         this.ipfs.files.add([new this.ipfs.types.Buffer(content)], {}, (error, res) => {

@@ -57,6 +57,7 @@ class Editor extends Component {
       isPosting: true,
     });
     this.props.group.createPost({title: title.trim(), content, contentType}).then((post) => {
+      console.log("post created:", post);
       this.setState({
         textAreaValue: '',
         isPosting: false,

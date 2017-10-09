@@ -12,8 +12,30 @@ class Post extends Component {
   }
 
   componentWillMount() {
-    this.props.post.loadHeader().then(() => this.forceUpdate());
-    this.props.post.loadContent().then(() => this.forceUpdate());
+    let post = this.props.post;
+    post.waitForConfirmation().then(() => {
+      this.forceUpdate();
+      post.loadHeader().then(() => {
+        this.forceUpdate();
+        post.loadContent().then(() => {
+          this.forceUpdate();
+        });
+      });
+    });
+    /*
+    if (post.id) {
+      post.loadHeader().then(() => {
+        this.forceUpdate()
+      });
+      post.loadContent().then(() => {
+        this.forceUpdate()
+      });
+    } else {
+      post.waitForConfirmation().then(() => {
+        this.forceUpdate()
+      });
+    }
+    */
     /*
      //TODO
     this.listenerId = PostStore.addNewPostListener((post) => {
@@ -35,16 +57,15 @@ class Post extends Component {
   }
 
   render() {
-    if (this.state.post.multiHashString !== null) {
+    if (this.props.post.isHeaderLoaded()) {
       return (
         <div style={this.styles.container} className='card'>
           <div style={this.styles.cardContent} className='card-content'>
             {this.renderTitle()}
             {this.renderTimestamp()}
             {this.renderCreator()}
-            {this.renderMultiHash()}
             {this.renderGroup()}
-            {this.renderButton()}
+            {this.renderMultiHash()}
             {this.renderContent()}
           </div>
         </div>
@@ -61,7 +82,7 @@ class Post extends Component {
   }
 
   getTargetPath() {
-    let post = this.state.post;
+    let post = this.props.post;
 
     if (!post) {
       return;
@@ -83,12 +104,12 @@ class Post extends Component {
     }
     */
 
-    return (parentPath + post.id + '-' + encodeURIComponent(this.state.post.title) + trailingSlash);
+    return (parentPath + post.id + '-' + encodeURIComponent(this.props.post.title) + trailingSlash);
   }
 
   renderTitle() {
     return (
-      <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.state.post.title}</Link>
+      <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.props.post.title}</Link>
     );
   }
 
@@ -97,7 +118,7 @@ class Post extends Component {
       <span style={this.styles.creator}>
         Creator:&nbsp;
         <span style={this.styles.creatorHash}>
-          {this.state.post.creator}
+          {this.props.post.creator}
         </span>
       </span>
     );
@@ -107,18 +128,18 @@ class Post extends Component {
     return (
       <span style={this.styles.multiHash}>
         Group:&nbsp;
-        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.state.post.groupAddress}</Link>
+        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>{this.renderConvertToGroupButton()}
       </span>
     );
   }
 
   renderMultiHash() {
-    if (this.state.post.multiHashString) {
+    if (this.props.post.multiHashString) {
       return (
         <span style={this.styles.multiHash}>
           IPFS:&nbsp;
-          <a href={"https://ipfs.io/ipfs/" + this.state.post.multiHashString} target="_blank" style={this.styles.multiHashIpfs}>
-            {this.state.post.multiHashString}
+          <a href={"https://ipfs.io/ipfs/" + this.props.post.multiHashString} target="_blank" style={this.styles.multiHashIpfs}>
+            {this.props.post.multiHashString}
           </a>
         </span>
       );
@@ -126,10 +147,10 @@ class Post extends Component {
   }
 
   renderId() {
-    if (this.state.post.id) {
+    if (this.props.post.id) {
       return (
         <span style={this.styles.number}>
-          #{this.state.post.id} --&nbsp;
+          #{this.props.post.id} --&nbsp;
         </span>
       );
     } else {
@@ -144,11 +165,11 @@ class Post extends Component {
   renderContent() {
     let content;
     let loaded = true;
-    if (this.state.post.content === undefined || this.state.post.content === null) {
-      content = "Loading...";
-      loaded = false;
+    if (this.props.post.isContentLoaded()) {
+      content = this.props.post.content;
     } else {
-      content = this.state.post.content;
+      content = "Loading IPFS content...";
+      loaded = false;
     }
     content = xss(content).replace(/\n/g, '<br />');
     if (content.length) {
@@ -166,25 +187,25 @@ class Post extends Component {
     }
   }
 
-  renderButton() {
+  renderConvertToGroupButton() {
     return (
     <button
         style={this.styles.joinButton}
-        onClick={() => this.createGroup(this.state.post.id)}
-        > Convert To Group </button>
+        onClick={() => this.createGroup(this.props.post.id)}
+        >+</button>
     );
   }
 
   createGroup(id) {
-    console.log(id);
+    console.log("creating group on post", id);
     this.props.group.convertPostToGroup(id).then((result) => {
-      console.log(result);
+      console.log("successfully created group on post", id, ":", result);
       this.forceUpdate(); 
     });
   }
 
   renderTimestamp() {
-    let m = moment(this.state.post.creationTime, "X");
+    let m = moment(this.props.post.creationTime, "X");
     return (
       <span style={this.styles.timestamp}>
         Posted&nbsp;

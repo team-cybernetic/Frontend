@@ -2,28 +2,62 @@ import moment from 'moment';
 import Ipfs from '../utils/Ipfs';
 
 export default class Post {
-  constructor(parentGroupContract, { title, content, contentType, multiHashArray, multiHashString = null, creationTime, creator, balance, id, transactionId, permissions, groupAddress }) {
-    this.parentGroupContract = parentGroupContract;
+  constructor(parentGroup, post) {
+    this.parentGroup = parentGroup;
     this.contentLoadListeners = [];
     this.headerLoadListeners = [];
-    this.title = title;
-    this.content = content;
-    this.contentType = contentType;
-    this.multiHashArray = multiHashArray;
-    this.multiHashString = multiHashString;
-    this.id = id;
-    this.transactionId = transactionId;
-    this.permissions = permissions;
-    this.groupAddress = groupAddress;
-    this.creationTime = creationTime || moment().unix();
-    this.creator = creator;
-    this.balance = balance || 0;
+    this.confirmationListeners = [];
+    this.populate(post);
     this.confirming = false;
-    this.confirmed = !!id;
     this.headerLoading = false;
-    this.headerLoaded = false;
     this.contentLoading = false;
-    this.contentLoaded = false;
+  }
+
+  populate({
+    title,
+    content,
+    contentType,
+    multiHashArray,
+    multiHashString,
+    creationTime,
+    creator,
+    balance,
+    id,
+    transactionId,
+    permissions,
+    groupAddress 
+  }) {
+    this.title = title || this.title;
+    this.content = content || this.content;
+    this.contentType = contentType || this.contentType;
+    this.multiHashArray = multiHashArray || this.multiHashArray;
+    this.multiHashString = (multiHashString === "" ? "" : multiHashString) || this.multiHashString;
+    this.id = (id ? id.toString() : this.id);
+    this.transactionId = transactionId || this.transactionId;
+    this.permissions = permissions || this.permissions;
+    this.groupAddress = groupAddress || this.groupAddress || '0x0000000000000000000000000000000000000000';
+    this.creationTime = creationTime || this.creationTime;
+    this.creator = creator || this.creator;
+    this.balance = 0 || this.balance || balance;
+    this.confirmed = !!this.id;
+    this.headerLoaded = !!this.title;
+    this.contentLoaded = !!this.content || this.multiHashString === "";
+  }
+
+  isConfirmed() {
+    return (this.confirmed);
+  }
+
+  isHeaderLoaded() {
+    return (this.headerLoaded);
+  }
+
+  isContentLoaded() {
+    return (this.contentLoaded);
+  }
+
+  isLoaded() {
+    return (this.isConfirmed() && this.isHeaderLoaded() && this.isContentLoaded());
   }
 
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.
@@ -48,33 +82,51 @@ export default class Post {
           this.headerLoadListeners.push({ resolve, reject });
         } else {
           this.headerLoading = true;
-          this.parentGroupContract.getPost(this.id).then(([
-            title,
-            id,
-            contentType,
-            ipfsHashFunction,
-            ipfsHashLength,
-            ipfsHash,
-            creator,
-            creationTime,
-            groupAddress,
-            balance,
-            permissions
-          ]) => {
-            this.title = title;
-            this.contentType = contentType;
-            this.multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
-            this.multiHashString = Ipfs.assembleMultiHash(this.multiHashArray);
-            this.permissions = permissions;
-            this.groupAddress = groupAddress;
-            this.creationTime = creationTime || moment().unix();
-            this.creator = creator;
-            this.balance = balance || 0;
-            this.headerLoaded = true;
-            this.headerLoadListeners.forEach((listener) => { listener.resolve() });
-            resolve();
+          this.waitForConfirmation().then(() => {
+            this.parentGroup.loadPost(this.id).then(([
+              title,
+              id,
+              contentType,
+              ipfsHashFunction,
+              ipfsHashLength,
+              ipfsHash,
+              creator,
+              creationTime,
+              groupAddress,
+              balance,
+              permissions
+            ]) => {
+              const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
+              this.populate({
+                title,
+                id,
+                contentType,
+                multiHashArray,
+                multiHashString: Ipfs.assembleMultiHash(multiHashArray),
+                ipfsHashFunction,
+                ipfsHashLength,
+                ipfsHash,
+                creator,
+                creationTime,
+                groupAddress,
+                balance,
+                permissions,
+              });
+              this.headerLoaded = true;
+              this.headerLoading = false;
+              this.headerLoadListeners.forEach((listener) => { listener.resolve() });
+              this.headerLoadListeners = [];
+              resolve();
+            }).catch((error) => {
+              this.headerLoading = false;
+              this.headerLoadListeners.forEach((listener) => { listener.reject(error) });
+              this.headerLoadListeners = [];
+              reject(error);
+            });
           }).catch((error) => {
-            this.headerLoadListeners.forEach((listener) => listener.reject(error));
+            this.headerLoading = false;
+            this.headerLoadListeners.forEach((listener) => { listener.reject(error) });
+            this.headerLoadListeners = [];
             reject(error);
           });
         }
@@ -82,6 +134,13 @@ export default class Post {
         resolve();
       }
     });
+  }
+
+  reloadHeader() {
+    if (this.headerLoaded) {
+      this.headerLoaded = false;
+    }
+    return (this.loadHeader());
   }
 
   loadContent() {
@@ -95,14 +154,20 @@ export default class Post {
             Ipfs.getContent(this.multiHashString).then((content) => {
               this.content = content;
               this.contentLoaded = true;
+              this.contentLoading = false;
               this.contentLoadListeners.forEach((listener) => { listener.resolve() });
+              this.contentLoadListeners = [];
               resolve();
             }).catch((error) => {
               this.contentLoading = false;
               this.contentLoadListeners.forEach((listener) => { listener.reject(error) });
+              this.contentLoadListeners = [];
               reject(error);
             });
           }).catch((error) => {
+            this.contentLoading = false;
+            this.contentLoadListeners.forEach((listener) => { listener.reject(error) });
+            this.contentLoadListeners = [];
             reject(error);
           });
         }
@@ -112,6 +177,14 @@ export default class Post {
     });
   }
 
+  reloadContent() {
+    if (this.contentLoaded) {
+      this.contentLoaded = false;
+    }
+    return (this.loadContent());
+  }
+
+
   waitForConfirmation() {
     return new Promise((resolve, reject) => {
       if (!this.confirmed) {
@@ -119,12 +192,12 @@ export default class Post {
           this.confirmationListeners.push({ resolve, reject });
         } else {
           this.confirming = true;
-          var eventListenerHandle = this.parentGroupContract.registerNewPostEventListener((error, response) => {
+          var eventListenerHandle = this.parentGroup.registerNewPostEventListener((error, response) => {
             if (!error) {
               if (response.transactionHash === this.transactionId) {
-                this.id = response.args.number.c[0]; //TODO: bigint to string?
+                this.id = response.args.number.toString();
                 this.confirmed = true;
-                this.parentGroupContract.unregisterEventListener(eventListenerHandle);
+                this.parentGroup.unregisterEventListener(eventListenerHandle);
                 this.confirmationListeners.forEach((listener) => { listener.resolve() });
                 resolve();
               }

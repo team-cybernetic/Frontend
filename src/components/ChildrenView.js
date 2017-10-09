@@ -10,24 +10,34 @@ class ChildrenView extends Component {
     this.state = {
       posts: null,
     };
+    this.listenerHandle = null;
   }
 
   componentWillMount() {
     console.log("children view mounting");
     this.loadPosts(this.props.isLoaded, this.props.group);
-    //TODO: add listener to group
-    //this.listenerId = PostStore.addNewPostListener((newPost) => this.addToPosts(newPost));
+    this.registerNewPostListener(this.props.isLoaded, this.props.group, (post) => this.addToPosts(post));
   }
 
   componentWillReceiveProps(nextProps) {
     console.log("children view props updated -- getting posts");
     this.loadPosts(nextProps.isLoaded, nextProps.group);
+    this.registerNewPostListener(nextProps.isLoaded, nextProps.group, (post) => this.addToPosts(post));
   }
 
   componentWillUnmount() {
     console.log("children view unmounting");
-    //TODO: remove listener from group
-    //PostStore.removeNewPostListener(this.listenerId);
+    if (this.listenerHandle) {
+      this.props.group.unregisterNewPostListener(this.listenerHandle);
+    }
+  }
+
+  registerNewPostListener(isLoaded, group, callback) {
+    if (isLoaded) {
+      if (!this.listenerHandle) {
+        this.listenerHandle = group.registerNewPostListener(callback);
+      }
+    }
   }
 
   loadPosts(isLoaded, group) {
@@ -69,6 +79,7 @@ class ChildrenView extends Component {
   }
 
   addToPosts(post) {
+    console.log("childrenView adding to posts", post);
     if (!this.alreadyHavePost(post)) {
       let { posts } = this.state;
       if (posts === null) {
@@ -76,6 +87,8 @@ class ChildrenView extends Component {
       }
       posts.push(post);
       this.setState({ posts });
+    } else {
+      console.log("we already had this though");
     }
   }
 

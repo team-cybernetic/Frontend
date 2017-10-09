@@ -3,6 +3,8 @@
 export default class GroupContract {
 
   static EVENT_NEW_POST = 'NewPost';
+  static EVENT_PENDING = '_pending';
+  static EVENT_LATEST = '_latest';
 
   constructor(web3, contractInstance) {
     this.web3 = web3;
@@ -11,9 +13,12 @@ export default class GroupContract {
     this.latestTransactionListeners = [[]];
     this.eventListeners = [[]];
     this.web3.eth.filter("pending").watch((error, txid) => {
+      console.log("got a pending", txid);
+      this.fireEventListener(GroupContract.EVENT_PENDING, error, txid);
       this.firePendingTransactionListeners(error, txid);
     });
     this.web3.eth.filter("latest").watch((error, txid) => {
+      this.fireEventListener(GroupContract.EVENT_LATEST, error, txid);
       this.fireLatestTransactionListeners(error, txid);
     });
     this.watchForEvent(GroupContract.EVENT_NEW_POST, {}, (error, response) => {
@@ -52,8 +57,11 @@ export default class GroupContract {
     });
   }
 
-  unregisterEventListener({eventName, num}) {
-    delete (this.eventListeners[eventName][num]);
+  unregisterEventListener(handle) {
+    if (handle) {
+      let {eventName, num} = handle;
+      delete (this.eventListeners[eventName][num - 1]);
+    }
   }
 
   registerEventListener(eventName, callback) {
@@ -67,34 +75,16 @@ export default class GroupContract {
     });
   }
 
+  registerPendingEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_PENDING, callback));
+  }
+
+  registerLatestEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_LATEST, callback));
+  }
+
   registerNewPostEventListener(callback) {
-    return (this.registerEventListener(this.EVENT_NEW_POST, callback));
-  }
-
-  firePendingTransactionListeners(error, transactionId) {
-    if (this.pendingTransactionListeners[transactionId] && this.pendingTransactionListeners[transactionId].length > 0) {
-      this.pendingTransactionListeners[transactionId].forEach((listener) => {
-        if (!error) {
-          listener.resolve(transactionId);
-        } else {
-          listener.reject(error);
-        }
-      });
-      delete (this.pendingTransactionListeners[transactionId]);
-    }
-  }
-
-  fireLatestTransactionListeners(error, transactionId) {
-    if (this.latestTransactionListeners[transactionId] && this.latestTransactionListeners[transactionId].length > 0) {
-      this.latestTransactionListeners[transactionId].forEach((listener) => {
-        if (!error) {
-          listener.resolve(transactionId);
-        } else {
-          listener.reject(error);
-        }
-      });
-      delete (this.latestTransactionListeners[transactionId]);
-    }
+    return (this.registerEventListener(GroupContract.EVENT_NEW_POST, callback));
   }
 
   fireEventListener(eventName, error, response) {
@@ -102,6 +92,106 @@ export default class GroupContract {
       this.eventListeners[eventName].forEach((listener) => {
         listener(error, response);
       });
+    }
+  }
+
+  registerPendingTransactionListener(transactionId, callback) {
+    if (!this.pendingTransactionListeners[transactionId]) {
+      this.pendingTransactionListeners[transactionId] = [];
+    }
+    if (!Array.isArray(this.pendingTransactionListeners[transactionId])) {
+      callback(this.pendingTransactionListeners[transactionId].error, this.pendingTransactionListeners[transactionId].transactionId);
+      return (null);
+    }
+    this.pendingTransactionListeners[transactionId].push(callback);
+    return ({
+      transactionId,
+      num: this.pendingTransactionListeners[transactionId].length,
+    });
+  }
+
+  unregisterPendingTransactionListener(handle) {
+    if (handle) {
+      let {transactionId, num} = handle;
+      if (this.pendingTransactionListeners[transactionId] && Array.isArray(this.pendingTransactionListeners[transactionId])) {
+        delete (this.pendingTransactionListeners[transactionId][num - 1]);
+      }
+    }
+  }
+
+  waitForPendingTransaction(transactionId) {
+    return new Promise((resolve, reject) => {
+      this.registerPendingTransactionListener(transactionId, (error, txid) => {
+        if (!error) {
+          resolve(txid);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+
+  firePendingTransactionListeners(error, transactionId) {
+    if (this.pendingTransactionListeners[transactionId]) {
+      if (Array.isArray(this.pendingTransactionListeners[transactionId])) {
+        this.pendingTransactionListeners[transactionId].forEach((listener) => {
+          listener(error, transactionId);
+        });
+      } //if it's not an array, we've already been through here once before, so lets just take the latest result
+      this.pendingTransactionListeners[transactionId] = {
+        error,
+        transactionId,
+      };
+    }
+  }
+
+  registerLatestTransactionListener(transactionId, callback) {
+    if (!this.latestTransactionListeners[transactionId]) {
+      this.latestTransactionListeners[transactionId] = [];
+    }
+    if (!Array.isArray(this.latestTransactionListeners[transactionId])) {
+      callback(this.latestTransactionListeners[transactionId].error, this.latestTransactionListeners[transactionId].transactionId);
+      return (null);
+    }
+    this.latestTransactionListeners[transactionId].push(callback);
+    return ({
+      transactionId,
+      num: this.latestTransactionListeners[transactionId].length,
+    });
+  }
+
+  unregisterLatestTransactionListener(handle) {
+    if (handle) {
+      let {transactionId, num} = handle;
+      if (this.latestTransactionListeners[transactionId] && Array.isArray(this.latestTransactionListeners[transactionId])) {
+        delete (this.latestTransactionListeners[transactionId][num - 1]);
+      }
+    }
+  }
+
+  waitForLatestTransaction(transactionId) {
+    return new Promise((resolve, reject) => {
+      this.registerLatestTransactionListener(transactionId, (error, txid) => {
+        if (!error) {
+          resolve(txid);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+
+  fireLatestTransactionListeners(error, transactionId) {
+    if (this.latestTransactionListeners[transactionId]) {
+      if (Array.isArray(this.latestTransactionListeners[transactionId])) {
+        this.latestTransactionListeners[transactionId].forEach((listener) => {
+          listener(error, transactionId);
+        });
+      } //if it's not an array, we've already been through here once before, so lets just take the latest result
+      this.latestTransactionListeners[transactionId] = {
+        error,
+        transactionId,
+      };
     }
   }
 }

@@ -80,8 +80,12 @@ export default class GroupTree {
     });
   }
 
+  static isAddressNull(addr) {
+    return (!addr || addr === '0x' || addr === '0x0000000000000000000000000000000000000000' || addr === '0000000000000000000000000000000000000000');
+  }
+
   static isAddressValid(addr) {
-    return (this.web3.isAddress(addr) && addr !== '0x0000000000000000000000000000000000000000' && addr !== '0000000000000000000000000000000000000000');
+    return (this.web3.isAddress(addr) && !this.isAddressNull());
   }
 
   static walkTree(pathToWalk, pathWalked, currentGroup) {
