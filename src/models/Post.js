@@ -31,7 +31,7 @@ export default class Post {
     this.content = content || this.content;
     this.contentType = contentType || this.contentType;
     this.multiHashArray = multiHashArray || this.multiHashArray;
-    this.multiHashString = (multiHashString === "" ? "" : multiHashString) || this.multiHashString;
+    this.multiHashString = (multiHashString === "" ? "" : (multiHashString || this.multiHashString));
     this.id = (id ? id.toString() : this.id);
     this.transactionId = transactionId || this.transactionId;
     this.permissions = permissions || this.permissions;
