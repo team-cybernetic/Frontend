@@ -1,7 +1,7 @@
 import RootGroupContractJson from './contracts/Posts.json'
 import getWeb3 from './utils/getWeb3'
 import TruffleContract from 'truffle-contract';
-import GroupTree from './models/GroupTree';
+import GroupStore from './stores/GroupStore';
 import WalletStore from './stores/WalletStore';
 import Ipfs from './utils/Ipfs';
 
@@ -17,7 +17,7 @@ function instantiateContract(web3, resolve) {
       [
         WalletStore,
       ].forEach((toInitialize) => toInitialize.initialize(web3, rootInstance));
-      GroupTree.initialize(web3, rootInstance, groupContract);
+      GroupStore.initialize(web3, rootInstance, groupContract);
       Ipfs.initialize().then(resolve);
     }).catch((error) => {
       console.error('Error deploying contract: ', error);

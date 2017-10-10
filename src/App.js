@@ -5,7 +5,7 @@ import NavigationBar from './components/NavigationBar';
 import ChildrenView from './components/ChildrenView';
 import SideBar from './components/SideBar';
 import Editor from './components/Editor';
-import GroupTree from './models/GroupTree';
+import GroupStore from './stores/GroupStore';
 import PathParser from './utils/PathParser';
 import {
   BrowserRouter as Router,
@@ -72,7 +72,7 @@ class App extends Component {
       if (this.state.pathState)
         console.log("App testing if", this.state.pathState.cleanGroupPath, "==", parsedPath.cleanGroupPath, ":", parsedPath.sameGroup(this.state.pathState) ? 'true' : 'false', " -- which means that isGroupLoaded ==", isGroupLoaded ? 'true' : 'false');
       console.log("App path changed from", this.state.pathState, "to", parsedPath);
-      GroupTree.getGroup(parsedPath).then(({group, post}) => {
+      GroupStore.getGroup(parsedPath).then(({group, post}) => {
         console.log("App successfully resolved group for", path, "with post:", post);
         this.setState({
           isGroupLoaded: true,

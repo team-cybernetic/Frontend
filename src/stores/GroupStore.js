@@ -1,6 +1,6 @@
-import Group from './Group'
+import Group from '../models/Group'
 
-export default class GroupTree {
+export default class GroupStore {
 
   /**
    * This class maintains the system's view of the group tree.
@@ -11,9 +11,9 @@ export default class GroupTree {
    * A path that starts with a / is an absolute path, which navigates from the root node down
    * A path that ends with a / specifies that if the lookup is successful, it should return a group.
    * If the path does not end with a /, it means that the lookup should return a post.
-   * The GroupTree must caches all intermediate nodes for future lookups.
-   * The GroupTree must watch for NewGroup events on all of the cached nodes to react to dynamic changes in tree structure
-   * The GroupTree must provide an event listener for changes on cached nodes, so components which use the content of such nodes can react to changes in tree structure
+   * The GroupStore must caches all intermediate nodes for future lookups.
+   * The GroupStore must watch for NewGroup events on all of the cached nodes to react to dynamic changes in tree structure
+   * The GroupStore must provide an event listener for changes on cached nodes, so components which use the content of such nodes can react to changes in tree structure
    **/
 
   static contractTC = null;
@@ -61,11 +61,11 @@ export default class GroupTree {
           currentGroup = startingGroup;
         }
       } else {
-        console.log("GroupTree walking an absolute path");
+        console.log("GroupStore walking an absolute path");
       }
-      console.log("GroupTree descending into the forest...");
+      console.log("GroupStore descending into the forest...");
       let groupNums = parsedPath.groupNums.slice(0); //clone the array
-      console.log("GroupTree needs to walk the path:", groupNums);
+      console.log("GroupStore needs to walk the path:", groupNums);
       let pathWalked = [];
       this.walkTree(groupNums, pathWalked, currentGroup).then((result) => {
         console.log("Successfully walked tree:", result);
