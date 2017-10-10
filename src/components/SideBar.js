@@ -33,30 +33,6 @@ class SideBar extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setContent(nextProps.isLoaded, nextProps.group, nextProps.post, nextProps.pathState);
-    /*
-    if (!this.props.isLoaded || !this.props.post) {
-    console.log("sidebar next state:", nextState, this.state);
-    if (!nextState.post && !this.state.post) {
-      console.log("sidebar next props:", nextProps);
-      if (!nextProps.isLoaded) {
-        console.log("sidebar loading");
-      } else {
-        console.log("sidebar loaded");
-        if (nextProps.pathState.isGroup) {
-          console.log("sidebar loading group");
-        } else {
-          console.log("sidebar loading post");
-          /*
-          let post = PostStore.getPost(nextProps.pathState.postNum);
-          post.waitForContentLoad().then(() => {
-            console.log("sidebar post loaded");
-            this.setState({ post });
-          });
-          * /
-        }
-      }
-    }
-    */
   }
 
   renderPost() {
@@ -64,66 +40,35 @@ class SideBar extends Component {
       if (this.props.pathState.isGroup) {
         console.log("sidebar render group TODO");
       } else if (this.state.post) {
-        console.log("sidebar render post");
         let post = this.state.post;
         return (
           <Post key={post.id ? post.id : post.transactionId} sidebar={true} post={post} parent={this.props.pathState.parent} />
         );
       } else {
-        console.log("sidebar render loading post");
         return (
           <p style={styles.groupDesc}>Loading post...</p>
         );
       }
     } else {
-      console.log("sidebar render loading");
       return (
         <p style={styles.groupDesc}>Loading...</p>
       );
     }
   }
 
-  getPostContent() {
-    if (this.props.isLoaded) {
-      let id = this.props.pathState.postNum;
-      if (id) {
-        console.log("sidebar rendering post:", id);
-        /*
-        content = xss(content).replace(/\n/g, '<br />');
-        if (content.length) {
-          const html = {
-            __html: content,
-          }
-          return (
-            <div style={styles.contentWrapper}>
-              {loaded ? <hr style={styles.contentHr}/> : ''}
-              <div style={styles.content}>
-              <span dangerouslySetInnerHTML={html}></span>
-              </div>
-              </div>
-          );
-        }
-        */
-
-      } else {
-        console.log("sidebar not rendering a post, rendering group:", this.props.pathState.group);
-      }
-    } else {
-      return ("Loading...");
-    }
-    return ("TODO");
+  joinGroup() {
+    console.log("TODO: join group");
   }
 
   render() {
     return (
       <div style={styles.container}>
-        { /*<p style={styles.groupDesc}>{this.getPostContent()}</p>*/ }
         {this.renderPost()}
         <p style={styles.groupDesc}>x Members / x Earnings</p>
 
         <button
         style={styles.joinButton}
-        onClick={() => this.testMethod()}
+        onClick={() => this.joinGroup()}
         > Join Group </button>
 
 
@@ -165,10 +110,6 @@ class SideBar extends Component {
       </div>
 
     );
-  }
-  testMethod() {
-    console.log('attempting navigation');
-    window.location = this.props.pathState.parent + this.state.post.id + '/';
   }
 }
 

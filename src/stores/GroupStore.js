@@ -25,6 +25,7 @@ export default class GroupStore {
     this.web3 = web3;
     this.groupContractTC = contractTC;
     this.treeRoot = new Group(this.web3, contractRootInstance, contractTC);
+    this.cache = [];
   }
 
   /**
@@ -33,7 +34,7 @@ export default class GroupStore {
    * If the path is a group (ends with a /) and the group can be fully resolved, resolves 
    */
 
-  static getGroup(parsedPath, startingGroup = null) {
+  static resolvePath(parsedPath, startingGroup = null) {
     return new Promise((resolve, reject) => {
       //need to do resolve({group, post, parsedPath}) or reject({error, group, partialPath})
       /*
@@ -69,6 +70,7 @@ export default class GroupStore {
       let pathWalked = [];
       this.walkTree(groupNums, pathWalked, currentGroup).then((result) => {
         console.log("Successfully walked tree:", result);
+        console.log("path walked", pathWalked);
         if (!parsedPath.isGroup) {
           result.post = result.group.getPost(parsedPath.postNum);
         }
@@ -100,18 +102,16 @@ export default class GroupStore {
       currentGroup.getGroupAddressOfPost(nextStep).then((addr) => {
         console.log("got address for", nextStep, ":", addr);
         if (this.isAddressValid(addr)) {
-          console.log("got a valid address!");
-          this.groupContractTC.at(addr).then((contractInstance) => {
-            console.log("got contractInstance for", nextStep, ":", contractInstance);
-            var nextGroup = new Group(this.web3, contractInstance, this.groupContractTC);
+          console.log("it's a valid address!");
+          GroupStore.getGroup(addr).then((nextGroup) => {
+            pathWalked.push(nextStep);
             if (pathToWalk.length > 0) {
-              this.walkTree(pathToWalk, [/*TODO*/], nextGroup).then(resolve).catch(reject);
+              this.walkTree(pathToWalk, pathWalked, nextGroup).then(resolve).catch(reject);
             } else {
               console.log("singleton resolved:", nextGroup);
               resolve({group: nextGroup});
             }
           }).catch((error) => {
-            console.error("error while getting contractInstance at address", addr, ":", error);
             reject(error);
           });
         } else {
@@ -127,6 +127,21 @@ export default class GroupStore {
     });
   }
 
-
-
+  static getGroup(addr) {
+    return new Promise((resolve, reject) => {
+      if (!this.cache[addr]) {
+        console.log("group not cached");
+        this.groupContractTC.at(addr).then((contractInstance) => {
+          this.cache[addr] = new Group(this.web3, contractInstance, this.groupContractTC);
+          resolve(this.cache[addr]);
+        }).catch((error) => {
+          console.error("error while getting contractInstance at address", addr, ":", error);
+          reject(error);
+        });
+      } else {
+        console.log("group cached!");
+        resolve(this.cache[addr]);
+      }
+    });
+  }
 }

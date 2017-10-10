@@ -6,6 +6,7 @@ export default class Post {
     this.contentLoadListeners = [];
     this.headerLoadListeners = [];
     this.confirmationListeners = [];
+    this.updateListeners = [];
     this.populate(post);
     this.confirming = false;
     this.headerLoading = false;
@@ -41,6 +42,7 @@ export default class Post {
     this.confirmed = !!this.id;
     this.headerLoaded = !!this.title;
     this.contentLoaded = !!this.content || this.multiHashString === "";
+    this.fireUpdateListeners();
   }
 
   isConfirmed() {
@@ -151,7 +153,9 @@ export default class Post {
           this.contentLoading = true;
           this.loadHeader().then(() => {
             Ipfs.getContent(this.multiHashString).then((content) => {
-              this.content = content;
+              this.populate({
+                content,
+              });
               this.contentLoaded = true;
               this.contentLoading = false;
               this.contentLoadListeners.forEach((listener) => { listener.resolve() });
@@ -194,8 +198,11 @@ export default class Post {
           var eventListenerHandle = this.parentGroup.registerNewPostEventListener((error, response) => {
             if (!error) {
               if (response.transactionHash === this.transactionId) {
-                this.id = response.args.number.toString();
+                this.populate({
+                  id: response.args.postNumber.toString(),
+                });
                 this.confirmed = true;
+                this.confirming = false;
                 this.parentGroup.unregisterEventListener(eventListenerHandle);
                 this.confirmationListeners.forEach((listener) => { listener.resolve() });
                 resolve();
@@ -212,4 +219,27 @@ export default class Post {
       }
     });
   }
+
+  registerUpdateListener(callback) {
+    this.updateListeners.push(callback);
+    return ({
+      num: this.updateListeners.length,
+    });
+  }
+
+  unregisterUpdateListener(handle) {
+    if (handle) {
+      let {num} = handle;
+      if (this.updateListeners) {
+        delete (this.updateListeners[num - 1]);
+      }
+    }
+  }
+
+  fireUpdateListeners() {
+    this.updateListeners.forEach((listener) => {
+      listener(this);
+    });
+  }
+
 }

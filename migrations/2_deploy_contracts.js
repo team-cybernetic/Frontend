@@ -1,7 +1,7 @@
-var Posts = artifacts.require("./Posts.sol");
+var Group = artifacts.require("./Group.sol");
 
 module.exports = function(deployer) {
     deployer.deploy([
-        Posts
+        Group
     ]);
 };

@@ -1,4 +1,4 @@
-import RootGroupContractJson from './contracts/Posts.json'
+import RootGroupContractJson from './contracts/Group.json'
 import getWeb3 from './utils/getWeb3'
 import TruffleContract from 'truffle-contract';
 import GroupStore from './stores/GroupStore';

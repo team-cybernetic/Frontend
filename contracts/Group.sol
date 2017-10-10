@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 
-contract Posts {
+contract Group {
   /*
      IPFS stores its hashes as a multihash -- the first two bytes represent
      the hash function used (default SHA256) and the length of the hash,
@@ -41,10 +41,10 @@ contract Posts {
   mapping (address => uint256[]) postNumbersByCreator;
   mapping (uint256 => Post) postsByNumber;
   uint256[] postNumbers;
-  address parentGroup;
 
-  event NewPost(address indexed creator, uint256 indexed number, string title);
+  event NewPost(uint256 indexed postNumber, address indexed creator, string title);
   event NewGroup(uint256 indexed postNumber, address groupAddress);
+  event NewUser(uint256 indexed userNumber, address userAddress);
 
   uint256 userCount = 0;
 
@@ -62,8 +62,10 @@ contract Posts {
 
   mapping (address => User) usersByAddress; //maps ethereum addres (public key) to user objects
   mapping (uint256 => User) usersByNumber;
+  uint256[] userNumbers;
+  address[] userAddresses;
 
-  function Posts(string title, string contentType, uint8 ipfsHashFunction, uint8 ipfsHashLength, bytes ipfsHash, uint256 creationTime) payable {
+  function Group(string title, string contentType, uint8 ipfsHashFunction, uint8 ipfsHashLength, bytes ipfsHash, uint256 creationTime) payable {
     require(ipfsHashLength == ipfsHash.length);
 
     contents.title = title;
@@ -80,6 +82,12 @@ contract Posts {
     contents.creationTime = creationTime;
   }
 
+  function postExistsByNumber(uint256 num) returns (bool) {
+    require(num <= postCount);
+    Post memory p = postsByNumber[num];
+    return (p.number != 0);
+  }
+
   function getPostByNumber(uint256 _number) constant returns (
     string title,
     uint256 number,
@@ -93,6 +101,7 @@ contract Posts {
     uint256 balance,
     int256 permissions
   ) {
+    require(_number <= postCount);
     Post memory p = postsByNumber[_number];
     return (
       p.title,
@@ -130,14 +139,6 @@ contract Posts {
     require(p.number != 0); //post deleted
 
     return p.groupAddress;
-  }
-
-  function getParent() constant returns (address) {
-    return parentGroup;
-  }
-
-  function setParent(address parent) {
-    parentGroup = parent;
   }
 
   function getPostNumbersByCreator(address _creator) constant returns (uint256[]) {
@@ -197,15 +198,118 @@ contract Posts {
     postsByNumber[postCount] = newPost;
     postNumbers.push(postCount);
 
-    NewPost(creator, postCount, title);
+    NewPost(postCount, creator, title);
 
     return (postCount);
   }
 
-  /*
-  function userExistsByAddress(address addr) {
+  function userExistsByAddress(address addr) returns (bool) {
+    User memory u = usersByAddress[addr];
+    return (u.number != 0);
   }
-   */
+
+  function userExistsByNumber(uint256 num) returns (bool) {
+    require(num <= userCount);
+    User memory u = usersByNumber[num];
+    return (u.number != 0);
+  }
+
+  function joinGroup() payable {
+    require(!userExistsByAddress(msg.sender));
+
+    userCount++;
+    User memory u = User({
+      nickname: "",
+      number: userCount,
+      profileType: "",
+      profileAddress: IpfsMultihash({
+        hashFunction: 0,
+        hashLength: 0,
+        hash: ""
+      }),
+      addr: msg.sender,
+      joinTime: block.timestamp,
+      directAddress: 0,
+      balance: 0, //TODO: ruleset
+      permissions: 0 //TODO: ruleset
+    });
+
+    usersByAddress[msg.sender] = u;
+    userAddresses.push(msg.sender);
+
+    usersByNumber[userCount] = u;
+    userNumbers.push(userCount);
+
+    NewUser(userCount, msg.sender);
+  }
+
+  function getUserNumbers() returns (uint256[]) {
+    return (userNumbers);
+  }
+
+  function getUserAddresses() returns (address[]) {
+    return (userAddresses);
+  }
+
+  function getUserByAddress(address _addr) returns (
+    string nickname,
+    uint256 number,
+    string profileType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash,
+    address addr,
+    uint256 joinTime,
+    address directAddress,
+    uint256 balance,
+    int256 permissions
+  ) {
+    require(userExistsByAddress(_addr));
+    User memory u = usersByAddress[_addr];
+    return (
+      u.nickname,
+      u.number,
+      u.profileType,
+      u.profileAddress.hashFunction,
+      u.profileAddress.hashLength,
+      u.profileAddress.hash,
+      u.addr,
+      u.joinTime,
+      u.directAddress,
+      u.balance,
+      u.permissions
+    );
+  }
+
+  function getUserByNumber(uint256 _number) returns (
+    string nickname,
+    uint256 number,
+    string profileType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash,
+    address addr,
+    uint256 joinTime,
+    address directAddress,
+    uint256 balance,
+    int256 permissions
+  ) {
+    require(userExistsByNumber(_number));
+    User memory u = usersByNumber[_number];
+    return (
+      u.nickname,
+      u.number,
+      u.profileType,
+      u.profileAddress.hashFunction,
+      u.profileAddress.hashLength,
+      u.profileAddress.hash,
+      u.addr,
+      u.joinTime,
+      u.directAddress,
+      u.balance,
+      u.permissions
+    );
+  }
 
   function getTitle() returns (string) {
     return (contents.title);

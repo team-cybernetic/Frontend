@@ -12,13 +12,23 @@ export default class Group {
     this.groupContractTC = contractTC;
     this.contractInstance = contractInstance;
     this.groupContract = new GroupContract(this.web3, this.contractInstance);
-    this.gasEstimator = new GasEstimator(this.web3, this.contractInstance, this.groupContractTC);
+    this.gasEstimator = new GasEstimator(this.web3, this.contractInstance);
     this.newPostListeners = [];
     this.registerNewPostEventListener((error, result) => {
       if (!error) {
-        const id = result.args.number.toString();
+        const id = result.args.postNumber.toString();
         const post = this.getPost(id, result.transactionHash);
         this.fireNewPostListeners(post);
+      }
+    });
+    this.registerNewGroupEventListener((error, result) => {
+      if (!error) {
+        const id = result.args.postNumber.toString();
+        const post = this.getPost(id, result.transactionHash);
+        const addr = result.args.groupAddress;
+        post.populate({
+          groupAddress: addr,
+        });
       }
     });
   }
@@ -131,9 +141,8 @@ export default class Group {
 
       this.getGroupAddressOfPost(postNum).then((currentAddress) => {
         if (!this.isAddressValid(currentAddress)) {
-//          this.gasEstimator.estimateContractCreation().then((gas) => { //TODO
-            let gas = 1000000
-            let actualGas = gas * 3;
+          this.gasEstimator.estimateContractCreation(this.groupContractTC).then((gas) => { //TODO
+            let actualGas = gas;
             console.log("gas estimator estimates that this contract creation will cost", gas, "gas, actualGas =", actualGas);
             //TODO: move contract related code to GroupContract
             this.groupContractTC.new({gas: actualGas}).then((newInstance) => {
@@ -144,19 +153,15 @@ export default class Group {
               console.error("Failed to create new contract:", error);
               reject(error);
             });
-          /*
           }).catch((error) => {
             console.error("Failed to estimate gas for new contract:", error);
             reject(error);
           });
-          */
         } else {
           console.log("There's already a group on post", postNum, "!");
+          resolve(currentAddress);
         }
       });
-    }).catch((error) => {
-      console.error("Error with promise.", error);
-      return null;
     });
   }
 

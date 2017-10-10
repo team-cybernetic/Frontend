@@ -6,33 +6,12 @@ import { Link } from 'react-router-dom';
 class Post extends Component {
   componentWillMount() {
     let post = this.props.post;
-    post.waitForConfirmation().then(() => {
+    post.registerUpdateListener((post) => {
       this.forceUpdate();
-      post.loadHeader().then(() => {
-        this.forceUpdate();
-        post.loadContent().then(() => {
-          this.forceUpdate();
-        });
-      });
-    });
-    this.groupListenerHandle = this.props.group.registerNewGroupEventListener((error, result) => {
-      console.log("NewGroup event:", error, result);
-      if (!error) {
-        let id = result.args.postNumber.toString();
-        console.log("testing", id, "vs", this.props.post.id);
-        if (id === this.props.post.id) {
-          let addr = result.args.groupAddress;
-          this.props.post.populate({ groupAddress: addr });
-          this.forceUpdate();
-        }
-      }
     });
   }
 
   componentWillUnmount() {
-    if (this.groupListenerHandle) {
-      this.props.group.unregisterEventListener(this.groupListenerHandle);
-    }
   }
 
   render() {
@@ -107,7 +86,7 @@ class Post extends Component {
     return (
       <span style={this.styles.multiHash}>
         Group:&nbsp;
-        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>{this.renderConvertToGroupButton()}
+        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>&nbsp;{this.renderConvertToGroupButton()}
       </span>
     );
   }
@@ -147,7 +126,7 @@ class Post extends Component {
     if (this.props.post.isContentLoaded()) {
       content = this.props.post.content;
     } else {
-      content = "Loading IPFS content...";
+      content = "Loading content...";
       loaded = false;
     }
     content = xss(content).replace(/\n/g, '<br />');
@@ -166,12 +145,16 @@ class Post extends Component {
     }
   }
 
+  isAddressNull(addr) { //TODO: util
+    return (!addr || addr === '0x' || addr === '0x0000000000000000000000000000000000000000' || addr === '0000000000000000000000000000000000000000');
+  }
+
   renderConvertToGroupButton() {
+    if (!this.isAddressNull(this.props.post.groupAddress)) {
+      return ('');
+    }
     return (
-    <button
-        style={this.styles.joinButton}
-        onClick={() => this.createGroup(this.props.post.id)}
-        >+</button>
+      <button style={this.styles.joinButton} onClick={() => this.createGroup(this.props.post.id)}>+</button>
     );
   }
 

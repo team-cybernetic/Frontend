@@ -4,6 +4,7 @@ export default class GroupContract {
 
   static EVENT_NEW_POST = 'NewPost';
   static EVENT_NEW_GROUP = 'NewGroup';
+  static EVENT_NEW_USER = 'NewUser';
   static EVENT_PENDING = '_pending';
   static EVENT_LATEST = '_latest';
 
@@ -26,6 +27,9 @@ export default class GroupContract {
     });
     this.watchForEvent(GroupContract.EVENT_NEW_GROUP, {}, (error, response) => {
       this.fireEventListener(GroupContract.EVENT_NEW_GROUP, error, response);
+    });
+    this.watchForEvent(GroupContract.EVENT_NEW_USER, {}, (error, response) => {
+      this.fireEventListener(GroupContract.EVENT_NEW_USER, error, response);
     });
   }
 
@@ -91,6 +95,10 @@ export default class GroupContract {
 
   registerNewGroupEventListener(callback) {
     return (this.registerEventListener(GroupContract.EVENT_NEW_GROUP, callback));
+  }
+
+  registerNewUserEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_NEW_USER, callback));
   }
 
   fireEventListener(eventName, error, response) {
