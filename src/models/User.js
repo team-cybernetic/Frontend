@@ -72,12 +72,8 @@ export default class User {
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.
   load() {
     return new Promise((resolve, reject) => {
-      this.loadHeader().then(() => {
-        this.loadProfile().then(() => {
-          resolve();
-        }).catch((error) => {
-          reject(error);
-        });
+      this.loadProfile().then(() => { //loadProfile calls loadHeader which calls waitForConfirmation
+        resolve();
       }).catch((error) => {
         reject(error);
       });
@@ -138,7 +134,6 @@ export default class User {
           this.waitForConfirmation().then(() => {
             if (!this.headerLoaded) { //waitForConfirmation can load header on an edge case
               this.parentGroup.loadUserByNumber(this.id).then((userStruct) => {
-                console.log("userStruct:", userStruct);
                 this.populate(this.userStructToObject(userStruct));
                 this.markHeaderLoaded();
                 resolve();
@@ -220,11 +215,13 @@ export default class User {
     this.confirmed = true;
     this.confirming = false;
     this.confirmationListeners.forEach((listener) => { listener.resolve() });
+    this.confirmationListeners = [];
   }
 
   markConfirmedFailure(error) {
     this.confirming = false;
     this.confirmationListeners.forEach((listener) => { listener.reject(error) });
+    this.confirmationListeners = [];
   }
 
   waitForConfirmation() {

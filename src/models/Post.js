@@ -64,16 +64,56 @@ export default class Post {
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.
   load() {
     return new Promise((resolve, reject) => {
-      this.loadHeader().then(() => {
-        this.loadContent().then(() => {
-          resolve();
-        }).catch((error) => {
-          reject(error);
-        });
+      this.loadContent().then(() => { //loadContent calls loadHeader which calls waitForConfirmation
+        resolve();
       }).catch((error) => {
         reject(error);
       });
     });
+  }
+
+  postStructToObject([
+    title,
+    id,
+    contentType,
+    ipfsHashFunction,
+    ipfsHashLength,
+    ipfsHash,
+    creator,
+    creationTime,
+    groupAddress,
+    balance,
+    permissions
+  ]) {
+    const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
+    return ({
+      title,
+      id,
+      contentType,
+      multiHashArray,
+      multiHashString: Ipfs.assembleMultiHash(multiHashArray),
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      creator,
+      creationTime,
+      groupAddress,
+      balance,
+      permissions,
+    });
+  }
+
+  markHeaderLoaded() {
+    this.headerLoaded = true;
+    this.headerLoading = false;
+    this.headerLoadListeners.forEach((listener) => { listener.resolve() });
+    this.headerLoadListeners = [];
+  }
+
+  markHeaderLoadedFailure(error) {
+    this.headerLoading = false;
+    this.headerLoadListeners.forEach((listener) => { listener.reject(error) });
+    this.headerLoadListeners = [];
   }
 
   loadHeader() {
@@ -84,50 +124,16 @@ export default class Post {
         } else {
           this.headerLoading = true;
           this.waitForConfirmation().then(() => {
-            this.parentGroup.loadPost(this.id).then(([
-              title,
-              id,
-              contentType,
-              ipfsHashFunction,
-              ipfsHashLength,
-              ipfsHash,
-              creator,
-              creationTime,
-              groupAddress,
-              balance,
-              permissions
-            ]) => {
-              const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
-              this.populate({
-                title,
-                id,
-                contentType,
-                multiHashArray,
-                multiHashString: Ipfs.assembleMultiHash(multiHashArray),
-                ipfsHashFunction,
-                ipfsHashLength,
-                ipfsHash,
-                creator,
-                creationTime,
-                groupAddress,
-                balance,
-                permissions,
-              });
-              this.headerLoaded = true;
-              this.headerLoading = false;
-              this.headerLoadListeners.forEach((listener) => { listener.resolve() });
-              this.headerLoadListeners = [];
+            this.parentGroup.loadPost(this.id).then((postStruct) => {
+              this.populate(this.postStructToObject(postStruct));
+              this.markHeaderLoaded();
               resolve();
             }).catch((error) => {
-              this.headerLoading = false;
-              this.headerLoadListeners.forEach((listener) => { listener.reject(error) });
-              this.headerLoadListeners = [];
+              this.markHeaderLoadedFailure(error);
               reject(error);
             });
           }).catch((error) => {
-            this.headerLoading = false;
-            this.headerLoadListeners.forEach((listener) => { listener.reject(error) });
-            this.headerLoadListeners = [];
+            this.markHeaderLoadedFailure(error);
             reject(error);
           });
         }
@@ -144,6 +150,19 @@ export default class Post {
     return (this.loadHeader());
   }
 
+  markContentLoaded() {
+    this.contentLoaded = true;
+    this.contentLoading = false;
+    this.contentLoadListeners.forEach((listener) => { listener.resolve() });
+    this.contentLoadListeners = [];
+  }
+
+  markContentLoadedFailure(error) {
+    this.contentLoading = false;
+    this.contentLoadListeners.forEach((listener) => { listener.reject(error) });
+    this.contentLoadListeners = [];
+  }
+
   loadContent() {
     return new Promise((resolve, reject) => {
       if (!this.contentLoaded) {
@@ -156,21 +175,14 @@ export default class Post {
               this.populate({
                 content,
               });
-              this.contentLoaded = true;
-              this.contentLoading = false;
-              this.contentLoadListeners.forEach((listener) => { listener.resolve() });
-              this.contentLoadListeners = [];
+              this.markContentLoaded();
               resolve();
             }).catch((error) => {
-              this.contentLoading = false;
-              this.contentLoadListeners.forEach((listener) => { listener.reject(error) });
-              this.contentLoadListeners = [];
+              this.markContentLoadedFailure(error);
               reject(error);
             });
           }).catch((error) => {
-            this.contentLoading = false;
-            this.contentLoadListeners.forEach((listener) => { listener.reject(error) });
-            this.contentLoadListeners = [];
+            this.markContentLoadedFailure(error);
             reject(error);
           });
         }
@@ -187,6 +199,18 @@ export default class Post {
     return (this.loadContent());
   }
 
+  markConfirmed() {
+    this.confirmed = true;
+    this.confirming = false;
+    this.confirmationListeners.forEach((listener) => { listener.resolve() });
+    this.confirmationListeners = [];
+  }
+
+  markConfirmedFailure(error) {
+    this.confirming = false;
+    this.confirmationListeners.forEach((listener) => { listener.reject(error) });
+    this.confirmationListeners = [];
+  }
 
   waitForConfirmation() {
     return new Promise((resolve, reject) => {
@@ -201,14 +225,11 @@ export default class Post {
                 this.populate({
                   id: response.args.postNumber.toString(),
                 });
-                this.confirmed = true;
-                this.confirming = false;
-                this.confirmationListeners.forEach((listener) => { listener.resolve() });
+                this.markConfirmed();
                 resolve();
               }
             } else {
-              this.confirming = false;
-              this.confirmationListeners.forEach((listener) => { listener.reject(error) });
+              this.markConfirmedFailure(error);
               reject(error);
             }
             this.parentGroup.unregisterEventListener(eventListenerHandle);
