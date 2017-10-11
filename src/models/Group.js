@@ -2,18 +2,21 @@ import Ipfs from '../utils/Ipfs';
 import GroupContract from '../ethWrappers/GroupContract';
 import GasEstimator from '../utils/GasEstimator';
 import Post from './Post';
+import User from './User';
 import WalletStore from '../stores/WalletStore'
 import moment from 'moment';
 
 export default class Group {
   constructor(web3, contractInstance, contractTC) {
-    this.cache = {};
+    this.postCache = [];
+    this.userCache = [];
     this.web3 = web3;
     this.groupContractTC = contractTC;
     this.contractInstance = contractInstance;
     this.groupContract = new GroupContract(this.web3, this.contractInstance);
     this.gasEstimator = new GasEstimator(this.web3, this.contractInstance);
     this.newPostListeners = [];
+    this.newUserListeners = [];
     this.registerNewPostEventListener((error, result) => {
       if (!error) {
         const id = result.args.postNumber.toString();
@@ -29,6 +32,14 @@ export default class Group {
         post.populate({
           groupAddress: addr,
         });
+      }
+    });
+    this.registerNewUserEventListener((error, result) => {
+      if (!error) {
+        console.log("got new user:", result);
+        const id = result.args.userNumber.toString();
+        const user = this.getUser(id);
+        this.fireNewUserListeners(user);
       }
     });
   }
@@ -83,32 +94,32 @@ export default class Group {
       }
       if (txid) {
         //id and txid
-        if (!this.cache[id]) {
-          if (this.cache[txid]) {
-            this.cache[id] = this.cache[txid];
-            delete (this.cache[txid]);
+        if (!this.postCache[id]) {
+          if (this.postCache[txid]) {
+            this.postCache[id] = this.postCache[txid];
+            delete (this.postCache[txid]);
           } else {
-            this.cache[id] = new Post(this, { id, transactionId: txid });
-            this.cache[id].load();
+            this.postCache[id] = new Post(this, { id, transactionId: txid });
+            this.postCache[id].load();
           }
         }
-        return (this.cache[id]);
+        return (this.postCache[id]);
       } else {
         //id only
-        if (!this.cache[id]) {
-          this.cache[id] = new Post(this, { id });
-          this.cache[id].load();
+        if (!this.postCache[id]) {
+          this.postCache[id] = new Post(this, { id });
+          this.postCache[id].load();
         }
-        return (this.cache[id]);
+        return (this.postCache[id]);
       }
     } else {
       if (txid) {
         //txid only
-        if (!this.cache[txid]) {
-          this.cache[txid] = new Post(this, { transactionId: txid });
-          this.cache[txid].load();
+        if (!this.postCache[txid]) {
+          this.postCache[txid] = new Post(this, { transactionId: txid });
+          this.postCache[txid].load();
         }
-        return (this.cache[txid]);
+        return (this.postCache[txid]);
       } else {
         //nothing
         return (null);
@@ -116,8 +127,39 @@ export default class Group {
     }
   }
 
+  getUserByNumber(id) {
+    if (!this.userCache[id]) {
+      this.userCache[id] = new User(this, {id});
+      this.userCache[id].load();
+      this.userCache[id].loadHeader().then(() => {
+        this.userCache[this.userCache[id].getAddress()] = this.userCache[id];
+      });
+    }
+    return (this.userCache[id]);
+  }
+
+  getUserByAddress(address) {
+    if (!this.userCache[address]) {
+      this.userCache[address] = new User(this, {address});
+      this.userCache[address].load();
+      this.userCache[address].loadHeader().then(() => {
+        this.userCache[this.userCache[address].getNumber()] = this.userCache[address];
+      });
+    }
+    return (this.userCache[address]);
+
+  }
+
   loadPost(id) {
     return (this.groupContract.getPost(id));
+  }
+
+  loadUserByNumber(num) {
+    return (this.groupContract.getUserByNumber(num));
+  }
+
+  loadUserByAddress(address) {
+    return (this.groupContract.getUserByAddress(address));
   }
 
   getPosts() {
@@ -132,13 +174,57 @@ export default class Group {
     });
   }
 
+  getUsers() {
+    return new Promise((resolve, reject) => {
+      console.log("Group getting users");
+      this.groupContract.getUserIds().then((userIds) => {
+        console.log("Group getting user ids");
+        resolve(userIds.map((bigInt) => {
+          return (this.getUserByNumber(bigInt.toString()));
+        }));
+      }).catch((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  joinGroup() {
+    return new Promise((resolve, reject) => {
+      const walletAddr = WalletStore.getAccountAddress();
+      this.groupContract.userExistsByAddress(walletAddr).then((result) => {
+        if (!result) {
+          console.log("user not already in group, joining");
+          this.gasEstimator.estimate('joinGroup').then((gas) => {
+            let actualGas = gas * 3;
+            console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
+            this.contractInstance.joinGroup({ gas: actualGas, from: walletAddr }).then((txid) => {
+              console.log("successfully joined group! txid:", txid);
+              resolve(true);
+            }).catch((error) => {
+              console.log("Failed to execute contract join group method:", error);
+              reject(error);
+            });
+          }).catch((error) => {
+            console.log("error while estimating join group gas:", error);
+            reject(error);
+          });
+        } else {
+          console.log("user was already in group!");
+          resolve(false);
+        }
+      }).catch((error) => {
+        console.log("Error while checking if user is in group:", error);
+        reject(error);
+      });
+    });
+  }
+
   isAddressValid(addr) { //TODO: not copy this everywhere...
     return (this.web3.isAddress(addr) && addr !== '0x0000000000000000000000000000000000000000' && addr !== '0000000000000000000000000000000000000000');
   }
 
   convertPostToGroup(postNum) {
     return new Promise((resolve, reject) => {
-
       this.getGroupAddressOfPost(postNum).then((currentAddress) => {
         if (!this.isAddressValid(currentAddress)) {
           this.gasEstimator.estimateContractCreation(this.groupContractTC).then((gas) => { //TODO
@@ -204,6 +290,10 @@ export default class Group {
     return (this.groupContract.registerNewGroupEventListener(callback));
   }
 
+  registerNewUserEventListener(callback) {
+    return (this.groupContract.registerNewUserEventListener(callback));
+  }
+
   registerEventListener(eventName, callback) {
     return (this.groupContract.registerEventListener(eventName, callback));
   }
@@ -231,6 +321,28 @@ export default class Group {
   fireNewPostListeners(post) {
     this.newPostListeners.forEach((listener, idx) => {
       listener(post);
+    });
+  }
+
+  registerNewUserListener(callback) {
+    this.newUserListeners.push(callback);
+    return ({
+      num: this.newUserListeners.length,
+    });
+  }
+
+  unregisterNewUserListener(handle) {
+    if (handle) {
+      let {num} = handle;
+      if (this.newUserListeners) {
+        delete (this.newUserListeners[num - 1]);
+      }
+    }
+  }
+
+  fireNewUserListeners(user) {
+    this.newUserListeners.forEach((listener, idx) => {
+      listener(user);
     });
   }
 }

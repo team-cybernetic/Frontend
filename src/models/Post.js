@@ -203,7 +203,6 @@ export default class Post {
                 });
                 this.confirmed = true;
                 this.confirming = false;
-                this.parentGroup.unregisterEventListener(eventListenerHandle);
                 this.confirmationListeners.forEach((listener) => { listener.resolve() });
                 resolve();
               }
@@ -212,6 +211,7 @@ export default class Post {
               this.confirmationListeners.forEach((listener) => { listener.reject(error) });
               reject(error);
             }
+            this.parentGroup.unregisterEventListener(eventListenerHandle);
           });
         }
       } else {

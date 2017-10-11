@@ -57,6 +57,26 @@ export default class GroupContract {
     return (this.contractInstance.getPostNumbers.call());
   }
 
+  getUserIds() {
+    return (this.contractInstance.getUserNumbers.call());
+  }
+
+  userExistsByAddress(addr) {
+    return (this.contractInstance.userExistsByAddress.call(addr));
+  }
+
+  userExistsByNumber(num) {
+    return (this.contractInstance.userExistsByNumber.call(num));
+  }
+
+  getUserByNumber(num) {
+    return (this.contractInstance.getUserByNumber.call(num));
+  }
+
+  getUserByAddress(address) {
+    return (this.contractInstance.getUserByAddress.call(address));
+  }
+
   waitForConfirmation(txid) {
     return new Promise((resolve, reject) => {
       this.latestTransactonListeners[txid].push({ resolve, reject });

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import Post from './Post';
+import PostView from './PostView';
 import Collapsible from 'react-collapsible';
 import './style.css';
+import cx from 'classnames';
 
 class SideBar extends Component {
   constructor(props) {
@@ -16,6 +17,20 @@ class SideBar extends Component {
   setContent(isLoaded, group, post, pathState) {
     if (isLoaded) {
       console.log("Sidebar loaded!");
+      group.getUsers().then((users) => {
+        if (users) {
+          console.log("users!");
+          users.forEach((user, idx) => {
+            console.log("user[" + idx + "]:", user);
+          });
+        } else {
+          console.log("no users!");
+          users = [];
+        }
+        this.setState({
+          users,
+        });
+      });
       this.setState({
         isLoaded,
         group,
@@ -42,7 +57,7 @@ class SideBar extends Component {
       } else if (this.state.post) {
         let post = this.state.post;
         return (
-          <Post key={post.id ? post.id : post.transactionId} sidebar={true} post={post} parent={this.props.pathState.parent} />
+          <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} parent={this.props.pathState.parent} />
         );
       } else {
         return (
@@ -57,7 +72,48 @@ class SideBar extends Component {
   }
 
   joinGroup() {
-    console.log("TODO: join group");
+    this.props.group.joinGroup().then(() => {
+      console.log("successfully joined group!");
+    }).catch((error) => {
+      console.log("failed to join group:", error);
+    });
+  }
+
+  renderUsers() {
+    if (this.state.users) {
+      return (this.state.users.map((user) => {
+        console.log("rendering user", user.getAddress());
+        const address = user.getAddress(); //user hasn't loaded yet, so this returns undefined
+        const id = user.getNumber();
+        return (
+          <div key={address ? address : id}> { /*TODO: <UserView> objects */}
+            User: {address}&nbsp;{id}<br />
+          </div>
+        );
+      }));
+    } else {
+      if (Array.isArray(this.state.users)) {
+        return ("");
+      } else {
+        return ("Loading users...");
+      }
+    }
+  }
+
+  renderUsersAccordian() {
+    return (
+      <Collapsible
+        triggerClassName="CustomTriggerCSS"
+        triggerOpenedClassName="CustomTriggerCSS--open"
+        contentOuterClassName="CustomOuterContentCSS"
+        contentInnerClassName="CustomInnerContentCSS"
+        transitionTime={200}
+        easing="ease-in"
+        trigger="Members"
+      >
+        {this.renderUsers()}
+      </Collapsible>
+    );
   }
 
   render() {
@@ -67,47 +123,39 @@ class SideBar extends Component {
         <p style={styles.groupDesc}>x Members / x Earnings</p>
 
         <button
-        style={styles.joinButton}
-        onClick={() => this.joinGroup()}
+      style={styles.joinButton}
+      className={cx('button')}
+      onClick={() => this.joinGroup()}
         > Join Group </button>
 
 
-    <Collapsible
-    triggerClassName="CustomTriggerCSS"
-    triggerOpenedClassName="CustomTriggerCSS--open"
-    contentOuterClassName="CustomOuterContentCSS"
-    contentInnerClassName="CustomInnerContentCSS"
-    transitionTime={200}
-    easing="ease-in"
-    trigger="Members">
-            { /* To be populated with actual data */ }
-      <p>Admin <br />User <br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User<br />User</p>
-    </Collapsible>
+        { /* To be populated with actual data */ }
+        {this.renderUsersAccordian()}
 
-    <Collapsible
-    triggerClassName="CustomTriggerCSS"
-    triggerOpenedClassName="CustomTriggerCSS--open"
-    contentOuterClassName="CustomOuterContentCSS"
-    contentInnerClassName="CustomInnerContentCSS"
-    transitionTime={200}
-    easing="ease-in"
-    trigger="Ruleset">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
-    </Collapsible>
+        <Collapsible
+      triggerClassName="CustomTriggerCSS"
+      triggerOpenedClassName="CustomTriggerCSS--open"
+      contentOuterClassName="CustomOuterContentCSS"
+      contentInnerClassName="CustomInnerContentCSS"
+      transitionTime={200}
+      easing="ease-in"
+      trigger="Ruleset">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
+        </Collapsible>
 
-    <Collapsible
-    triggerClassName="CustomTriggerCSS"
-    triggerOpenedClassName="CustomTriggerCSS--open"
-    contentOuterClassName="CustomOuterContentCSS"
-    contentInnerClassName="CustomInnerContentCSS"
-    transitionTime={200}
-    easing="ease-in"
-    trigger="Content Types">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
-    </Collapsible>
+        <Collapsible
+      triggerClassName="CustomTriggerCSS"
+      triggerOpenedClassName="CustomTriggerCSS--open"
+      contentOuterClassName="CustomOuterContentCSS"
+      contentInnerClassName="CustomInnerContentCSS"
+      transitionTime={200}
+      easing="ease-in"
+      trigger="Content Types">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
+        </Collapsible>
 
 
-      </div>
+        </div>
 
     );
   }

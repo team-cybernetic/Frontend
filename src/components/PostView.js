@@ -3,7 +3,7 @@ import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 
-class Post extends Component {
+export default class PostView extends Component {
   componentWillMount() {
     let post = this.props.post;
     post.registerUpdateListener((post) => {
@@ -82,11 +82,42 @@ class Post extends Component {
     );
   }
 
+  isAddressNull(addr) { //TODO: util
+    return (!addr || addr === '0x' || addr === '0x0000000000000000000000000000000000000000' || addr === '0000000000000000000000000000000000000000');
+  }
+
+  renderConvertToGroupButton() {
+    if (!this.isAddressNull(this.props.post.groupAddress)) {
+      return ('');
+    }
+    return (
+      <button style={this.styles.joinButton} onClick={() => this.createGroup(this.props.post.id)}>Create group!</button>
+    );
+  }
+
+  createGroup(id) {
+    console.log("creating group on post", id);
+    this.props.group.convertPostToGroup(id).then((result) => {
+      console.log("successfully created group on post", id, ":", result);
+      this.forceUpdate(); 
+    });
+  }
+
+
+  renderGroupAddress() {
+    if (!this.isAddressNull(this.props.post.groupAddress)) {
+      return (
+        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>
+      );
+    } else {
+      return ('');
+    }
+  }
+
   renderGroup() {
     return (
       <span style={this.styles.multiHash}>
-        Group:&nbsp;
-        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>&nbsp;{this.renderConvertToGroupButton()}
+        Group:&nbsp;{this.renderGroupAddress()}{this.renderConvertToGroupButton()}
       </span>
     );
   }
@@ -143,27 +174,6 @@ class Post extends Component {
         </div>
       );
     }
-  }
-
-  isAddressNull(addr) { //TODO: util
-    return (!addr || addr === '0x' || addr === '0x0000000000000000000000000000000000000000' || addr === '0000000000000000000000000000000000000000');
-  }
-
-  renderConvertToGroupButton() {
-    if (!this.isAddressNull(this.props.post.groupAddress)) {
-      return ('');
-    }
-    return (
-      <button style={this.styles.joinButton} onClick={() => this.createGroup(this.props.post.id)}>+</button>
-    );
-  }
-
-  createGroup(id) {
-    console.log("creating group on post", id);
-    this.props.group.convertPostToGroup(id).then((result) => {
-      console.log("successfully created group on post", id, ":", result);
-      this.forceUpdate(); 
-    });
   }
 
   renderTimestamp() {
@@ -243,5 +253,3 @@ class Post extends Component {
     }
   };
 }
-
-export default Post;
