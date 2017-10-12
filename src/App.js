@@ -7,6 +7,7 @@ import SideBar from './components/SideBar';
 import Editor from './components/Editor';
 import GroupStore from './stores/GroupStore';
 import PathParser from './utils/PathParser';
+import PropTypes from 'prop-types';
 import {
   BrowserRouter as Router,
   Route
@@ -81,17 +82,18 @@ class App extends Component {
           pathState: parsedPath,
         });
       }).catch((errorState) => {
-        //{error, group, partialPath} = errorState;
-        //let error = errorState.error;
-        let group = errorState.group;
-        let partialPath = errorState.partialPath;
-        console.log("App failed to navigate fully to", path, ":", errorState);
-        this.setState({
-          isGroupLoaded: true,
-          group,
-          post: undefined,
-          pathState: partialPath,
-        });
+        if (errorState.partial) {
+          console.log("App was able to partially navigate to", errorState.partialPath.path);
+          this.context.router.history.replace({ pathname: errorState.partialPath.path });
+          this.setState({
+            isGroupLoaded: true,
+            group: errorState.group,
+            post: undefined,
+            pathState: errorState.partialPath,
+          });
+        } else {
+          console.error("App failed to navigate fully to", path, ":", errorState);
+        }
       });
     }
     this.setState({
@@ -122,6 +124,10 @@ class App extends Component {
       </div>
     );
   }
+
+  static contextTypes = {
+    router: PropTypes.object
+  };
 }
 
 const styles = {

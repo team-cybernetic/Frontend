@@ -12,6 +12,7 @@
     "multi-hash": "^0.1.1",
     "nan": "^2.7.0",
     "promise-polyfill": "^6.0.2",
+    "prop-types": "^15.6.0",
     "react": "15.6.1",
     "react-collapsible": "^2.0.3",
     "react-dom": "15.6.1",

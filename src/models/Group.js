@@ -100,7 +100,9 @@ export default class Group {
             delete (this.postCache[txid]);
           } else {
             this.postCache[id] = new Post(this, { id, transactionId: txid });
-            this.postCache[id].load();
+            this.postCache[id].load().catch((error) => {
+              delete (this.postCache[id]);
+            });
           }
         }
         return (this.postCache[id]);
@@ -108,7 +110,9 @@ export default class Group {
         //id only
         if (!this.postCache[id]) {
           this.postCache[id] = new Post(this, { id });
-          this.postCache[id].load();
+          this.postCache[id].load().catch((error) => {
+            delete (this.postCache[id]);
+          });
         }
         return (this.postCache[id]);
       }
@@ -117,7 +121,9 @@ export default class Group {
         //txid only
         if (!this.postCache[txid]) {
           this.postCache[txid] = new Post(this, { transactionId: txid });
-          this.postCache[txid].load();
+          this.postCache[txid].load().catch((error) => {
+            delete (this.postCache[txid]);
+          });
         }
         return (this.postCache[txid]);
       } else {
@@ -162,6 +168,18 @@ export default class Group {
     return (this.groupContract.getUserByAddress(address));
   }
 
+  userExistsByNumber(num) {
+    return (this.groupContract.userExistsByNumber(num));
+  }
+
+  userExistsByAddress(address) {
+    return (this.groupContract.userExistsByAddress(address));
+  }
+
+  postExistsByNumber(num) {
+    return (this.groupContract.postExistsByNumber(num));
+  }
+
   getPosts() {
     return new Promise((resolve, reject) => {
       this.groupContract.getPostIds().then((postIds) => {
@@ -191,7 +209,7 @@ export default class Group {
   joinGroup() {
     return new Promise((resolve, reject) => {
       const walletAddr = WalletStore.getAccountAddress();
-      this.groupContract.userExistsByAddress(walletAddr).then((result) => {
+      this.userExistsByAddress(walletAddr).then((result) => {
         if (!result) {
           console.log("user not already in group, joining");
           this.gasEstimator.estimate('joinGroup').then((gas) => {

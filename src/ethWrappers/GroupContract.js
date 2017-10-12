@@ -69,6 +69,10 @@ export default class GroupContract {
     return (this.contractInstance.userExistsByNumber.call(num));
   }
 
+  postExistsByNumber(num) {
+    return (this.contractInstance.postExistsByNumber.call(num));
+  }
+
   getUserByNumber(num) {
     return (this.contractInstance.getUserByNumber.call(num));
   }

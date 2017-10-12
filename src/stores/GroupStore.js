@@ -1,4 +1,5 @@
 import Group from '../models/Group'
+import PathParser from '../utils/PathParser';
 
 export default class GroupStore {
 
@@ -76,7 +77,24 @@ export default class GroupStore {
         }
         resolve(result);
       }).catch((error) => {
-        console.log("Failed to walk tree:", error);
+        console.error("Failed to walk tree:", error);
+        if (error.partial) {
+          console.log("need to rebuild partialPath from:");
+          console.log("pathWalked:", pathWalked);
+          console.log("Failed on:", error.num);
+          console.log("groupNums:", groupNums);
+          console.log("parsedPath:", parsedPath);
+          let partial = "";
+          if (parsedPath.absolute) {
+            partial = parsedPath.separator;
+          }
+          for (var i = 0; i < pathWalked.length; i++) {
+            partial = partial + parsedPath.titleArray[i];
+          }
+          console.log("rebuild partial:", partial);
+          error.partialPath = PathParser.parse(partial);
+          console.log("partialPath:", error.partialPath);
+        }
         reject(error);
       });
     });
@@ -103,27 +121,35 @@ export default class GroupStore {
         console.log("got address for", nextStep, ":", addr);
         if (this.isAddressValid(addr)) {
           console.log("it's a valid address!");
-          GroupStore.getGroup(addr).then((nextGroup) => {
+          this.getGroup(addr).then((nextGroup) => {
             pathWalked.push(nextStep);
             if (pathToWalk.length > 0) {
               this.walkTree(pathToWalk, pathWalked, nextGroup).then(resolve).catch(reject);
             } else {
               console.log("singleton resolved:", nextGroup);
-              resolve({group: nextGroup});
+              resolve({
+                group: nextGroup,
+              });
             }
           }).catch((error) => {
             reject(error);
           });
         } else {
-          console.log("post", nextStep, "has no group address!");
-          resolve({group: currentGroup, num: nextStep});
+          console.error("post", nextStep, "has no group address!");
+          resolve({
+            group: currentGroup,
+            num: nextStep,
+          });
         }
       }).catch((error) => {
-        console.log("Failed to get group for post", nextStep, ":", error);
-        reject(error);
+        console.error("Failed to get group for post", nextStep, ":", error);
+        reject({
+          group: currentGroup,
+          num: nextStep,
+          partial: true,
+          error,
+        });
       });
-    }).catch((error) => {
-      console.log("top level error:", error);
     });
   }
 

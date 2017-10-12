@@ -4,13 +4,15 @@ export default class PathParser {
   static PATH = /^(\/(.*\/)?)(.*)$/;
   static PARENT = /^(.*\/).+\/?$/;
   static POST = /^([0-9]+)(-(.*))?$/;
-  static POST_TITLE_STRIPPER = /([0-9]+)(-([^/]*))?(\/?)/g;
+  static POST_TITLE_STRIPPER = /(([0-9]+)(-([^/]*))?(\/?))/g;
+
+  static SEPARATOR = '/';
 
   static parse(path) {
     let absolute = true;
     if (path === undefined || path === '' || typeof(path) !== 'string') {
-      path = '/';
-    } else if (!path.startsWith('/')) {
+      path = this.SEPARATOR;
+    } else if (!path.startsWith(this.SEPARATOR)) {
       absolute = false;
     }
     //console.log("PathParser parsing:", path);
@@ -45,18 +47,24 @@ export default class PathParser {
     let pathArray = [];
     let groupArray = [];
 
+    let titleArray = [];
+
     do {
       postSplitMatch = this.POST_TITLE_STRIPPER.exec(pathCopy);
       if (!postSplitMatch) {
         break;
       }
-      let num = postSplitMatch[1];
+      let wholeTitle = postSplitMatch[1];
+      titleArray.push(wholeTitle);
+
+      let num = postSplitMatch[2];
       pathNums.push(num);
       groupNums.push(num);
+
       let x = {
         num,
-        title: postSplitMatch[3],
-        isGroup: postSplitMatch[4] === '/',
+        title: postSplitMatch[4],
+        isGroup: postSplitMatch[5] === this.SEPARATOR,
       };
       pathArray.push(x);
       groupArray.push(x);
@@ -67,10 +75,11 @@ export default class PathParser {
       groupArray.pop();
     }
 
-    let cleanPath = (absolute ? '/' : '') + pathNums.join('/') + (isGroup && pathNums.length > 0 ? '/' : '');
-    let cleanGroupPath = (absolute ? '/' : '') + groupNums.join('/') + (groupNums.length > 0 ? '/' : '');
+    let cleanPath = (absolute ? this.SEPARATOR : '') + pathNums.join(this.SEPARATOR) + (isGroup && pathNums.length > 0 ? this.SEPARATOR : '');
+    let cleanGroupPath = (absolute ? this.SEPARATOR : '') + groupNums.join(this.SEPARATOR) + (groupNums.length > 0 ? this.SEPARATOR : '');
 
     var pathState = {
+      separator: this.SEPARATOR,
       path,
       cleanPath,
       'parent': par,
@@ -82,6 +91,7 @@ export default class PathParser {
       groupNums,
       pathArray,
       pathNums,
+      titleArray,
       post,
       postNum,
       postTitle,

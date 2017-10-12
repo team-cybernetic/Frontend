@@ -11,6 +11,7 @@ export default class Post {
     this.confirming = false;
     this.headerLoading = false;
     this.contentLoading = false;
+    this.confirmed = false;
   }
 
   populate({
@@ -39,7 +40,7 @@ export default class Post {
     this.creationTime = creationTime || this.creationTime;
     this.creator = creator || this.creator;
     this.balance = 0 || this.balance || balance;
-    this.confirmed = !!this.id;
+    //this.confirmed = !!this.id;
     this.headerLoaded = !!this.title;
     this.contentLoaded = !!this.content || this.multiHashString === "";
     this.fireUpdateListeners();
@@ -123,9 +124,19 @@ export default class Post {
           this.headerLoadListeners.push({ resolve, reject });
         } else {
           this.headerLoading = true;
-          this.waitForConfirmation().then(() => {
+          console.log("waiting for confirmation of post", this.id);
+          this.waitForConfirmation().then((postExists) => {
+            if (!postExists) {
+              let error = new Error("Post " + this.id + " does not exist!");
+              this.markHeaderLoadedFailure(error);
+              reject(error);
+              return;
+            }
+            console.log("post", this.id, "confirmed");
             this.parentGroup.loadPost(this.id).then((postStruct) => {
+              console.log("post", this.id, "loaded", postStruct);
               this.populate(this.postStructToObject(postStruct));
+              console.log(this);
               this.markHeaderLoaded();
               resolve();
             }).catch((error) => {
@@ -199,8 +210,8 @@ export default class Post {
     return (this.loadContent());
   }
 
-  markConfirmed() {
-    this.confirmed = true;
+  markConfirmed(result = true) {
+    this.confirmed = result;
     this.confirming = false;
     this.confirmationListeners.forEach((listener) => { listener.resolve() });
     this.confirmationListeners = [];
@@ -219,21 +230,31 @@ export default class Post {
           this.confirmationListeners.push({ resolve, reject });
         } else {
           this.confirming = true;
-          var eventListenerHandle = this.parentGroup.registerNewPostEventListener((error, response) => {
-            if (!error) {
-              if (response.transactionHash === this.transactionId) {
-                this.populate({
-                  id: response.args.postNumber.toString(),
-                });
-                this.markConfirmed();
-                resolve();
-              }
-            } else {
+          if (!!this.id) {
+            this.parentGroup.postExistsByNumber(this.id).then((result) => {
+              this.markConfirmed(result);
+              resolve(result);
+            }).catch((error) => {
               this.markConfirmedFailure(error);
               reject(error);
-            }
-            this.parentGroup.unregisterEventListener(eventListenerHandle);
-          });
+            });
+          } else {
+            var eventListenerHandle = this.parentGroup.registerNewPostEventListener((error, response) => {
+              if (!error) {
+                if (response.transactionHash === this.transactionId) {
+                  this.populate({
+                    id: response.args.postNumber.toString(),
+                  });
+                  this.markConfirmed();
+                  resolve();
+                }
+              } else {
+                this.markConfirmedFailure(error);
+                reject(error);
+              }
+              this.parentGroup.unregisterEventListener(eventListenerHandle);
+            });
+          }
         }
       } else {
         resolve();
