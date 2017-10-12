@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PostView from './PostView';
+import UserView from './UserView';
 import Collapsible from 'react-collapsible';
 import './style.css';
 import cx from 'classnames';
@@ -86,9 +87,7 @@ class SideBar extends Component {
         const address = user.getAddress(); //user hasn't loaded yet, so this returns undefined
         const id = user.getNumber();
         return (
-          <div key={address ? address : id}> { /*TODO: <UserView> objects */}
-            User: {address}&nbsp;{id}<br />
-          </div>
+          <UserView key={'u' + this.props.pathState.cleanPath + (address ? address : id)} sidebar={true} user={user} group={this.props.group} />
         );
       }));
     } else {

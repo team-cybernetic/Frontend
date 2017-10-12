@@ -40,7 +40,7 @@ export default class User {
     this.address = address || this.address;
     this.balance = 0 || this.balance || balance;
     this.confirmed = !!this.id;
-    this.headerLoaded = !!this.nickname;
+    this.headerLoaded = !!this.nickname || (!!this.id && !!this.address);
     this.profileLoaded = !!this.profile || this.multiHashString === "";
     this.fireUpdateListeners();
   }

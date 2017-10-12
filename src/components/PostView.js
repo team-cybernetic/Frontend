@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 
 export default class PostView extends Component {
   componentWillMount() {
-    let post = this.props.post;
-    post.registerUpdateListener((post) => {
+    this.listenerHandle = this.props.post.registerUpdateListener((post) => {
       this.forceUpdate();
     });
   }
 
   componentWillUnmount() {
+    this.props.post.unregisterUpdateListener(this.listenerHandle);
   }
 
   render() {
