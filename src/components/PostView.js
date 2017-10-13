@@ -191,17 +191,14 @@ export default class PostView extends Component {
   get styles() {
     return {
       container:
-        this.props.sidebar ?
-        {
+        this.props.sidebar ? {
           width: '96%',
           marginLeft: '2%',
           marginRight: '2%',
           marginTop: '1.5%',
           marginBottom: '1.5%',
           backgroundColor: 'white',
-        }
-        :
-        {
+        } : {
           width: '46%',
           marginLeft: '2%',
           marginRight: '2%',

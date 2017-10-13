@@ -15,16 +15,17 @@ export default class Group {
     this.contractInstance = contractInstance;
     this.groupContract = new GroupContract(this.web3, this.contractInstance);
     this.gasEstimator = new GasEstimator(this.web3, this.contractInstance);
-    this.newPostListeners = [];
-    this.newUserListeners = [];
-    this.registerNewPostEventListener((error, result) => {
+    this.postCreatedListeners = [];
+    this.userJoinedListeners = [];
+    this.userLeftListeners = [];
+    this.registerPostCreatedEventListener((error, result) => {
       if (!error) {
         const id = result.args.postNumber.toString();
         const post = this.getPost(id, result.transactionHash);
-        this.fireNewPostListeners(post);
+        this.firePostCreatedListeners(post);
       }
     });
-    this.registerNewGroupEventListener((error, result) => {
+    this.registerSubgroupCreatedEventListener((error, result) => {
       if (!error) {
         const id = result.args.postNumber.toString();
         const post = this.getPost(id, result.transactionHash);
@@ -34,12 +35,20 @@ export default class Group {
         });
       }
     });
-    this.registerNewUserEventListener((error, result) => {
+    this.registerUserJoinedEventListener((error, result) => {
       if (!error) {
         console.log("got new user:", result);
         const id = result.args.userNumber.toString();
-        const user = this.getUser(id);
-        this.fireNewUserListeners(user);
+        const user = this.getUserByNumber(id);
+        this.fireUserJoinedListeners(user);
+      }
+    });
+    this.registerUserLeftEventListener((error, result) => {
+      if (!error) {
+        console.log("user left event:", result);
+        const id = result.args.userNumber.toString();
+        const user = this.getUserByNumber(id);
+        this.fireUserLeftListeners(user);
       }
     });
   }
@@ -66,7 +75,7 @@ export default class Group {
                   creationTime,
                   transactionId: txid,
                 });
-                this.fireNewPostListeners(post);
+                this.firePostCreatedListeners(post);
                 resolve(post);
               }).catch((error) => {
                 reject(error);
@@ -100,7 +109,8 @@ export default class Group {
             delete (this.postCache[txid]);
           } else {
             this.postCache[id] = new Post(this, { id, transactionId: txid });
-            this.postCache[id].load().catch((error) => {
+            this.postCache[id].load();
+            this.postCache[id].waitForConfirmation().catch((error) => {
               delete (this.postCache[id]);
             });
           }
@@ -197,9 +207,14 @@ export default class Group {
       console.log("Group getting users");
       this.groupContract.getUserIds().then((userIds) => {
         console.log("Group getting user ids");
-        resolve(userIds.map((bigInt) => {
-          return (this.getUserByNumber(bigInt.toString()));
-        }));
+        let res = [];
+        userIds.forEach((bigInt) => {
+          let id = bigInt.toString();
+          if (id !== '0') {
+            res.push(this.getUserByNumber(id));
+          }
+        });
+        resolve(res);
       }).catch((error) => {
         reject(error);
       });
@@ -214,16 +229,16 @@ export default class Group {
           console.log("user not already in group, joining");
           this.gasEstimator.estimate('joinGroup').then((gas) => {
             let actualGas = gas * 3;
-            console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
+            console.log("gas estimator estimates that this joinGroup call will cost", gas, "gas, actualGas =", actualGas);
             this.contractInstance.joinGroup({ gas: actualGas, from: walletAddr }).then((txid) => {
               console.log("successfully joined group! txid:", txid);
               resolve(true);
             }).catch((error) => {
-              console.log("Failed to execute contract join group method:", error);
+              console.error("Failed to execute contract join group method:", error);
               reject(error);
             });
           }).catch((error) => {
-            console.log("error while estimating join group gas:", error);
+            console.error("error while estimating join group gas:", error);
             reject(error);
           });
         } else {
@@ -231,7 +246,38 @@ export default class Group {
           resolve(false);
         }
       }).catch((error) => {
-        console.log("Error while checking if user is in group:", error);
+        console.error("Error while checking if user is in group:", error);
+        reject(error);
+      });
+    });
+  }
+
+  leaveGroup() {
+    return new Promise((resolve, reject) => {
+      const walletAddr = WalletStore.getAccountAddress();
+      this.userExistsByAddress(walletAddr).then((result) => {
+        if (result) {
+          console.log("user is in group, leaving");
+          this.gasEstimator.estimate('leaveGroup').then((gas) => {
+            let actualGas = gas * 3;
+            console.log("gas estimator estimates that this leaveGroup call will cost", gas, "gas, actualGas =", actualGas);
+            this.contractInstance.leaveGroup({ gas: actualGas, from: walletAddr }).then((txid) => {
+              console.log("successfully left group! txid:", txid);
+              resolve(true);
+            }).catch((error) => {
+              console.error("Failed to execute contract leave group method:", error);
+              reject(error);
+            });
+          }).catch((error) => {
+            console.error("error while estimating leave group gas:", error);
+            reject(error);
+          });
+        } else {
+          console.log("user was not in group!");
+          resolve(false);
+        }
+      }).catch((error) => {
+        console.error("Error while checking if user is in group:", error);
         reject(error);
       });
     });
@@ -300,16 +346,20 @@ export default class Group {
     });
   }
 
-  registerNewPostEventListener(callback) {
-    return (this.groupContract.registerNewPostEventListener(callback));
+  registerPostCreatedEventListener(callback) {
+    return (this.groupContract.registerPostCreatedEventListener(callback));
   }
 
-  registerNewGroupEventListener(callback) {
-    return (this.groupContract.registerNewGroupEventListener(callback));
+  registerSubgroupCreatedEventListener(callback) {
+    return (this.groupContract.registerSubgroupCreatedEventListener(callback));
   }
 
-  registerNewUserEventListener(callback) {
-    return (this.groupContract.registerNewUserEventListener(callback));
+  registerUserJoinedEventListener(callback) {
+    return (this.groupContract.registerUserJoinedEventListener(callback));
+  }
+
+  registerUserLeftEventListener(callback) {
+    return (this.groupContract.registerUserLeftEventListener(callback));
   }
 
   registerEventListener(eventName, callback) {
@@ -320,46 +370,68 @@ export default class Group {
     return (this.groupContract.unregisterEventListener(handle));
   }
 
-  registerNewPostListener(callback) {
-    this.newPostListeners.push(callback);
+  registerPostCreatedListener(callback) {
+    this.postCreatedListeners.push(callback);
     return ({
-      num: this.newPostListeners.length,
+      num: this.postCreatedListeners.length,
     });
   }
 
-  unregisterNewPostListener(handle) {
+  unregisterPostCreatedListener(handle) {
     if (handle) {
       let {num} = handle;
-      if (this.newPostListeners) {
-        delete (this.newPostListeners[num - 1]);
+      if (this.postCreatedListeners) {
+        delete (this.postCreatedListeners[num - 1]);
       }
     }
   }
 
-  fireNewPostListeners(post) {
-    this.newPostListeners.forEach((listener, idx) => {
+  firePostCreatedListeners(post) {
+    this.postCreatedListeners.forEach((listener, idx) => {
       listener(post);
     });
   }
 
-  registerNewUserListener(callback) {
-    this.newUserListeners.push(callback);
+  registerUserJoinedListener(callback) {
+    this.userJoinedListeners.push(callback);
     return ({
-      num: this.newUserListeners.length,
+      num: this.userJoinedListeners.length,
     });
   }
 
-  unregisterNewUserListener(handle) {
+  unregisterUserJoinedListener(handle) {
     if (handle) {
       let {num} = handle;
-      if (this.newUserListeners) {
-        delete (this.newUserListeners[num - 1]);
+      if (this.userJoinedListeners) {
+        delete (this.userJoinedListeners[num - 1]);
       }
     }
   }
 
-  fireNewUserListeners(user) {
-    this.newUserListeners.forEach((listener, idx) => {
+  fireUserJoinedListeners(user) {
+    this.userJoinedListeners.forEach((listener, idx) => {
+      listener(user);
+    });
+  }
+
+  registerUserLeftListener(callback) {
+    this.userLeftListeners.push(callback);
+    return ({
+      num: this.userLeftListeners.length,
+    });
+  }
+
+  unregisterUserLeftListener(handle) {
+    if (handle) {
+      let {num} = handle;
+      if (this.userLeftListeners) {
+        delete (this.userLeftListeners[num - 1]);
+      }
+    }
+  }
+
+  fireUserLeftListeners(user) {
+    this.userLeftListeners.forEach((listener, idx) => {
       listener(user);
     });
   }

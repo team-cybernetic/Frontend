@@ -1,12 +1,27 @@
 import React, { Component } from 'react';
+import WalletStore from '../stores/WalletStore'
 import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 
 export default class UserView extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isSelf: undefined,
+    };
+  }
+
   componentWillMount() {
     this.listenerHandle = this.props.user.registerUpdateListener((post) => {
       this.forceUpdate();
+    });
+    this.props.user.loadHeader().then(() => {
+      if (this.props.user.getAddress() === WalletStore.getAccountAddress()) {
+        this.setState({
+          isSelf: true,
+        });
+      }
     });
   }
 
@@ -28,7 +43,7 @@ export default class UserView extends Component {
   renderNumber() {
     return (
       <div style={this.styles.numberWrapper}>
-        Number:&nbsp;
+        User&nbsp;#
         <span style={this.styles.number}>
           {this.props.user.getNumber()}
         </span>
@@ -61,23 +76,20 @@ export default class UserView extends Component {
   get styles() {
     return {
       container:
-        this.props.sidebar ?
-        {
+        this.props.sidebar ? {
           width: '96%',
           marginLeft: '2%',
           marginRight: '2%',
           marginTop: '1.5%',
           marginBottom: '1.5%',
-          backgroundColor: 'white',
-        }
-        :
-        {
+          backgroundColor: this.state.isSelf ? 'yellow' : 'white',
+        } : {
           width: '46%',
           marginLeft: '2%',
           marginRight: '2%',
           marginTop: '1.5%',
           marginBottom: '1.5%',
-          backgroundColor: this.props.selected ? 'yellow' : 'white',
+          backgroundColor: 'white',
         },
       contentWrapper: {
         flex: 1,

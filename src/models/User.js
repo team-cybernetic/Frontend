@@ -232,7 +232,7 @@ export default class User {
         } else {
           this.confirming = true;
           if (this.transactionId) {
-            var eventListenerHandle = this.parentGroup.registerNewUserEventListener((error, response) => { //TODO: parentGroup.waitForNewUserEvent(txid).then((response) =>
+            var eventListenerHandle = this.parentGroup.registerUserJoinedEventListener((error, response) => { //TODO: parentGroup.waitForNewUserEvent(txid).then((response) =>
               if (!error) {
                 if (response.transactionHash === this.transactionId) {
                   this.populate({

@@ -2,9 +2,10 @@
 
 export default class GroupContract {
 
-  static EVENT_NEW_POST = 'NewPost';
-  static EVENT_NEW_GROUP = 'NewGroup';
-  static EVENT_NEW_USER = 'NewUser';
+  static EVENT_POST_CREATED = 'PostCreated';
+  static EVENT_GROUP_CREATED = 'SubgroupCreated';
+  static EVENT_USER_JOINED = 'UserJoined';
+  static EVENT_USER_LEFT = 'UserLeft';
   static EVENT_PENDING = '_pending';
   static EVENT_LATEST = '_latest';
 
@@ -22,14 +23,17 @@ export default class GroupContract {
       this.fireEventListener(GroupContract.EVENT_LATEST, error, txid);
       this.fireLatestTransactionListeners(error, txid);
     });
-    this.watchForEvent(GroupContract.EVENT_NEW_POST, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_NEW_POST, error, response);
+    this.watchForEvent(GroupContract.EVENT_POST_CREATED, {}, (error, response) => {
+      this.fireEventListener(GroupContract.EVENT_POST_CREATED, error, response);
     });
-    this.watchForEvent(GroupContract.EVENT_NEW_GROUP, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_NEW_GROUP, error, response);
+    this.watchForEvent(GroupContract.EVENT_GROUP_CREATED, {}, (error, response) => {
+      this.fireEventListener(GroupContract.EVENT_GROUP_CREATED, error, response);
     });
-    this.watchForEvent(GroupContract.EVENT_NEW_USER, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_NEW_USER, error, response);
+    this.watchForEvent(GroupContract.EVENT_USER_JOINED, {}, (error, response) => {
+      this.fireEventListener(GroupContract.EVENT_USER_JOINED, error, response);
+    });
+    this.watchForEvent(GroupContract.EVENT_USER_LEFT, {}, (error, response) => {
+      this.fireEventListener(GroupContract.EVENT_USER_LEFT, error, response);
     });
   }
 
@@ -113,16 +117,20 @@ export default class GroupContract {
     return (this.registerEventListener(GroupContract.EVENT_LATEST, callback));
   }
 
-  registerNewPostEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_NEW_POST, callback));
+  registerPostCreatedEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_POST_CREATED, callback));
   }
 
-  registerNewGroupEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_NEW_GROUP, callback));
+  registerSubgroupCreatedEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_GROUP_CREATED, callback));
   }
 
-  registerNewUserEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_NEW_USER, callback));
+  registerUserJoinedEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_USER_JOINED, callback));
+  }
+
+  registerUserLeftEventListener(callback) {
+    return (this.registerEventListener(GroupContract.EVENT_USER_LEFT, callback));
   }
 
   fireEventListener(eventName, error, response) {

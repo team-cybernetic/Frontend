@@ -42,9 +42,10 @@ contract Group {
   mapping (uint256 => Post) postsByNumber;
   uint256[] postNumbers;
 
-  event NewPost(uint256 indexed postNumber, address indexed creator, string title);
-  event NewGroup(uint256 indexed postNumber, address groupAddress);
-  event NewUser(uint256 indexed userNumber, address userAddress);
+  event PostCreated(uint256 indexed postNumber, address indexed creator, string title);
+  event SubgroupCreated(uint256 indexed postNumber, address groupAddress);
+  event UserJoined(uint256 indexed userNumber, address indexed userAddress);
+  event UserLeft(uint256 indexed userNumber, address indexed userAddress);
 
   uint256 userCount = 0;
 
@@ -74,6 +75,10 @@ contract Group {
     contents.contentAddress.hashLength = ipfsHashLength;
     contents.contentAddress.hash = ipfsHash;
     contents.creator = msg.sender;
+
+    if (!userExistsByAddress(contents.creator)) {
+      joinGroup();
+    }
 
     if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) { //TODO ruleset? moving average across all posts in the last hour?
       creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
@@ -119,7 +124,7 @@ contract Group {
   }
 
   function setGroupAddress(uint256 postNum, address addr) {
-    require(postNum <= postCount); //bad input
+    require(postExistsByNumber(postNum));
 
     require(postsByNumber[postNum].number != 0); //post deleted
 
@@ -129,11 +134,11 @@ contract Group {
 
     postsByNumber[postNum].groupAddress = addr;
 
-    NewGroup(postNum, addr);
+    SubgroupCreated(postNum, addr);
   }
 
   function getGroupAddress(uint256 postNum) returns (address) {
-    require(postNum <= postCount); //bad input
+    require(postExistsByNumber(postNum));
 
     Post memory p = postsByNumber[postNum];
     require(p.number != 0); //post deleted
@@ -173,7 +178,6 @@ contract Group {
 
     address creator = msg.sender;
 
-    //User memory usr = usersByAddress[creator];
     //TODO: ruleset: award or fees
 
     postCount++;
@@ -198,7 +202,7 @@ contract Group {
     postsByNumber[postCount] = newPost;
     postNumbers.push(postCount);
 
-    NewPost(postCount, creator, title);
+    PostCreated(postCount, creator, title);
 
     return (postCount);
   }
@@ -240,7 +244,26 @@ contract Group {
     usersByNumber[userCount] = u;
     userNumbers.push(userCount);
 
-    NewUser(userCount, msg.sender);
+    UserJoined(userCount, msg.sender);
+  }
+
+  function leaveGroup() { 
+    require(userExistsByAddress(msg.sender));
+
+    User memory u = usersByAddress[msg.sender];
+
+    //TODO: send the user their ether
+
+    uint256 old_num = u.number;
+
+    u.number = 0;
+
+    usersByAddress[msg.sender] = u;
+    usersByNumber[old_num] = u;
+    delete userAddresses[old_num - 1];
+    delete userNumbers[old_num - 1];
+
+    UserLeft(old_num, msg.sender);
   }
 
   function getUserNumbers() returns (uint256[]) {

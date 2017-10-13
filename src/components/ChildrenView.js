@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PostView from './PostView';
-//import PostStore from '../stores/PostStore';
 import { some } from 'lodash';
 
 class ChildrenView extends Component {
@@ -16,26 +15,26 @@ class ChildrenView extends Component {
   componentWillMount() {
     console.log("children view mounting");
     this.loadPosts(this.props.isLoaded, this.props.group);
-    this.registerNewPostListener(this.props.isLoaded, this.props.group, (post) => this.addToPosts(post));
+    this.registerPostCreatedListener(this.props.isLoaded, this.props.group, (post) => this.addToPosts(post));
   }
 
   componentWillReceiveProps(nextProps) {
     console.log("children view props updated -- getting posts");
     this.loadPosts(nextProps.isLoaded, nextProps.group);
-    this.registerNewPostListener(nextProps.isLoaded, nextProps.group, (post) => this.addToPosts(post));
+    this.registerPostCreatedListener(nextProps.isLoaded, nextProps.group, (post) => this.addToPosts(post));
   }
 
   componentWillUnmount() {
     console.log("children view unmounting");
     if (this.listenerHandle) {
-      this.props.group.unregisterNewPostListener(this.listenerHandle);
+      this.props.group.unregisterPostCreatedListener(this.listenerHandle);
     }
   }
 
-  registerNewPostListener(isLoaded, group, callback) {
+  registerPostCreatedListener(isLoaded, group, callback) {
     if (isLoaded) {
       if (!this.listenerHandle) {
-        this.listenerHandle = group.registerNewPostListener(callback);
+        this.listenerHandle = group.registerPostCreatedListener(callback);
       }
     }
   }

@@ -239,7 +239,7 @@ export default class Post {
               reject(error);
             });
           } else {
-            var eventListenerHandle = this.parentGroup.registerNewPostEventListener((error, response) => {
+            var eventListenerHandle = this.parentGroup.registerPostCreatedEventListener((error, response) => {
               if (!error) {
                 if (response.transactionHash === this.transactionId) {
                   this.populate({
