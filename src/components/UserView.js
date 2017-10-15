@@ -5,10 +5,12 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 
 export default class UserView extends Component {
+  static count = 0;
   constructor(props) {
     super(props);
     this.state = {
       isSelf: undefined,
+      count: ++UserView.count,
     };
   }
 

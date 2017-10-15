@@ -204,9 +204,9 @@ export default class Group {
 
   getUsers() {
     return new Promise((resolve, reject) => {
-      console.log("Group getting users");
+      console.log("Group getting user ids");
       this.groupContract.getUserIds().then((userIds) => {
-        console.log("Group getting user ids");
+        console.log("Group got user ids:", userIds);
         let res = [];
         userIds.forEach((bigInt) => {
           let id = bigInt.toString();
@@ -214,6 +214,7 @@ export default class Group {
             res.push(this.getUserByNumber(id));
           }
         });
+        console.log("Group got users:", res);
         resolve(res);
       }).catch((error) => {
         reject(error);

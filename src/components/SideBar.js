@@ -10,6 +10,7 @@ import { some, compact } from 'lodash';
 class SideBar extends Component {
   constructor(props) {
     super(props);
+    this.userViewMap = [];
     this.state = {
       post: null,
       group: null,
@@ -101,7 +102,6 @@ class SideBar extends Component {
     }).catch((error) => {
       console.error("failed to leave group:", error);
     });
-
   }
 
   renderUsers() {
@@ -109,8 +109,21 @@ class SideBar extends Component {
       return (this.state.users.map((user) => {
         const address = user.getAddress(); //user hasn't loaded yet, so this returns undefined
         const id = user.getNumber();
+        let key = 'u' + this.props.pathState.cleanPath;
+        if (!id) {
+          if (!this.userViewMap[address]) {
+            this.userViewMap[address] = user;
+          }
+          key = key + address;
+        } else {
+          if (this.userViewMap[address]) { //we cached it for the address before we saw the id
+            key = key + address;
+          } else {
+            key = key + id;
+          }
+        }
         return (
-          <UserView key={'u' + this.props.pathState.cleanPath + (address ? address : id)} sidebar={true} user={user} group={this.props.group} />
+          <UserView key={key} sidebar={true} user={user} group={this.props.group} />
         );
       }));
     } else {
