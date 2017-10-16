@@ -13,7 +13,8 @@ export default function getWeb3() {
         web3 = new Web3(web3.currentProvider);
 
         results = {
-          web3: web3
+          web3: web3,
+          managedWeb3: true,
         };
 
         console.log('Injected web3 detected.');
@@ -39,7 +40,8 @@ export default function getWeb3() {
         }
 
         results = {
-          web3: web3
+          web3: web3,
+          managedWeb3: false,
         };
 
         resolve(results);

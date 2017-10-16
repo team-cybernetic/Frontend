@@ -8,6 +8,7 @@ import Editor from './components/Editor';
 import GroupStore from './stores/GroupStore';
 import PathParser from './utils/PathParser';
 import PropTypes from 'prop-types';
+import TransactionConfirmationModal from './components/TransactionConfirmationModal';
 import {
   BrowserRouter as Router,
   Route
@@ -36,7 +37,7 @@ export default class InitializationWrapper extends Component {
     if (!this.state.isLoaded) {
       return (
         <div style={styles.container}>
-          Loading App...
+          <button style={styles.loader} className='button is-loading'></button>
         </div>
       );
     } else {
@@ -50,6 +51,9 @@ export default class InitializationWrapper extends Component {
 }
 
 class App extends Component {
+  static contextTypes = {
+    router: PropTypes.object
+  };
 
   constructor(props) {
     super(props);
@@ -103,31 +107,43 @@ class App extends Component {
 
   componentWillMount() {
     this.browseTo(this.props.match.url);
+    TransactionConfirmationModal.registerAppListener((transactionConfirmationInfo) => {
+      transactionConfirmationInfo.closeModal = () => {
+        this.setState({ transactionConfirmationInfo: null});
+      }
+      this.setState({ transactionConfirmationInfo });
+    });
   }
 
   componentWillReceiveProps(nextProps) {
     this.browseTo(nextProps.match.url);
   }
 
-
   render() {
+    const { group, post, pathState, transactionConfirmationInfo } = this.state;
+    const sharedState = {
+      isLoaded: this.state.isGroupLoaded,
+      group,
+      post,
+      pathState,
+    };
+
     return (
       <div style={styles.container}>
-        <NavigationBar key={`navbar-${this.state.pathState.path}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
+        {transactionConfirmationInfo && (
+          <TransactionConfirmationModal {...transactionConfirmationInfo} />
+        )}
+        <NavigationBar key={`navbar-${pathState.path}`} {...sharedState} />
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
-            <ChildrenView key={`children-${this.state.pathState.cleanGroupPath}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
-            <Editor key={`editor-${this.state.pathState.cleanGroupPath}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
+            <ChildrenView key={`children-$pathState.cleanGroupPath}`} {...sharedState} />
+            <Editor key={`editor-${pathState.cleanGroupPath}`} {...sharedState} />
           </div>
-          <SideBar key={`sidebar-${this.state.pathState.cleanGroupPath}`} isLoaded={this.state.isGroupLoaded} group={this.state.group} post={this.state.post} pathState={this.state.pathState} />
+          <SideBar key={`sidebar-${pathState.cleanGroupPath}`} {...sharedState} />
         </div>
       </div>
     );
   }
-
-  static contextTypes = {
-    router: PropTypes.object
-  };
 }
 
 const styles = {
@@ -145,5 +161,11 @@ const styles = {
     display: 'flex',
     flexFlow: 'column',
     width: '70%',
+  },
+  loader: {
+    flex: 1,
+    border: 0,
+    fontSize: '3em',
+    alignSelf: 'center',
   },
 };

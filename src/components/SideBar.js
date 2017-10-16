@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PostView from './PostView';
 import UserView from './UserView';
 import Collapsible from 'react-collapsible';
-import WalletStore from '../stores/WalletStore'
+import Wallet from '../models/Wallet'
 import './style.css';
 import cx from 'classnames';
 import { some, compact } from 'lodash';
@@ -29,8 +29,8 @@ class SideBar extends Component {
           users.forEach((user, idx) => {
             console.log("user[" + idx + "]:", user);
             user.loadHeader().then(() => {
-              let userInGroup = some(users, (user) => { 
-                let walletAddr = WalletStore.getAccountAddress();
+              let userInGroup = some(users, (user) => {
+                let walletAddr = Wallet.getAccountAddress();
                 let userAddr = user.getAddress();
                 return (walletAddr === userAddr);
               });

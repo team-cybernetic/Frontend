@@ -1,14 +1,11 @@
-//import GasEstimator from '../utils/GasEstimator';
+const EVENT_POST_CREATED = 'PostCreated';
+const EVENT_GROUP_CREATED = 'SubgroupCreated';
+const EVENT_USER_JOINED = 'UserJoined';
+const EVENT_USER_LEFT = 'UserLeft';
+const EVENT_PENDING = '_pending';
+const EVENT_LATEST = '_latest';
 
 export default class GroupContract {
-
-  static EVENT_POST_CREATED = 'PostCreated';
-  static EVENT_GROUP_CREATED = 'SubgroupCreated';
-  static EVENT_USER_JOINED = 'UserJoined';
-  static EVENT_USER_LEFT = 'UserLeft';
-  static EVENT_PENDING = '_pending';
-  static EVENT_LATEST = '_latest';
-
   constructor(web3, contractInstance) {
     this.web3 = web3;
     this.contractInstance = contractInstance;
@@ -16,24 +13,24 @@ export default class GroupContract {
     this.latestTransactionListeners = [[]];
     this.eventListeners = [[]];
     this.web3.eth.filter("pending").watch((error, txid) => {
-      this.fireEventListener(GroupContract.EVENT_PENDING, error, txid);
+      this.fireEventListener(EVENT_PENDING, error, txid);
       this.firePendingTransactionListeners(error, txid);
     });
     this.web3.eth.filter("latest").watch((error, txid) => {
-      this.fireEventListener(GroupContract.EVENT_LATEST, error, txid);
+      this.fireEventListener(EVENT_LATEST, error, txid);
       this.fireLatestTransactionListeners(error, txid);
     });
-    this.watchForEvent(GroupContract.EVENT_POST_CREATED, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_POST_CREATED, error, response);
+    this.watchForEvent(EVENT_POST_CREATED, {}, (error, response) => {
+      this.fireEventListener(EVENT_POST_CREATED, error, response);
     });
-    this.watchForEvent(GroupContract.EVENT_GROUP_CREATED, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_GROUP_CREATED, error, response);
+    this.watchForEvent(EVENT_GROUP_CREATED, {}, (error, response) => {
+      this.fireEventListener(EVENT_GROUP_CREATED, error, response);
     });
-    this.watchForEvent(GroupContract.EVENT_USER_JOINED, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_USER_JOINED, error, response);
+    this.watchForEvent(EVENT_USER_JOINED, {}, (error, response) => {
+      this.fireEventListener(EVENT_USER_JOINED, error, response);
     });
-    this.watchForEvent(GroupContract.EVENT_USER_LEFT, {}, (error, response) => {
-      this.fireEventListener(GroupContract.EVENT_USER_LEFT, error, response);
+    this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
+      this.fireEventListener(EVENT_USER_LEFT, error, response);
     });
   }
 
@@ -117,27 +114,27 @@ export default class GroupContract {
   }
 
   registerPendingEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_PENDING, callback));
+    return (this.registerEventListener(EVENT_PENDING, callback));
   }
 
   registerLatestEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_LATEST, callback));
+    return (this.registerEventListener(EVENT_LATEST, callback));
   }
 
   registerPostCreatedEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_POST_CREATED, callback));
+    return (this.registerEventListener(EVENT_POST_CREATED, callback));
   }
 
   registerSubgroupCreatedEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_GROUP_CREATED, callback));
+    return (this.registerEventListener(EVENT_GROUP_CREATED, callback));
   }
 
   registerUserJoinedEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_USER_JOINED, callback));
+    return (this.registerEventListener(EVENT_USER_JOINED, callback));
   }
 
   registerUserLeftEventListener(callback) {
-    return (this.registerEventListener(GroupContract.EVENT_USER_LEFT, callback));
+    return (this.registerEventListener(EVENT_USER_LEFT, callback));
   }
 
   fireEventListener(eventName, error, response) {
