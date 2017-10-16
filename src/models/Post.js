@@ -246,18 +246,19 @@ export default class Post {
                     id: response.args.postNumber.toString(),
                   });
                   this.markConfirmed();
-                  resolve();
+                  this.parentGroup.unregisterEventListener(eventListenerHandle);
+                  resolve(true);
                 }
               } else {
                 this.markConfirmedFailure(error);
+                this.parentGroup.unregisterEventListener(eventListenerHandle);
                 reject(error);
               }
-              this.parentGroup.unregisterEventListener(eventListenerHandle);
             });
           }
         }
       } else {
-        resolve();
+        resolve(true);
       }
     });
   }

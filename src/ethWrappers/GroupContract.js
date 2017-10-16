@@ -87,7 +87,14 @@ export default class GroupContract {
 
   waitForConfirmation(txid) {
     return new Promise((resolve, reject) => {
-      this.latestTransactonListeners[txid].push({ resolve, reject });
+      let handle = this.registerLatestEventListener((error, txid) => {
+        if (!error) {
+          resolve(txid);
+        } else {
+          reject(error);
+        }
+        this.unregisterEventListener(handle);
+      });
     });
   }
 
