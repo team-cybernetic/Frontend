@@ -1,9 +1,8 @@
 import Ipfs from '../utils/Ipfs';
 import GroupContract from '../ethWrappers/GroupContract';
-import GasEstimator from '../utils/GasEstimator';
 import Post from './Post';
 import User from './User';
-import WalletStore from '../stores/WalletStore'
+import Wallet from '../models/Wallet'
 import moment from 'moment';
 
 export default class Group {
@@ -14,7 +13,6 @@ export default class Group {
     this.groupContractTC = contractTC;
     this.contractInstance = contractInstance;
     this.groupContract = new GroupContract(this.web3, this.contractInstance);
-    this.gasEstimator = new GasEstimator(this.web3, this.contractInstance);
     this.postCreatedListeners = [];
     this.userJoinedListeners = [];
     this.userLeftListeners = [];
@@ -58,10 +56,8 @@ export default class Group {
       Ipfs.saveContent(content).then((multiHashString) => {
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
         const creationTime = moment().unix();
-        this.gasEstimator.estimate('createPost', title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime).then((gas) => {
-          let actualGas = gas * 3;
-          console.log("gas estimator estimates that this createPost call will cost", gas, "gas, actualGas =", actualGas);
-          this.contractInstance.contract.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas: actualGas }, (error, transactionId) => {
+        Wallet.runTransaction(this.contractInstance, 'createPost', 'create this post', title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime).then(({ gas, gasPrice }) => {
+          this.contractInstance.contract.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas, gasPrice }, (error, transactionId) => {
             if (!error) {
               this.groupContract.waitForPendingTransaction(transactionId).then((txid) => {
                 const post = this.getPost(undefined, txid);
@@ -71,7 +67,7 @@ export default class Group {
                   contentType,
                   multiHashArray,
                   multiHashString,
-                  creator: WalletStore.getAccountAddress(),
+                  creator: Wallet.getAccountAddress(),
                   creationTime,
                   transactionId: txid,
                 });
@@ -224,14 +220,13 @@ export default class Group {
 
   joinGroup() {
     return new Promise((resolve, reject) => {
-      const walletAddr = WalletStore.getAccountAddress();
+      const walletAddr = Wallet.getAccountAddress();
       this.userExistsByAddress(walletAddr).then((result) => {
         if (!result) {
           console.log("user not already in group, joining");
-          this.gasEstimator.estimate('joinGroup').then((gas) => {
-            let actualGas = gas * 3;
-            console.log("gas estimator estimates that this joinGroup call will cost", gas, "gas, actualGas =", actualGas);
-            this.contractInstance.joinGroup({ gas: actualGas, from: walletAddr }).then((txid) => {
+          Wallet.runTransaction(this.contractInstance, 'joinGroup', 'join this group').then(({ gas, gasPrice }) => {
+            console.log("gas estimator estimates that this joinGroup call will cost", gas);
+            this.contractInstance.joinGroup({ gas, from: walletAddr }).then((txid) => {
               console.log("successfully joined group! txid:", txid);
               resolve(true);
             }).catch((error) => {
@@ -255,14 +250,13 @@ export default class Group {
 
   leaveGroup() {
     return new Promise((resolve, reject) => {
-      const walletAddr = WalletStore.getAccountAddress();
+      const walletAddr = Wallet.getAccountAddress();
       this.userExistsByAddress(walletAddr).then((result) => {
         if (result) {
           console.log("user is in group, leaving");
-          this.gasEstimator.estimate('leaveGroup').then((gas) => {
-            let actualGas = gas * 3;
-            console.log("gas estimator estimates that this leaveGroup call will cost", gas, "gas, actualGas =", actualGas);
-            this.contractInstance.leaveGroup({ gas: actualGas, from: walletAddr }).then((txid) => {
+          Wallet.runTransaction(this.contractInstance, 'leaveGroup', 'leave this group').then(({ gas, gasPrice }) => {
+            console.log("gas estimator estimates that this leaveGroup call will cost", gas);
+            this.contractInstance.leaveGroup({ gas, from: walletAddr }).then((txid) => {
               console.log("successfully left group! txid:", txid);
               resolve(true);
             }).catch((error) => {
@@ -292,20 +286,12 @@ export default class Group {
     return new Promise((resolve, reject) => {
       this.getGroupAddressOfPost(postNum).then((currentAddress) => {
         if (!this.isAddressValid(currentAddress)) {
-          this.gasEstimator.estimateContractCreation(this.groupContractTC).then((gas) => { //TODO
-            let actualGas = gas;
-            console.log("gas estimator estimates that this contract creation will cost", gas, "gas, actualGas =", actualGas);
-            //TODO: move contract related code to GroupContract
-            this.groupContractTC.new({gas: actualGas}).then((newInstance) => {
-              console.log('post number ', postNum, ' created as a group with address ', newInstance.address);
-              this.setGroupAddressOfPost(postNum, newInstance.address)
-              resolve(newInstance.address);
-            }).catch((error) => {
-              console.error("Failed to create new contract:", error);
-              reject(error);
-            });
+          Wallet.deployContract(this.groupContractTC).then((newInstance) => {
+            console.log('post number ', postNum, ' created as a group with address ', newInstance.address);
+            this.setGroupAddressOfPost(postNum, newInstance.address)
+            resolve(newInstance.address);
           }).catch((error) => {
-            console.error("Failed to estimate gas for new contract:", error);
+            console.error("Failed to create new contract:", error);
             reject(error);
           });
         } else {
@@ -329,11 +315,10 @@ export default class Group {
 
   setGroupAddressOfPost(postNum, groupAddress) {
     return new Promise((resolve, reject) => {
-      this.gasEstimator.estimate('setGroupAddress', postNum, groupAddress).then((gas) => {
-        let actualGas = gas * 3;
+      Wallet.runTransaction(this.contractInstance, 'setGroupAddress', null, postNum, groupAddress).then(({ gas, gasPrice }) => {
         console.log("Group.setGroupAddressOfPost is setting post", postNum, "group to", groupAddress);
-        console.log("gas estimator estimates that this setGroupAddressOfPost call will cost", gas, "gas, actualGas =", actualGas);
-        this.contractInstance.setGroupAddress(postNum, groupAddress.valueOf(), { gas: actualGas }).then((result) => {
+        console.log("gas estimator estimates that this setGroupAddressOfPost call will cost", gas);
+        this.contractInstance.setGroupAddress(postNum, groupAddress.valueOf(), { gas }).then((result) => {
           console.log("Group.setGroupAddressOfPost result:", result);
           resolve(result);
         }).catch((error) => {

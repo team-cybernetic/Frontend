@@ -40,34 +40,18 @@ export default class PostView extends Component {
   }
 
   getTargetPath() {
-    let post = this.props.post;
+    const { post, parent } = this.props;
 
-    if (!post) {
-      return;
+    if (post && post.id) {
+      const prefix = parent || '/';
+      return prefix + post.id + '-' + encodeURIComponent(post.title) + '';
     }
-
-    if (!post.id) {
-      return;
-    }
-
-    var parentPath = this.props.parent;
-    if (!parentPath) {
-      parentPath = '/';
-    }
-
-    var trailingSlash = '';
-    /*
-    if (!!this.state.post.groupAddress && this.state.post.groupAddress !== '0x' && this.state.post.groupAddress !== '0x0000000000000000000000000000000000000000') {
-      trailingSlash = '/';
-    }
-    */
-
-    return (parentPath + post.id + '-' + encodeURIComponent(this.props.post.title) + trailingSlash);
+    return '';
   }
 
   renderTitle() {
     return (
-      <Link to={`${this.getTargetPath()}`}>{this.renderId()}{this.props.post.title}</Link>
+      <Link to={this.getTargetPath()}>{this.renderId()}{this.props.post.title}</Link>
     );
   }
 
@@ -99,7 +83,7 @@ export default class PostView extends Component {
     console.log("creating group on post", id);
     this.props.group.convertPostToGroup(id).then((result) => {
       console.log("successfully created group on post", id, ":", result);
-      this.forceUpdate(); 
+      this.forceUpdate();
     });
   }
 

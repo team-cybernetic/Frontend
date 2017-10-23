@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import WalletStore from '../stores/WalletStore'
-import xss from 'xss';
-import moment from 'moment';
-import { Link } from 'react-router-dom';
+import Wallet from '../models/Wallet';
 
 export default class UserView extends Component {
   static count = 0;
@@ -19,7 +16,7 @@ export default class UserView extends Component {
       this.forceUpdate();
     });
     this.props.user.loadHeader().then(() => {
-      if (this.props.user.getAddress() === WalletStore.getAccountAddress()) {
+      if (this.props.user.getAddress() === Wallet.getAccountAddress()) {
         this.setState({
           isSelf: true,
         });

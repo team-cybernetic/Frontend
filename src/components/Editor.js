@@ -63,7 +63,9 @@ class Editor extends Component {
         isPosting: false,
       });
     }).catch((error) => {
-      console.error(error);
+      if (error) {
+        console.error(error);
+      }
       this.setState({
         isPosting: false,
       });
@@ -98,7 +100,6 @@ const styles = {
     height: '100%',
     width: '90px',
     float: 'right',
-//    whiteSpace: 'normal',
   },
   textArea: {
     flex: 1,
