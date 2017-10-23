@@ -213,7 +213,7 @@ export default class Post {
   markConfirmed(result = true) {
     this.confirmed = result;
     this.confirming = false;
-    this.confirmationListeners.forEach((listener) => { listener.resolve() });
+    this.confirmationListeners.forEach((listener) => { listener.resolve(result) });
     this.confirmationListeners = [];
   }
 

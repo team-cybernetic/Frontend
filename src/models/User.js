@@ -131,7 +131,13 @@ export default class User {
           this.headerLoadListeners.push({ resolve, reject });
         } else {
           this.headerLoading = true;
-          this.waitForConfirmation().then(() => {
+          this.waitForConfirmation().then((userExists) => {
+            if (!userExists) {
+              let error = new Error("User " + this.id + " does not exist!");
+              this.markHeaderLoadedFailure(error);
+              reject(error);
+              return;
+            }
             if (!this.headerLoaded) { //waitForConfirmation can load header on an edge case
               this.parentGroup.loadUserByNumber(this.id).then((userStruct) => {
                 this.populate(this.userStructToObject(userStruct));
@@ -240,13 +246,14 @@ export default class User {
                     address: response.args.userAddress.toString(),
                   });
                   this.markConfirmed();
-                  resolve();
+                  this.parentGroup.unregisterEventListener(eventListenerHandle);
+                  resolve(true);
                 }
               } else {
                 this.markConfirmedFailure(error);
+                this.parentGroup.unregisterEventListener(eventListenerHandle);
                 reject(error);
               }
-              this.parentGroup.unregisterEventListener(eventListenerHandle);
             });
           } else {
             if (this.address) {
@@ -254,7 +261,7 @@ export default class User {
                 this.populate(this.userStructToObject(userStruct));
                 this.markConfirmed();
                 this.markHeaderLoaded();
-                resolve();
+                resolve(true);
               }).catch((error) => {
                 this.markConfirmedFailure(error);
                 reject(error);
@@ -266,7 +273,7 @@ export default class User {
           }
         }
       } else {
-        resolve();
+        resolve(true);
       }
     });
   }

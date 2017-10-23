@@ -34,7 +34,7 @@ contract Group {
     address creator; //immutable
     uint256 creationTime; //UNIX timestamp, accept user input bounded by block.timestamp, immutable
     address groupAddress; //null when group has not been created for this post
-    uint256 balance; //amount of money owned by this post in this group
+    int256 balance; //amount of money owned by this post in this group
     int256 permissions; //permission level of post
   }
 
@@ -46,6 +46,7 @@ contract Group {
   event SubgroupCreated(uint256 indexed postNumber, address groupAddress);
   event UserJoined(uint256 indexed userNumber, address indexed userAddress);
   event UserLeft(uint256 indexed userNumber, address indexed userAddress);
+  event UserBalanceChanged(uint256 indexed userNumber, int256 amount);
 
   uint256 userCount = 0;
 
@@ -57,7 +58,7 @@ contract Group {
     address addr; //public key, unique, immutable
     uint256 joinTime; //UNIX timestamp when user first joined group, use block.timestamp, immutable
     address directAddress; //null when user has not created/linked a private group (for direct messaging)
-    uint256 balance; //amount of money owned by this user in this group
+    int256 balance; //amount of money owned by this user in this group
     int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
   }
 
@@ -103,7 +104,7 @@ contract Group {
     address creator,
     uint256 creationTime,
     address groupAddress,
-    uint256 balance,
+    int256 balance,
     int256 permissions
   ) {
     require(_number <= postCount);
@@ -177,6 +178,14 @@ contract Group {
     }
 
     address creator = msg.sender;
+
+    if (!userExistsByAddress(creator)) {
+      joinGroup(); //TODO: do this via ruleset
+    }
+
+    User storage u = usersByAddress[creator];
+
+    awardTokensToUser(u, 1); //TODO: ruleset
 
     //TODO: ruleset: award or fees
 
@@ -284,7 +293,7 @@ contract Group {
     address addr,
     uint256 joinTime,
     address directAddress,
-    uint256 balance,
+    int256 balance,
     int256 permissions
   ) {
     require(userExistsByAddress(_addr));
@@ -314,7 +323,7 @@ contract Group {
     address addr,
     uint256 joinTime,
     address directAddress,
-    uint256 balance,
+    int256 balance,
     int256 permissions
   ) {
     require(userExistsByNumber(_number));
@@ -332,6 +341,44 @@ contract Group {
       u.balance,
       u.permissions
     );
+  }
+
+  function transferTokensToUser(address _userAddress, int256 _amount) returns (bool success) {
+    require(userExistsByAddress(msg.sender));
+    require(userExistsByAddress(_userAddress));
+    if (_amount != 0) {
+      User memory sender = usersByAddress[msg.sender];
+      User memory receiver = usersByAddress[_userAddress];
+      if (_amount > 0) {
+        if (sender.balance >= _amount &&
+            receiver.balance + _amount > receiver.balance) {
+          awardTokensToUser(sender, _amount * -1);
+          awardTokensToUser(receiver, _amount);
+          //TODO: ruleset taxes?
+          return (true);
+        } else {
+          return (false);
+        }
+      } else {
+        if (sender.balance >= (_amount * -1) &&
+            receiver.balance + _amount < receiver.balance) {
+          awardTokensToUser(sender, _amount); //negative amount decreases when adding
+          awardTokensToUser(receiver, _amount);
+          //TODO: ruleset taxes, not 1:1 deduction?
+          return (true);
+        } else {
+          return (false);
+        }
+      }
+    } else {
+      return (true);
+    }
+  }
+
+  //internal function, does _no_ sanity checks (like _user.number != 0)
+  function awardTokensToUser(User _user, int256 _amount) private {
+    _user.balance += _amount;
+    UserBalanceChanged(_user.number, _amount);
   }
 
   function getTitle() returns (string) {
