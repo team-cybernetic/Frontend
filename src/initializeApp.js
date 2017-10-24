@@ -15,6 +15,7 @@ export default function initializeApp() {
       groupContract.defaults({
         gasLimit: '5000000'
       });
+      groupContract.linked_binary = RootGroupContractJson.networks[web3.version.network].linked_binary;
       groupContract.deployed().then((rootInstance) => {
         console.log("groupContract root instance deployed at address:", rootInstance.address);
         Wallet.initialize(web3, managedWeb3);

@@ -39,6 +39,7 @@ export default class Wallet {
 
   static deployContract(contractTC) {
     return GasEstimator.estimateContractCreation(contractTC).then((gas) => {
+      console.log("Gas estimator estimates that this contract creation will take", gas, "gas");
       return new Promise((resolve, reject) => {
         if (!this.managedWeb3) {
           TransactionConfirmationModal.show(gas, 'create this group', (gasPrice) => {

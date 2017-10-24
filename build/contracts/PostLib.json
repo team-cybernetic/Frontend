@@ -1,0 +1,132 @@
+{
+  "contract_name": "PostLib",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "self",
+          "type": "PostLib.State storage"
+        },
+        {
+          "name": "num",
+          "type": "uint256"
+        },
+        {
+          "name": "groupAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setGroupAddressOfPost",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "postNumber",
+          "type": "uint256"
+        }
+      ],
+      "name": "PostCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "postNumber",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "groupAddress",
+          "type": "address"
+        }
+      ],
+      "name": "SubgroupCreated",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b6101768061001f6000396000f300606060405263ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416638e018a31811461003d575b600080fd5b61006460043560243573ffffffffffffffffffffffffffffffffffffffff60443516610066565b005b610076838363ffffffff61011b16565b151561008157600080fd5b600082815260018401602052604090819020600701805473ffffffffffffffffffffffffffffffffffffffff191673ffffffffffffffffffffffffffffffffffffffff841617905582907f0f3ce190ebd85b09cc4b44d45dca8a0691ff7e3c8810fe2bfd43b0c115832db39083905173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390a25b505050565b815460009082111561012c57600080fd5b50600081815260018301602052604090206006015415155b929150505600a165627a7a7230582070c075377faafa8d9a879b5461d9158c9a942e8a17e95e8b69830bf63f1624380029",
+  "networks": {
+    "13": {
+      "events": {
+        "0x7083e11102808886115763619dc7e7c3f40b0b6dfd04262b94ea7de82d917ece": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            }
+          ],
+          "name": "PostCreated",
+          "type": "event"
+        },
+        "0x0f3ce190ebd85b09cc4b44d45dca8a0691ff7e3c8810fe2bfd43b0c115832db3": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "groupAddress",
+              "type": "address"
+            }
+          ],
+          "name": "SubgroupCreated",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x591933c7711b56167d809101cde39cd9aad32ef0",
+      "updated_at": 1508865969182
+    },
+    "1508814648373": {
+      "events": {
+        "0x7083e11102808886115763619dc7e7c3f40b0b6dfd04262b94ea7de82d917ece": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            }
+          ],
+          "name": "PostCreated",
+          "type": "event"
+        },
+        "0x0f3ce190ebd85b09cc4b44d45dca8a0691ff7e3c8810fe2bfd43b0c115832db3": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "groupAddress",
+              "type": "address"
+            }
+          ],
+          "name": "SubgroupCreated",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x69156ae47e1daca0b6669a720987a33305a60364",
+      "updated_at": 1508861801731
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1508865969182
+}

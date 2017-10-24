@@ -285,7 +285,9 @@ export default class Group {
   convertPostToGroup(postNum) {
     return new Promise((resolve, reject) => {
       this.getGroupAddressOfPost(postNum).then((currentAddress) => {
+        console.log("Got group address of post", postNum, ":", currentAddress);
         if (!this.isAddressValid(currentAddress)) {
+          console.log("Deploying contract via wallet");
           Wallet.deployContract(this.groupContractTC).then((newInstance) => {
             console.log('post number ', postNum, ' created as a group with address ', newInstance.address);
             this.setGroupAddressOfPost(postNum, newInstance.address)
@@ -315,10 +317,10 @@ export default class Group {
 
   setGroupAddressOfPost(postNum, groupAddress) {
     return new Promise((resolve, reject) => {
-      Wallet.runTransaction(this.contractInstance, 'setGroupAddress', null, postNum, groupAddress).then(({ gas, gasPrice }) => {
+      Wallet.runTransaction(this.contractInstance, 'setGroupAddressOfPost', null, postNum, groupAddress).then(({ gas, gasPrice }) => {
         console.log("Group.setGroupAddressOfPost is setting post", postNum, "group to", groupAddress);
         console.log("gas estimator estimates that this setGroupAddressOfPost call will cost", gas);
-        this.contractInstance.setGroupAddress(postNum, groupAddress.valueOf(), { gas }).then((result) => {
+        this.contractInstance.setGroupAddressOfPost(postNum, groupAddress.valueOf(), { gas }).then((result) => {
           console.log("Group.setGroupAddressOfPost result:", result);
           resolve(result);
         }).catch((error) => {

@@ -1,0 +1,21 @@
+{
+  "contract_name": "CurrencyLib",
+  "abi": [],
+  "unlinked_binary": "0x60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a72305820d21ee7e2ed419c374bcf7a1eb5fad37fd6780ce8fac7bc927fbce6af9f11903f0029",
+  "networks": {
+    "13": {
+      "events": {},
+      "links": {},
+      "address": "0x9a5b7646ceaa4a1041b1da747346ca6813f5c020",
+      "updated_at": 1508865969183
+    },
+    "1508814648373": {
+      "events": {},
+      "links": {},
+      "address": "0x2000a188446e752991ce13fd5d35b7c5a399c63e",
+      "updated_at": 1508861801732
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1508865969183
+}

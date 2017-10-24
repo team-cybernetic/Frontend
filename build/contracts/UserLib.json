@@ -1,0 +1,177 @@
+{
+  "contract_name": "UserLib",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "userNumber",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "name": "userAddress",
+          "type": "address"
+        }
+      ],
+      "name": "UserJoined",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "userNumber",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "name": "userAddress",
+          "type": "address"
+        }
+      ],
+      "name": "UserLeft",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "userNumber",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "amount",
+          "type": "int256"
+        }
+      ],
+      "name": "UserBalanceChanged",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a72305820c7904117b4dfa1a98414beaddebb496d68ce1271ade76244174bb8d73e32b3780029",
+  "networks": {
+    "13": {
+      "events": {
+        "0x6a5f716eff9d9b77c04378575633c0f6784ea8d1a0b7cc011d723b4022decd57": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserJoined",
+          "type": "event"
+        },
+        "0x29b8faa3fcd3114fc2e3197ee983011779d847dd9f2eb40a1b68ee205e981447": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserLeft",
+          "type": "event"
+        },
+        "0x7b59cb3078dffc5872c26228a1826e119dfd917d0b1b2ccd285363fc8c0c06ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "int256"
+            }
+          ],
+          "name": "UserBalanceChanged",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x99bf1dce554c1fded3f2d6b8e214f39f005ce214",
+      "updated_at": 1508865969183
+    },
+    "1508814648373": {
+      "events": {
+        "0x6a5f716eff9d9b77c04378575633c0f6784ea8d1a0b7cc011d723b4022decd57": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserJoined",
+          "type": "event"
+        },
+        "0x29b8faa3fcd3114fc2e3197ee983011779d847dd9f2eb40a1b68ee205e981447": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserLeft",
+          "type": "event"
+        },
+        "0x7b59cb3078dffc5872c26228a1826e119dfd917d0b1b2ccd285363fc8c0c06ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "int256"
+            }
+          ],
+          "name": "UserBalanceChanged",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x218290b32b8042a3bbe1a2889a9b7e33d8256fc5",
+      "updated_at": 1508861801731
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1508865969183
+}
