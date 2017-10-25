@@ -136,7 +136,7 @@ class App extends Component {
         <NavigationBar key={`navbar-${pathState.path}`} {...sharedState} />
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
-            <ChildrenView key={`children-$pathState.cleanGroupPath}`} {...sharedState} />
+            <ChildrenView key={`children-${pathState.cleanGroupPath}`} {...sharedState} />
             <Editor key={`editor-${pathState.cleanGroupPath}`} {...sharedState} />
           </div>
           <SideBar key={`sidebar-${pathState.cleanGroupPath}`} {...sharedState} />

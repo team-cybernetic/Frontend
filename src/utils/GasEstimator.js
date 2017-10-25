@@ -21,7 +21,6 @@ export default class GasEstimator {
     return new Promise((resolve, reject) => {
       let args = Array.prototype.slice.call(arguments);
       const TC = args.shift();
-      console.log("TC:", TC.linked_binary);
       const Contract = this.web3.eth.contract(TC.abi);
       args.push({ data: TC.linked_binary });
       const data = Contract.new.getData.apply(Contract, args);

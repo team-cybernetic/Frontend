@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import Wallet from '../models/Wallet';
 
 export default class UserView extends Component {
-  static count = 0;
   constructor(props) {
     super(props);
     this.state = {
       isSelf: undefined,
-      count: ++UserView.count,
     };
   }
 
