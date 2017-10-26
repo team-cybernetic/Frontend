@@ -1,5 +1,6 @@
 import Ipfs from '../utils/Ipfs';
 import GroupContract from '../ethWrappers/GroupContract';
+import Blockchain from '../ethWrappers/Blockchain';
 import Post from './Post';
 import User from './User';
 import Wallet from '../models/Wallet'
@@ -59,7 +60,7 @@ export default class Group {
         Wallet.runTransaction(this.contractInstance, 'createPost', 'create this post', title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime).then(({ gas, gasPrice }) => {
           this.contractInstance.contract.createPost(title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, { gas, gasPrice }, (error, transactionId) => {
             if (!error) {
-              this.groupContract.waitForPendingTransaction(transactionId).then((txid) => {
+              Blockchain.waitForPendingTransaction(transactionId).then((txid) => {
                 const post = this.getPost(undefined, txid);
                 post.populate({
                   title,
@@ -278,15 +279,11 @@ export default class Group {
     });
   }
 
-  isAddressValid(addr) { //TODO: not copy this everywhere...
-    return (this.web3.isAddress(addr) && addr !== '0x0000000000000000000000000000000000000000' && addr !== '0000000000000000000000000000000000000000');
-  }
-
   convertPostToGroup(postNum) {
     return new Promise((resolve, reject) => {
       this.getGroupAddressOfPost(postNum).then((currentAddress) => {
         console.log("Got group address of post", postNum, ":", currentAddress);
-        if (!this.isAddressValid(currentAddress)) {
+        if (!Blockchain.isAddressValid(currentAddress)) {
           console.log("Deploying contract via wallet");
           Wallet.deployContract(this.groupContractTC).then((newInstance) => {
             console.log('post number ', postNum, ' created as a group with address ', newInstance.address);

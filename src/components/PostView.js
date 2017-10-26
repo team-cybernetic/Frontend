@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import Blockchain from '../ethWrappers/Blockchain';
 
 export default class PostView extends Component {
   componentWillMount() {
@@ -66,12 +67,8 @@ export default class PostView extends Component {
     );
   }
 
-  isAddressNull(addr) { //TODO: util
-    return (!addr || addr === '0x' || addr === '0x0000000000000000000000000000000000000000' || addr === '0000000000000000000000000000000000000000');
-  }
-
   renderConvertToGroupButton() {
-    if (!this.isAddressNull(this.props.post.groupAddress)) {
+    if (!Blockchain.isAddressNull(this.props.post.groupAddress)) {
       return ('');
     }
     return (
@@ -89,7 +86,7 @@ export default class PostView extends Component {
 
 
   renderGroupAddress() {
-    if (!this.isAddressNull(this.props.post.groupAddress)) {
+    if (!Blockchain.isAddressNull(this.props.post.groupAddress)) {
       return (
         <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>
       );

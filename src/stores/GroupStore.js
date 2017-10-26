@@ -1,5 +1,6 @@
 import Group from '../models/Group'
 import PathParser from '../utils/PathParser';
+import Blockchain from '../ethWrappers/Blockchain';
 
 export default class GroupStore {
 
@@ -100,14 +101,6 @@ export default class GroupStore {
     });
   }
 
-  static isAddressNull(addr) {
-    return (!addr || addr === '0x' || addr === '0x0000000000000000000000000000000000000000' || addr === '0000000000000000000000000000000000000000');
-  }
-
-  static isAddressValid(addr) {
-    return (this.web3.isAddress(addr) && !this.isAddressNull(addr));
-  }
-
   static walkTree(pathToWalk, pathWalked, currentGroup) {
     return new Promise((resolve, reject) => {
       console.log("Walking the group tree; pathToWalk:", pathToWalk, "; pathWalked:", pathWalked);
@@ -119,7 +112,7 @@ export default class GroupStore {
       console.log("nextStep:", nextStep);
       currentGroup.getGroupAddressOfPost(nextStep).then((addr) => {
         console.log("got address for", nextStep, ":", addr);
-        if (this.isAddressValid(addr)) {
+        if (Blockchain.isAddressValid(addr)) {
           console.log("it's a valid address!");
           this.getGroup(addr).then((nextGroup) => {
             pathWalked.push(nextStep);

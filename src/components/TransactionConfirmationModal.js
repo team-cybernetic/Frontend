@@ -36,14 +36,17 @@ class TransactionConfirmationModal extends Component {
               <label className="label">Gas Price</label>
             </div>
             <div className="field-body">
-              <div className="field">
-                <div className="control">
+              <div className="field is-horizontal" style={styles.numberInputContainer}>
+                <div className="control" style={styles.numberInput}>
                   <input
                     className='input'
                     type='number'
                     value={this.gweiGasPrice()}
                     onChange={(e) => this.onChangeGasPrice(e)}
                   />
+                </div>
+                <div>
+                  Gwei
                 </div>
               </div>
             </div>
@@ -188,6 +191,14 @@ const styles = {
   modalDescription: {
     marginTop: '5px',
     marginBottom: '5px',
+  },
+  numberInputContainer: {
+    alignItems: 'center',
+  },
+  numberInput: {
+    marginRight: '4px',
+    maxWidth: '30%',
+    flex: '1',
   },
 };
 

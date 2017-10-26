@@ -7,6 +7,11 @@ export default class Wallet {
   static balance = 0;
   static balanceEth = 0;
   static etherToUsdConversion = -1;
+  static etherToUsdConversionFailures = 0;
+  static etherToUsdConversionMaxFailures = 10;
+  static etherConfirmationSpeeds = {};
+  static etherConfirmationSpeedsFailures = 0;
+  static etherConfirmationSpeedsMaxFailures = 10;
 
   static initialize(web3, managedWeb3) {
     this.web3 = web3;
@@ -18,8 +23,47 @@ export default class Wallet {
         console.log("account balance =", this.balance);
       });
     });
-    fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD').then((response) => {
-      response.json().then((json) => this.etherToUsdConversion = json.USD);
+    this.fetchEthUsdPrice().then((ethUsdPrice) => {
+      this.etherToUsdConversion = ethUsdPrice;
+      console.log("eth to usd price:", this.etherToUsdConversion);
+    });
+    this.fetchEthConfirmationSpeeds().then((ethConfirmationSpeeds) => {
+      this.ethConfirmationSpeeds = ethConfirmationSpeeds;
+      console.log("eth confirmation speeds:", this.ethConfirmationSpeeds);
+    }).catch((error) => {
+      console.error("Failed to fetch eth confirmation speeds", error);
+    });
+  }
+
+  static fetchEthUsdPrice() {
+    return new Promise((resolve, reject) => {
+      fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD').then((response) => {
+        this.etherToUsdConversionFailures = 0;
+        response.json().then((json) => resolve(json.USD));
+      }).catch((error) => {
+        this.etherToUsdConversionFailures++;
+        if (this.etherToUsdConversionFailures < this.etherToUsdConversionMaxFailures) {
+          this.fetchEthUsdPrice().then(resolve).catch(reject);
+        } else {
+          reject(error);
+        }
+      });
+    });
+  }
+
+  static fetchEthConfirmationSpeeds() {
+    return new Promise((resolve, reject) => {
+      fetch('https://www.eth.ttt222.org/ethgas.php').then((response) => {
+        this.etherConfirmationSpeedsFailures = 0;
+        response.json().then((json) => resolve(json));
+      }).catch((error) => {
+        this.etherConfirmationSpeedsFailures++;
+        if (this.etherConfirmationSpeedsFailures < this.etherConfirmationSpeedsMaxFailures) {
+          this.fetchEthConfirmationSpeeds().then(resolve).catch(reject);
+        } else {
+          reject(error);
+        }
+      });
     });
   }
 
