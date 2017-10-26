@@ -1,5 +1,3 @@
-import Blockchain from './Blockchain';
-
 const EVENT_POST_CREATED = 'PostCreated';
 const EVENT_GROUP_CREATED = 'SubgroupCreated';
 const EVENT_USER_JOINED = 'UserJoined';

@@ -5,7 +5,7 @@ import { some } from 'lodash';
 class ChildrenView extends Component {
   constructor(props) {
     super(props);
-    console.log("creating new children view");
+    //console.log("creating new children view");
     this.state = {
       posts: null,
     };
@@ -13,17 +13,17 @@ class ChildrenView extends Component {
   }
 
   componentWillMount() {
-    console.log("children view mounting");
+    //console.log("children view mounting");
     this.loadPosts(this.props.isLoaded, this.props.group);
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("children view props updated -- getting posts");
+    //console.log("children view props updated -- getting posts");
     this.loadPosts(nextProps.isLoaded, nextProps.group);
   }
 
   componentWillUnmount() {
-    console.log("children view unmounting");
+    //console.log("children view unmounting");
     if (this.listenerHandle) {
       this.props.group.unregisterPostCreatedListener(this.listenerHandle);
       this.listenerHandle = null;
@@ -38,19 +38,19 @@ class ChildrenView extends Component {
   loadPosts(isLoaded, group) {
     if (isLoaded) {
       if (!this.props.isLoaded) {
-        console.log("children view done loading, getting posts");
+        //console.log("children view done loading, getting posts");
         if (!this.listenerHandle) {
           this.listenerHandle = group.registerPostCreatedListener((post) => this.addToPosts(post));
         }
         group.getPosts().then((posts) => {
-          console.log("children view got these posts from group:", posts);
+          //console.log("children view got these posts from group:", posts);
           this.setState({ posts });
         });
       } else {
-        console.log("children view was already loaded!");
+        //console.log("children view was already loaded!");
       }
     } else {
-      console.log("children view still loading, not getting posts yet");
+      //console.log("children view still loading, not getting posts yet");
     }
   }
 

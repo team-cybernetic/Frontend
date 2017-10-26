@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import cx from 'classnames';
+import Wallet from '../models/Wallet';
 
 const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*((.*\n?)+)\s*)?/;
 
@@ -12,12 +13,22 @@ class Editor extends Component {
     }
   }
 
+  componentWillMount() {
+    this.walletListener = Wallet.registerBalanceUpdateListener((oldBalance, newBalance) => {
+      this.forceUpdate();
+    });
+  }
+
+  componentWillUnmount() {
+    Wallet.unregisterBalanceUpdateListener(this.walletListener);
+  }
+
   render() {
     return (
       <div style={styles.container}>
         <div style={styles.earnings}>
-          <p>Earnings</p>
-          <p style={styles.earningsText}>Global: <span className='is-pulled-right'>0.54kB</span></p>
+          <p>Balances</p>
+          <p style={styles.earningsText}>Global: <span className='is-pulled-right'>{this.getGlobalBalance()}</span></p>
           <p style={styles.earningsText}>Local: <span className='is-pulled-right'>0.12kB</span></p>
         </div>
         <textarea
@@ -37,6 +48,10 @@ class Editor extends Component {
         </button>
       </div>
     );
+  }
+
+  getGlobalBalance() {
+    return (Wallet.getCurrentEthBalance().toFixed(6).toLocaleString());
   }
 
   isValid() {
@@ -90,6 +105,7 @@ const styles = {
     width: '100px',
     textAlign: 'center',
     padding: '2px',
+    flex: '0 1 18%',
   },
   earningsText: {
     textAlign: 'left',

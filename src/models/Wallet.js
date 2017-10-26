@@ -4,6 +4,7 @@ import TransactionConfirmationModal from '../components/TransactionConfirmationM
 
 export default class Wallet {
   static web3 = null;
+  static blockListener = null;
   static managedWeb3 = false;
   static balance = 0;
   static balanceEth = 0;
@@ -17,11 +18,23 @@ export default class Wallet {
   static initialize(web3, managedWeb3) {
     this.web3 = web3;
     this.managedWeb3 = managedWeb3;
+    this.balanceUpdateListeners = [];
     this.web3.eth.getAccounts((error, accounts) => {
       this.web3.eth.defaultAccount = accounts[0];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
         this.balance = balance;
-        console.log("account balance =", this.balance);
+        this.fireBalanceUpdateListeners(-1, balance);
+        console.log("account balance =", this.weiToEther(this.balance).toLocaleString());
+      });
+    });
+    this.blockListener = Blockchain.registerLatestBlockListener((error, blockid) => {
+      this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
+        if (balance !== this.balance) {
+          const oldBalance = this.balance;
+          this.balance = balance;
+          this.fireBalanceUpdateListeners(oldBalance, balance);
+          console.log("account balance updated to", this.weiToEther(this.balance).toLocaleString());
+        }
       });
     });
     this.fetchEthUsdPrice().then((ethUsdPrice) => {
@@ -125,4 +138,25 @@ export default class Wallet {
       return (this.weiToEther(wei) * this.etherToUsdConversion);
     }
   }
+
+  static registerBalanceUpdateListener(callback) {
+    this.balanceUpdateListeners.push(callback);
+    return ({
+      num: this.balanceUpdateListeners.length,
+    });
+  }
+
+  static unregisterBalanceUpdateListener(handle) {
+    if (handle) {
+      let {num} = handle;
+      delete (this.balanceUpdateListeners[num - 1]);
+    }
+  }
+
+  static fireBalanceUpdateListeners(oldBalance, newBalance) {
+    this.balanceUpdateListeners.forEach((listener) => {
+      listener(oldBalance, newBalance);
+    });
+  }
+
 }

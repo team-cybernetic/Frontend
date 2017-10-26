@@ -4,8 +4,12 @@ export default class Blockchain {
 
   static initialize(web3) {
     this.web3 = web3;
-    this.pendingTransactionListeners = [[]];
-    this.latestBlockListeners = [];
+    if (!this.pendingTransactionListeners) {
+      this.pendingTransactionListeners = [[]];
+    }
+    if (!this.latestBlockListeners) {
+      this.latestBlockListeners = [];
+    }
     this.web3.eth.filter("pending").watch((error, txid) => {
       this.firePendingTransactionListeners(error, txid);
     });
@@ -81,6 +85,9 @@ export default class Blockchain {
   }
 
   static registerLatestBlockListener(callback) {
+    if (!this.latestBlockListeners) {
+      this.latestBlockListeners = [];
+    }
     this.latestBlockListeners.push(callback);
     return ({
       num: this.latestBlockListeners.length,
