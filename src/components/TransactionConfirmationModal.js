@@ -25,7 +25,7 @@ class TransactionConfirmationModal extends Component {
             <div className="field-body">
               <div className="field">
                 <div style={styles.fieldText}>
-                  {this.props.costInGas}
+                  {this.props.costInGas.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -56,9 +56,9 @@ class TransactionConfirmationModal extends Component {
             <div className="field-body">
               <div className="field">
                 <div style={styles.fieldText}>
-                  {this.costInEther()} ETH
+                  {this.costInEther().toLocaleString()} ETH
                   {this.costInUsd() && (
-                    ' | ' + this.costInUsd() + ' USD'
+                    ' | ' + this.costInUsd().toLocaleString() + ' USD'
                   )}
                 </div>
               </div>
@@ -72,7 +72,10 @@ class TransactionConfirmationModal extends Component {
             <div className="field-body">
               <div className="field">
                 <div style={styles.fieldText}>
-                  {this.remainingBalance()} ETH
+                  {this.remainingBalanceInEther().toLocaleString()} ETH
+                  {this.remainingBalanceInUsd() && (
+                    ' | ' + this.remainingBalanceInUsd().toLocaleString() + ' USD'
+                  )}
                 </div>
               </div>
             </div>
@@ -108,20 +111,28 @@ class TransactionConfirmationModal extends Component {
     });
   }
 
+  costInWei() {
+    return this.props.costInGas * this.state.gasPrice;
+  }
+
   costInEther() {
-    return Wallet.weiToEther(this.props.costInGas * this.state.gasPrice);
+    return Wallet.weiToEther(this.costInWei());
   }
 
   costInUsd() {
-    return Wallet.weiToUsd(this.props.costInGas * this.state.gasPrice);
+    return Wallet.weiToUsd(this.props.costInGas * this.state.gasPrice).toFixed(2);
   }
 
-  remainingBalance() {
-    return Wallet.getCurrentBalance() - this.costInEther();
+  remainingBalanceInEther() {
+    return Wallet.weiToEther(Wallet.getCurrentBalance() - this.costInWei());
+  }
+
+  remainingBalanceInUsd() {
+    return Wallet.weiToUsd(Wallet.getCurrentBalance() - this.costInWei());
   }
 
   hasEnoughBalance() {
-    return this.remainingBalance() > 0;
+    return this.remainingBalanceInEther() >= 0;
   }
 
   gweiGasPrice() {

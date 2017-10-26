@@ -5,6 +5,7 @@ export default class Wallet {
   static web3 = null;
   static managedWeb3 = false;
   static balance = 0;
+  static balanceEth = 0;
   static etherToUsdConversion = -1;
 
   static initialize(web3, managedWeb3) {
@@ -13,8 +14,8 @@ export default class Wallet {
     this.web3.eth.getAccounts((error, accounts) => {
       this.web3.eth.defaultAccount = accounts[0];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
-        this.balance = this.web3.fromWei(balance).toNumber();
-        console.log("account balance =", this.web3.fromWei(balance).toNumber());
+        this.balance = balance;
+        console.log("account balance =", this.balance);
       });
     });
     fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD').then((response) => {
@@ -57,7 +58,11 @@ export default class Wallet {
   }
 
   static getCurrentBalance() {
-    return this.balance.toFixed(4);
+    return this.balance;
+  }
+
+  static getCurrentEthBalance() {
+    return this.web3.fromWei(this.balance, 'ether');
   }
 
   static defaultGasPrice() {
@@ -65,14 +70,14 @@ export default class Wallet {
   }
 
   static weiToEther(wei) {
-    return (this.web3.fromWei(wei) * 1).toFixed(4);
+    return this.web3.fromWei(wei);
   }
 
   static weiToUsd(wei) {
     if (this.etherToUsdConversion < 0) {
       return null;
     } else {
-      return (this.weiToEther(wei) * this.etherToUsdConversion).toFixed(2);
+      return (this.weiToEther(wei) * this.etherToUsdConversion);
     }
   }
 }
