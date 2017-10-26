@@ -15,37 +15,40 @@ class ChildrenView extends Component {
   componentWillMount() {
     console.log("children view mounting");
     this.loadPosts(this.props.isLoaded, this.props.group);
-    this.registerPostCreatedListener(this.props.isLoaded, this.props.group, (post) => this.addToPosts(post));
   }
 
   componentWillReceiveProps(nextProps) {
     console.log("children view props updated -- getting posts");
     this.loadPosts(nextProps.isLoaded, nextProps.group);
-    this.registerPostCreatedListener(nextProps.isLoaded, nextProps.group, (post) => this.addToPosts(post));
   }
 
   componentWillUnmount() {
     console.log("children view unmounting");
     if (this.listenerHandle) {
       this.props.group.unregisterPostCreatedListener(this.listenerHandle);
+      this.listenerHandle = null;
     }
   }
 
   registerPostCreatedListener(isLoaded, group, callback) {
     if (isLoaded) {
-      if (!this.listenerHandle) {
-        this.listenerHandle = group.registerPostCreatedListener(callback);
-      }
     }
   }
 
   loadPosts(isLoaded, group) {
     if (isLoaded) {
-      console.log("children view done loading, getting posts");
-      group.getPosts().then((posts) => {
-        console.log("children view got these posts from group:", posts);
-        this.setState({ posts });
-      });
+      if (!this.props.isLoaded) {
+        console.log("children view done loading, getting posts");
+        if (!this.listenerHandle) {
+          this.listenerHandle = group.registerPostCreatedListener((post) => this.addToPosts(post));
+        }
+        group.getPosts().then((posts) => {
+          console.log("children view got these posts from group:", posts);
+          this.setState({ posts });
+        });
+      } else {
+        console.log("children view was already loaded!");
+      }
     } else {
       console.log("children view still loading, not getting posts yet");
     }
