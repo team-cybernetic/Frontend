@@ -9,8 +9,6 @@ export default class GroupContract {
   constructor(web3, contractInstance) {
     this.web3 = web3;
     this.contractInstance = contractInstance;
-    this.pendingTransactionListeners = [[]];
-    this.latestTransactionListeners = [[]];
     this.eventListeners = [[]];
     this.watchForEvent(EVENT_POST_CREATED, {}, (error, response) => {
       this.fireEventListener(EVENT_POST_CREATED, error, response);

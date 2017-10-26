@@ -5,12 +5,12 @@ export default class Blockchain {
   static initialize(web3) {
     this.web3 = web3;
     this.pendingTransactionListeners = [[]];
-    this.latestTransactionListeners = [[]];
+    this.latestBlockListeners = [];
     this.web3.eth.filter("pending").watch((error, txid) => {
       this.firePendingTransactionListeners(error, txid);
     });
-    this.web3.eth.filter("latest").watch((error, txid) => {
-      this.fireLatestTransactionListeners(error, txid);
+    this.web3.eth.filter("latest").watch((error, blockid) => {
+      this.fireLatestBlockListeners(error, blockid);
     });
   }
 
@@ -80,53 +80,23 @@ export default class Blockchain {
     }
   }
 
-  static registerLatestTransactionListener(transactionId, callback) {
-    if (!this.latestTransactionListeners[transactionId]) {
-      this.latestTransactionListeners[transactionId] = [];
-    }
-    if (!Array.isArray(this.latestTransactionListeners[transactionId])) {
-      callback(this.latestTransactionListeners[transactionId].error, this.latestTransactionListeners[transactionId].transactionId);
-      return (null);
-    }
-    this.latestTransactionListeners[transactionId].push(callback);
+  static registerLatestBlockListener(callback) {
+    this.latestBlockListeners.push(callback);
     return ({
-      transactionId,
-      num: this.latestTransactionListeners[transactionId].length,
+      num: this.latestBlockListeners.length,
     });
   }
 
-  static unregisterLatestTransactionListener(handle) {
+  static unregisterLatestBlockListener(handle) {
     if (handle) {
-      let {transactionId, num} = handle;
-      if (this.latestTransactionListeners[transactionId] && Array.isArray(this.latestTransactionListeners[transactionId])) {
-        delete (this.latestTransactionListeners[transactionId][num - 1]);
-      }
+      let {num} = handle;
+      delete (this.latestBlockListeners[num - 1]);
     }
   }
 
-  static waitForLatestTransaction(transactionId) {
-    return new Promise((resolve, reject) => {
-      this.registerLatestTransactionListener(transactionId, (error, txid) => {
-        if (!error) {
-          resolve(txid);
-        } else {
-          reject(error);
-        }
-      });
+  static fireLatestBlockListeners(error, blockid) {
+    this.latestBlockListeners.forEach((listener) => {
+      listener(error, blockid);
     });
-  }
-
-  static fireLatestTransactionListeners(error, transactionId) {
-    if (this.latestTransactionListeners[transactionId]) {
-      if (Array.isArray(this.latestTransactionListeners[transactionId])) {
-        this.latestTransactionListeners[transactionId].forEach((listener) => {
-          listener(error, transactionId);
-        });
-      } //if it's not an array, we've already been through here once before, so lets just take the latest result
-      this.latestTransactionListeners[transactionId] = {
-        error,
-        transactionId,
-      };
-    }
   }
 }

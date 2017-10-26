@@ -1,3 +1,4 @@
+import Blockchain from '../ethWrappers/Blockchain';
 import GasEstimator from '../utils/GasEstimator';
 import TransactionConfirmationModal from '../components/TransactionConfirmationModal';
 
