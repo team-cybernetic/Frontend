@@ -1,20 +1,21 @@
 pragma solidity ^0.4.11;
 
 import "./ContentLib.sol";
+import "./CurrencyLib.sol";
 
 library UserLib {
 
   using UserLib for State;
 
+  using CurrencyLib for CurrencyLib.State;
+
   event UserJoined(uint256 indexed userNumber, address indexed userAddress);
   event UserLeft(uint256 indexed userNumber, address indexed userAddress);
-  event UserBalanceChanged(uint256 indexed userNumber, int256 amount);
 
   struct User {
     ContentLib.Content contents;
     uint256 number; //must be > 0 if user exists, unique, immutable
     address directAddress; //null when user has not created/linked a private group (for direct messaging)
-    int256 balance; //amount of money owned by this user in this group
     int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
   }
 
@@ -26,7 +27,7 @@ library UserLib {
     address[] addresses;
   }
 
-  function getUserNumbers(State storage self) internal returns (uint256[]) {
+  function getUserNumbers(State storage self) returns (uint256[]) {
     return (self.numbers);
   }
 
@@ -35,17 +36,17 @@ library UserLib {
     return (self.byNumber[num].number != 0);
   }
 
-  function getUserByNumberRaw(State storage self, uint256 num) internal returns (User) {
+  function getUserByNumberRaw(State storage self, uint256 num) internal returns (User storage) {
     return (self.byNumber[num]);
   }
 
-  function getUserByNumber(State storage self, uint256 num) internal returns (User) {
+  function getUserByNumber(State storage self, uint256 num) internal returns (User storage) {
     require(userExistsByNumber(self, num));
     return (getUserByNumberRaw(self, num));
   }
 
 
-  function getUserAddresses(State storage self) internal returns (address[]) {
+  function getUserAddresses(State storage self) returns (address[]) {
     return (self.addresses);
   }
 
@@ -54,20 +55,20 @@ library UserLib {
     return (self.byAddress[addr].number != 0);
   }
 
-  function getUserByAddressRaw(State storage self, address userAddress) internal returns (User) {
+  function getUserByAddressRaw(State storage self, address userAddress) internal returns (User storage) {
     return (self.byAddress[userAddress]);
   }
 
-  function getUserByAddress(State storage self, address userAddress) internal returns (User) {
+  function getUserByAddress(State storage self, address userAddress) internal returns (User storage) {
     require(self.userExistsByAddress(userAddress));
-    return (getUserByAddressRaw(self, userAddress));
+    return (self.getUserByAddressRaw(userAddress));
   }
 
-  function join(State storage self) internal {
+  function join(State storage self) {
     require(!userExistsByAddress(self, msg.sender));
 
     self.count++;
-    self.byNumber[self.count] = User({
+    self.byAddress[msg.sender] = self.byNumber[self.count] = User({
       contents: ContentLib.Content({
         title: "",
         mimeType: "",
@@ -81,19 +82,16 @@ library UserLib {
       }),
       number: self.count,
       directAddress: 0,
-      balance: 0, //TODO: ruleset
       permissions: 0 //TODO: ruleset
     });
 
-    self.byAddress[msg.sender] = self.byNumber[self.count];
     self.addresses.push(msg.sender);
-
     self.numbers.push(self.count);
 
     UserJoined(self.count, msg.sender);
   }
 
-  function leave(State storage self) internal { 
+  function leave(State storage self) { 
     require(self.userExistsByAddress(msg.sender));
 
     //TODO: send the user their ether

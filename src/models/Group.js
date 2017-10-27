@@ -50,6 +50,19 @@ export default class Group {
         this.fireUserLeftListeners(user);
       }
     });
+    this.registerUserBalanceChangedListener((error, result) => {
+      if (!error) {
+        console.log("User balance changed:", result);
+        const id = result.args.userNumber.toString();
+        //const addr = result.args.userAddress;
+        const amount = result.args.amount;
+        const user = this.getUserByNumber(id);
+        user.populate({
+          balance: user.getBalance().add(amount),
+        });
+        console.log("Balance is now", user.getBalance());
+      }
+    });
   }
 
   createPost({title, content, contentType}) {
@@ -347,9 +360,14 @@ export default class Group {
     return (this.groupContract.registerUserLeftEventListener(callback));
   }
 
+  registerUserBalanceChangedListener(callback) {
+    return (this.groupContract.registerUserBalanceChangedListener(callback));
+  }
+
   registerEventListener(eventName, callback) {
     return (this.groupContract.registerEventListener(eventName, callback));
   }
+
 
   unregisterEventListener(handle) {
     return (this.groupContract.unregisterEventListener(handle));

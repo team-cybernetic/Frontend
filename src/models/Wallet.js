@@ -1,6 +1,7 @@
 import Blockchain from '../ethWrappers/Blockchain';
 import GasEstimator from '../utils/GasEstimator';
 import TransactionConfirmationModal from '../components/TransactionConfirmationModal';
+import BigNumber from 'bignumber.js';
 
 export default class Wallet {
   static web3 = null;
@@ -133,7 +134,7 @@ export default class Wallet {
 
   static weiToUsd(wei) {
     if (this.etherToUsdConversion < 0) {
-      return null;
+      return new BigNumber(NaN);
     } else {
       return (this.weiToEther(wei) * this.etherToUsdConversion);
     }

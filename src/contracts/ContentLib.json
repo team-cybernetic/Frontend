@@ -3,19 +3,13 @@
   "abi": [],
   "unlinked_binary": "0x60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a72305820828da8ea63c819091491858cfa3989fc502ef61871def3820d08fbd1cd2915f70029",
   "networks": {
-    "13": {
+    "1509049816544": {
       "events": {},
       "links": {},
-      "address": "0xd3297e1d99c903655f24cf533bfa10199d65ae66",
-      "updated_at": 1508865969183
-    },
-    "1508814648373": {
-      "events": {},
-      "links": {},
-      "address": "0x92768119ad18163d1a972324b675365b3ccb450b",
-      "updated_at": 1508861801732
+      "address": "0xd906d59fa442dd8aee9220a673af8fa64a39cd3a",
+      "updated_at": 1509077332249
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1508865969183
+  "updated_at": 1509077332249
 }

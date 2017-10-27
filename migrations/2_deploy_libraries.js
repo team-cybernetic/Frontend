@@ -6,13 +6,17 @@ var CurrencyLib = artifacts.require("./CurrencyLib.sol");
 
 module.exports = function(deployer) {
   deployer.deploy([
-    PostLib,
     UserLib,
     ContentLib,
     CurrencyLib,
   ]);
-  deployer.link(PostLib, Group);
+
+  deployer.link(UserLib, PostLib);
+  deployer.link(CurrencyLib, PostLib);
+  deployer.deploy(PostLib);
+
   deployer.link(UserLib, Group);
+  deployer.link(PostLib, Group);
   deployer.link(ContentLib, Group);
   deployer.link(CurrencyLib, Group);
 };

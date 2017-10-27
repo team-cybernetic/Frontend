@@ -48,6 +48,17 @@ export default class UserView extends Component {
     );
   }
 
+  renderBalance() {
+    return (
+      <div style={this.styles.balanceWrapper}>
+        Balance:&nbsp;
+        <span style={this.styles.balance}>
+          {this.props.user.getBalance().toLocaleString()}
+        </span>
+      </div>
+    );
+  }
+
   render() {
     if (this.props.user.isHeaderLoaded()) {
       return (
@@ -55,6 +66,7 @@ export default class UserView extends Component {
           <div style={this.styles.cardContent} className='card-content'>
             {this.renderNumber()}
             {this.renderAddress()}
+            {this.renderBalance()}
           </div>
         </div>
       );
@@ -118,6 +130,12 @@ export default class UserView extends Component {
         fontSize: 'small',
       },
       number: {
+        fontSize: 'small',
+      },
+      balanceWrapper: {
+        fontSize: 'small',
+      },
+      balance: {
         fontSize: 'small',
       },
       multiHash: {

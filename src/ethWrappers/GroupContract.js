@@ -2,6 +2,7 @@ const EVENT_POST_CREATED = 'PostCreated';
 const EVENT_GROUP_CREATED = 'SubgroupCreated';
 const EVENT_USER_JOINED = 'UserJoined';
 const EVENT_USER_LEFT = 'UserLeft';
+const EVENT_USER_BALANCE_CHANGED = 'UserBalanceChanged';
 
 export default class GroupContract {
   constructor(web3, contractInstance) {
@@ -19,6 +20,9 @@ export default class GroupContract {
     });
     this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
       this.fireEventListener(EVENT_USER_LEFT, error, response);
+    });
+    this.watchForEvent(EVENT_USER_BALANCE_CHANGED, {}, (error, response) => {
+      this.fireEventListener(EVENT_USER_BALANCE_CHANGED, error, response);
     });
   }
 
@@ -98,6 +102,10 @@ export default class GroupContract {
 
   registerUserLeftEventListener(callback) {
     return (this.registerEventListener(EVENT_USER_LEFT, callback));
+  }
+
+  registerUserBalanceChangedListener(callback) {
+    return (this.registerEventListener(EVENT_USER_BALANCE_CHANGED, callback));
   }
 
   fireEventListener(eventName, error, response) {

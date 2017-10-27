@@ -22,10 +22,11 @@ class SideBar extends Component {
 
   setContent(isLoaded, group, post, pathState) {
     if (isLoaded) {
-      console.log("Sidebar loaded!");
+      if (this.props.isLoaded) {
+        return; //went from loaded -> loaded, no update
+      }
       group.getUsers().then((users) => {
         if (users) {
-          console.log("users!");
           users.forEach((user, idx) => {
             console.log("user[" + idx + "]:", user);
             user.loadHeader().then(() => {
@@ -55,7 +56,7 @@ class SideBar extends Component {
         pathState,
       });
     } else {
-      console.log("Sidebar loading...");
+      //console.log("Sidebar loading...");
     }
   }
 
@@ -197,7 +198,6 @@ class SideBar extends Component {
 
         {this.renderJoinButton()}
 
-        { /* To be populated with actual data */ }
         {this.renderUsersAccordian()}
 
         <Collapsible

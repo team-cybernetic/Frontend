@@ -1,6 +1,7 @@
 pragma solidity ^0.4.11;
 
 import "./ContentLib.sol";
+import "./CurrencyLib.sol";
 import "./PostLib.sol";
 import "./UserLib.sol";
 
@@ -14,13 +15,24 @@ contract Group {
   using UserLib for UserLib.State;
   UserLib.State userlib;
 
+  using CurrencyLib for CurrencyLib.State;
+  CurrencyLib.State currencylib;
+
   event PostCreated(uint256 indexed postNumber);
   event SubgroupCreated(uint256 indexed postNumber, address groupAddress);
   event UserJoined(uint256 indexed userNumber, address indexed userAddress);
   event UserLeft(uint256 indexed userNumber, address indexed userAddress);
-  event UserBalanceChanged(uint256 indexed userNumber, int256 amount);
+  event UserBalanceChanged(uint256 indexed userNumber, address indexed userAddress, uint256 amount, bool increased);
+  event PostBalanceChanged(uint256 indexed postNumber, uint256 amount, bool increased);
 
-  function Group(string title, string contentType, uint8 ipfsHashFunction, uint8 ipfsHashLength, bytes ipfsHash, uint256 creationTime) payable {
+  function Group(
+    string title,
+    string contentType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash,
+    uint256 creationTime
+  ) {
     require(ipfsHashLength == ipfsHash.length);
 
     contents.title = title;
@@ -58,10 +70,10 @@ contract Group {
     address creator,
     uint256 creationTime,
     address groupAddress,
-    int256 balance,
+    uint256 balance,
     int256 permissions
   ) {
-    PostLib.Post memory p = postlib.getPostByNumber(num);
+    PostLib.Post storage p = postlib.getPostByNumber(num);
     return (
       p.contents.title,
       p.number,
@@ -72,7 +84,7 @@ contract Group {
       p.contents.creator,
       p.contents.creationTime,
       p.groupAddress,
-      p.balance,
+      currencylib.getPostBalance(p),
       p.permissions
     );
   }
@@ -85,7 +97,6 @@ contract Group {
     return (postlib.numbers);
   }
 
-
   function createPost(
     string title,
     string mimeType,
@@ -96,6 +107,7 @@ contract Group {
   ) returns (uint256) {
     return (postlib.createPost(
       userlib,
+      currencylib,
       title,
       mimeType,
       ipfsHashFunction,
@@ -140,10 +152,10 @@ contract Group {
     address addr,
     uint256 joinTime,
     address directAddress,
-    int256 balance,
+    uint256 balance,
     int256 permissions
   ) {
-    UserLib.User memory u = userlib.getUserByAddress(userAddress);
+    UserLib.User storage u = userlib.getUserByAddress(userAddress);
     return (
       u.contents.title,
       u.number,
@@ -154,7 +166,7 @@ contract Group {
       u.contents.creator,
       u.contents.creationTime,
       u.directAddress,
-      u.balance,
+      currencylib.getUserBalance(u),
       u.permissions
     );
   }
@@ -169,10 +181,10 @@ contract Group {
     address addr,
     uint256 joinTime,
     address directAddress,
-    int256 balance,
+    uint256 balance,
     int256 permissions
   ) {
-    UserLib.User memory u = userlib.getUserByNumber(num);
+    UserLib.User storage u = userlib.getUserByNumber(num);
     return (
       u.contents.title,
       u.number,
@@ -183,50 +195,14 @@ contract Group {
       u.contents.creator,
       u.contents.creationTime,
       u.directAddress,
-      u.balance,
+      currencylib.getUserBalance(u),
       u.permissions
     );
   }
 
-  /*
-  function transferTokensToUser(address _userAddress, int256 _amount) returns (bool success) {
-    require(userExistsByAddress(msg.sender));
-    require(userExistsByAddress(_userAddress));
-    if (_amount != 0) {
-      User memory sender = usersByAddress[msg.sender];
-      User memory receiver = usersByAddress[_userAddress];
-      if (_amount > 0) {
-        if (sender.balance >= _amount &&
-            receiver.balance + _amount > receiver.balance) {
-          awardTokensToUser(sender, _amount * -1);
-          awardTokensToUser(receiver, _amount);
-          //TODO: ruleset taxes?
-          return (true);
-        } else {
-          return (false);
-        }
-      } else {
-        if (sender.balance >= (_amount * -1) &&
-            receiver.balance + _amount < receiver.balance) {
-          awardTokensToUser(sender, _amount); //negative amount decreases when adding
-          awardTokensToUser(receiver, _amount);
-          //TODO: ruleset taxes, not 1:1 deduction?
-          return (true);
-        } else {
-          return (false);
-        }
-      }
-    } else {
-      return (true);
-    }
+  function transferTokensToUser(address userAddress, uint256 amount, bool increase) {
+    return (currencylib.transferTokensToUser(userlib, userAddress, amount, increase));
   }
-
-  //internal function, does _no_ sanity checks (like _user.number != 0)
-  function awardTokensToUser(User _user, int256 _amount) private {
-    _user.balance += _amount;
-    UserBalanceChanged(_user.number, _amount);
-  }
-  */
 
   function getTitle() returns (string) {
     return (contents.title);
@@ -252,6 +228,8 @@ contract Group {
     return (contents.creationTime);
   }
 
-
+  function getTotalBalance() returns (uint256) {
+    return (currencylib.getTotalBalance());
+  }
 }
 

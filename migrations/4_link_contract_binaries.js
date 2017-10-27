@@ -6,6 +6,11 @@ function escapeRegExp(str) {
 
 module.exports = function(deployer) {
   var filesStore = {
+    PostLib: {
+      requirename: '../build/contracts/PostLib.json', //requires happen from the migrations folder...
+      outputname: './build/contracts/PostLib.json', //but writes happen from its parent
+      obj: {},
+    },
     Group: {
       requirename: '../build/contracts/Group.json', //requires happen from the migrations folder...
       outputname: './build/contracts/Group.json', //but writes happen from its parent

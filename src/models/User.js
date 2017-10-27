@@ -1,4 +1,5 @@
 import Ipfs from '../utils/Ipfs';
+import BigNumber from 'bignumber.js';
 
 export default class User {
   constructor(parentGroup, user) {
@@ -38,7 +39,7 @@ export default class User {
     this.directAddress = directAddress || this.directAddress || '0x0000000000000000000000000000000000000000';
     this.joinTime = joinTime || this.joinTime;
     this.address = address || this.address;
-    this.balance = 0 || this.balance || balance;
+    this.balance = balance || this.balance || new BigNumber(0);
     this.confirmed = !!this.id;
     this.headerLoaded = !!this.nickname || (!!this.id && !!this.address);
     this.profileLoaded = !!this.profile || this.multiHashString === "";
@@ -67,6 +68,10 @@ export default class User {
 
   getNumber() {
     return (this.id);
+  }
+
+  getBalance() {
+    return (this.balance ? this.balance : new BigNumber(0));
   }
 
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.
@@ -140,6 +145,7 @@ export default class User {
             }
             if (!this.headerLoaded) { //waitForConfirmation can load header on an edge case
               this.parentGroup.loadUserByNumber(this.id).then((userStruct) => {
+                console.log("User loaded struct:", userStruct);
                 this.populate(this.userStructToObject(userStruct));
                 this.markHeaderLoaded();
                 resolve();

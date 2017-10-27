@@ -2,6 +2,7 @@ pragma solidity ^0.4.11;
 
 import "./ContentLib.sol";
 import "./UserLib.sol";
+import "./CurrencyLib.sol";
 
 library PostLib {
 
@@ -12,11 +13,12 @@ library PostLib {
 
   using UserLib for UserLib.State;
 
+  using CurrencyLib for CurrencyLib.State;
+
   struct Post {
     ContentLib.Content contents;
     uint256 number; //must be > 0 if post exists, unique, immutable
     address groupAddress; //null when group has not been created for this post
-    int256 balance; //amount of money owned by this post in this group
     int256 permissions; //permission level of post
   }
 
@@ -26,7 +28,7 @@ library PostLib {
     uint256[] numbers;
   }
 
-  function getPostNumbers(State storage self) internal returns (uint256[]) {
+  function getPostNumbers(State storage self) returns (uint256[]) {
     return (self.numbers);
   }
 
@@ -35,11 +37,11 @@ library PostLib {
     return (self.byNumber[num].number != 0);
   }
 
-  function getPostByNumberRaw(State storage self, uint256 num) internal returns (Post) {
+  function getPostByNumberRaw(State storage self, uint256 num) internal returns (Post storage) {
     return (self.byNumber[num]);
   }
 
-  function getPostByNumber(State storage self, uint256 num) internal returns (Post) {
+  function getPostByNumber(State storage self, uint256 num) internal returns (Post storage) {
     require(postExistsByNumber(self, num));
     return (getPostByNumberRaw(self, num));
   }
@@ -63,13 +65,14 @@ library PostLib {
   function createPost(
     State storage self,
     UserLib.State storage userlib,
+    CurrencyLib.State storage currencylib,
     string title,
     string mimeType,
     uint8 ipfsHashFunction,
     uint8 ipfsHashLength,
     bytes ipfsHash,
     uint256 creationTime
-  ) internal returns (uint256) {
+  ) returns (uint256) {
     //TODO: check title length via ruleset
     //TODO: UTF-8 length != bytes().length
     require(bytes(title).length <= 255);
@@ -94,17 +97,12 @@ library PostLib {
     address creator = msg.sender;
 
     if (!userlib.userExistsByAddress(creator)) {
-      userlib.join();
-      //joinGroup(); //TODO: do this via ruleset
+      userlib.join(); //TODO: ruleset
     }
 
-    /*
-    User storage u = usersByAddress[creator];
+    UserLib.User storage u = userlib.getUserByAddress(creator);
 
-    awardTokensToUser(u, 1); //TODO: ruleset
-    */
-
-    //TODO: ruleset: award or fees
+    currencylib.awardTokensToUser(u, 8, true); //TODO: ruleset
 
     self.count++;
 
@@ -122,7 +120,6 @@ library PostLib {
       }),
       number: self.count,
       groupAddress: 0,
-      balance: 0, //TODO: default from ruleset
       permissions: 0 //TODO: default from ruleset
     });
 
