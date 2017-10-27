@@ -200,6 +200,10 @@ export default class Group {
     return (this.groupContract.postExistsByNumber(num));
   }
 
+  getBalance() {
+    return (this.groupContract.getTotalBalance());
+  }
+
   getPosts() {
     return new Promise((resolve, reject) => {
       this.groupContract.getPostIds().then((postIds) => {

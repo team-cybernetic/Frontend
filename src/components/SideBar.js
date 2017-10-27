@@ -20,11 +20,23 @@ class SideBar extends Component {
     };
   }
 
+  updateBalance(group) {
+    group.getBalance().then((balance) => {
+      this.setState({
+        balance: balance.toLocaleString(),
+      });
+    });
+  }
+
   setContent(isLoaded, group, post, pathState) {
     if (isLoaded) {
       if (this.props.isLoaded) {
         return; //went from loaded -> loaded, no update
       }
+      this.updateBalance(group);
+      group.registerUserBalanceChangedListener(() => {
+        this.updateBalance(group);
+      });
       group.getUsers().then((users) => {
         if (users) {
           users.forEach((user, idx) => {
@@ -185,7 +197,7 @@ class SideBar extends Component {
     }
     return (
       <div style={styles.stats}>
-        {this.state.userCount} Member{this.state.userCount === 1 ? '' : 's'} / x Earnings
+        {this.state.userCount} Member{this.state.userCount === 1 ? '' : 's'} / {this.state.balance} Earnings
       </div>
     );
   }

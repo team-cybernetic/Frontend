@@ -10,6 +10,18 @@ class Editor extends Component {
     this.state = {
       textAreaValue: '',
       isPosting: false,
+      localBalance: "",
+    }
+  }
+
+  getBalances(isLoaded, group) {
+    if (isLoaded) {
+      const user = group.getUserByAddress(Wallet.getAccountAddress());
+      user.loadHeader().then(() => {
+        this.setState({
+          localBalance: user.getBalance().toLocaleString(),
+        });
+      });
     }
   }
 
@@ -17,6 +29,11 @@ class Editor extends Component {
     this.walletListener = Wallet.registerBalanceUpdateListener((oldBalance, newBalance) => {
       this.forceUpdate();
     });
+    this.getBalances(this.props.isLoaded, this.props.group);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getBalances(nextProps.isLoaded, nextProps.group);
   }
 
   componentWillUnmount() {
@@ -29,7 +46,7 @@ class Editor extends Component {
         <div style={styles.earnings}>
           <p>Balances</p>
           <p style={styles.earningsText}>Global: <span className='is-pulled-right'>{this.getGlobalBalance()}</span></p>
-          <p style={styles.earningsText}>Local: <span className='is-pulled-right'>0.12kB</span></p>
+          <p style={styles.earningsText}>Local: <span className='is-pulled-right'>{this.getLocalBalance()}</span></p>
         </div>
         <textarea
           style={styles.textArea}
@@ -52,6 +69,20 @@ class Editor extends Component {
 
   getGlobalBalance() {
     return (Wallet.getCurrentEthBalance().toFixed(6).toLocaleString());
+  }
+
+  getLocalBalance() {
+    return (this.state.localBalance);
+    /*
+    if (this.props.isLoaded) {
+      const user = this.props.group.getUserByAddress(Wallet.getAccountAddress());
+      console.log("user = ", user);
+      if (user) {
+        return (user.getBalance().toLocaleString());
+      }
+    }
+    return ("");
+    */
   }
 
   isValid() {

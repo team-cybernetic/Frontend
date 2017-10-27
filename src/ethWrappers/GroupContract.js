@@ -70,6 +70,10 @@ export default class GroupContract {
     return (this.contractInstance.getUserByAddress.call(address));
   }
 
+  getTotalBalance() {
+    return (this.contractInstance.getTotalBalance.call());
+  }
+
   unregisterEventListener(handle) {
     if (handle) {
       let {eventName, num} = handle;

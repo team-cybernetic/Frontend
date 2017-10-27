@@ -30,11 +30,13 @@ export default class Wallet {
     });
     this.blockListener = Blockchain.registerLatestBlockListener((error, blockid) => {
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
-        if (balance !== this.balance) {
-          const oldBalance = this.balance;
-          this.balance = balance;
-          this.fireBalanceUpdateListeners(oldBalance, balance);
-          console.log("account balance updated to", this.weiToEther(this.balance).toLocaleString());
+        if (!error) {
+          if (!balance.equals(this.balance)) {
+            const oldBalance = this.balance;
+            this.balance = balance;
+            this.fireBalanceUpdateListeners(oldBalance, balance);
+            console.log("account balance updated to", this.weiToEther(this.balance).toLocaleString());
+          }
         }
       });
     });
