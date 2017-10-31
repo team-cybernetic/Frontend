@@ -23,22 +23,25 @@
     color: black;
 }
 
-.CustomTriggerCSS {
+span.CustomTriggerCSS,
+span.CustomTriggerCSS--open {
   background-color: lightgrey;
   cursor: pointer;
+  font-family: inherit;
+  display: block;
+  text-align: left;
+  font-size: 13px;
 }
 
-.CustomTriggerCSS::before {
-  content: "⯈		";
+span.CustomTriggerCSS::before,
+span.CustomTriggerCSS--open::before {
+  font-family: 'FontAwesome';
+  margin-right: 5px;
+  font-size: 16px;
 }
 
-.CustomTriggerCSS--open {
-  background-color: lightgrey;
-  cursor: pointer;
-}
-
-.CustomTriggerCSS--open::before {
-  content: "⯆		";
+span.CustomTriggerCSS::before {
+  margin-right: 10px;
 }
 
 .Collapsible__custom-sibling {
