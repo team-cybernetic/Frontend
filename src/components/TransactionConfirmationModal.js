@@ -9,7 +9,7 @@ class TransactionConfirmationModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      gasPrice: Wallet.defaultGasPrice(),
+      gasPrice: Wallet.defaultGasPrice,
     };
   }
 
