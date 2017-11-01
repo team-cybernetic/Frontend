@@ -1,7 +1,303 @@
 {
-  "contract_name": "ContentLib",
+  "contractName": "ContentLib",
   "abi": [],
-  "unlinked_binary": "0x60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a72305820828da8ea63c819091491858cfa3989fc502ef61871def3820d08fbd1cd2915f70029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820e51c95e68ab49de132a520fe8691c61fa53a722273f2738dd35c05dccfefcbc50029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820e51c95e68ab49de132a520fe8691c61fa53a722273f2738dd35c05dccfefcbc50029",
+  "sourceMap": "26:738:0:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "26:738:0:-;;;;;",
+  "source": "pragma solidity ^0.4.11;\n\nlibrary ContentLib {\n\n  /*\n     IPFS stores its hashes as a multihash -- the first two bytes represent\n     the hash function used (default SHA256) and the length of the hash,\n     which is typically 0x12 = SHA256 and 0x20 = 32 bytes (256 bits)\n     The hash is typically base58 encoded (like how bitcoin addresses are encoded),\n     but the hash part actually is only 32 bytes long when un-base58 encoded\n   */\n  struct IpfsMultihash {\n    uint8 hashFunction; //first byte of multihash\n    uint8 hashLength; //second byte of multihash\n    bytes hash; //hashLength remaining bytes of multihash\n  }\n\n  struct Content {\n    string title;\n    string mimeType;\n    IpfsMultihash multihash;\n    address creator;\n    uint256 creationTime;\n  }\n}\n",
+  "sourcePath": "/Users/kylegrinstead/Dropbox/Developer/gatech/Junior_Design/Frontend/contracts/ContentLib.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/kylegrinstead/Dropbox/Developer/gatech/Junior_Design/Frontend/contracts/ContentLib.sol",
+      "exportedSymbols": {
+        "ContentLib": [
+          20
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".11"
+          ]
+        },
+        "id": 1,
+        "name": "PragmaDirective",
+        "src": "0:24:0"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "library",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            20
+          ],
+          "name": "ContentLib",
+          "scope": 21
+        },
+        "children": [
+          {
+            "attributes": {
+              "canonicalName": "ContentLib.IpfsMultihash",
+              "name": "IpfsMultihash",
+              "scope": 20,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "hashFunction",
+                  "scope": 8,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint8",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint8",
+                      "type": "uint8"
+                    },
+                    "id": 2,
+                    "name": "ElementaryTypeName",
+                    "src": "467:5:0"
+                  }
+                ],
+                "id": 3,
+                "name": "VariableDeclaration",
+                "src": "467:18:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "hashLength",
+                  "scope": 8,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint8",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint8",
+                      "type": "uint8"
+                    },
+                    "id": 4,
+                    "name": "ElementaryTypeName",
+                    "src": "517:5:0"
+                  }
+                ],
+                "id": 5,
+                "name": "VariableDeclaration",
+                "src": "517:16:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "hash",
+                  "scope": 8,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "bytes storage pointer",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "bytes",
+                      "type": "bytes storage pointer"
+                    },
+                    "id": 6,
+                    "name": "ElementaryTypeName",
+                    "src": "566:5:0"
+                  }
+                ],
+                "id": 7,
+                "name": "VariableDeclaration",
+                "src": "566:10:0"
+              }
+            ],
+            "id": 8,
+            "name": "StructDefinition",
+            "src": "440:183:0"
+          },
+          {
+            "attributes": {
+              "canonicalName": "ContentLib.Content",
+              "name": "Content",
+              "scope": 20,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "title",
+                  "scope": 19,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "string storage pointer",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "string",
+                      "type": "string storage pointer"
+                    },
+                    "id": 9,
+                    "name": "ElementaryTypeName",
+                    "src": "648:6:0"
+                  }
+                ],
+                "id": 10,
+                "name": "VariableDeclaration",
+                "src": "648:12:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "mimeType",
+                  "scope": 19,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "string storage pointer",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "string",
+                      "type": "string storage pointer"
+                    },
+                    "id": 11,
+                    "name": "ElementaryTypeName",
+                    "src": "666:6:0"
+                  }
+                ],
+                "id": 12,
+                "name": "VariableDeclaration",
+                "src": "666:15:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "multihash",
+                  "scope": 19,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "struct ContentLib.IpfsMultihash storage pointer",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "contractScope": null,
+                      "name": "IpfsMultihash",
+                      "referencedDeclaration": 8,
+                      "type": "struct ContentLib.IpfsMultihash storage pointer"
+                    },
+                    "id": 13,
+                    "name": "UserDefinedTypeName",
+                    "src": "687:13:0"
+                  }
+                ],
+                "id": 14,
+                "name": "VariableDeclaration",
+                "src": "687:23:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "creator",
+                  "scope": 19,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "address",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 15,
+                    "name": "ElementaryTypeName",
+                    "src": "716:7:0"
+                  }
+                ],
+                "id": 16,
+                "name": "VariableDeclaration",
+                "src": "716:15:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "creationTime",
+                  "scope": 19,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint256",
+                      "type": "uint256"
+                    },
+                    "id": 17,
+                    "name": "ElementaryTypeName",
+                    "src": "737:7:0"
+                  }
+                ],
+                "id": 18,
+                "name": "VariableDeclaration",
+                "src": "737:20:0"
+              }
+            ],
+            "id": 19,
+            "name": "StructDefinition",
+            "src": "627:135:0"
+          }
+        ],
+        "id": 20,
+        "name": "ContractDefinition",
+        "src": "26:738:0"
+      }
+    ],
+    "id": 21,
+    "name": "SourceUnit",
+    "src": "0:765:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
   "networks": {
     "13": {
       "events": {},
@@ -10,6 +306,6 @@
       "updated_at": 1509106370349
     }
   },
-  "schema_version": "0.0.5",
-  "updated_at": 1509106370349
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2017-10-31T22:22:41.816Z"
 }
