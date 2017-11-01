@@ -106,7 +106,6 @@ const styles = {
   },
   children: {
     display: 'flex',
-    flexFlow: 'row-reverse',
     flexWrap: 'wrap-reverse',
     alignItems: 'flex-start',
     alignContent: 'flex-start',

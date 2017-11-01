@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Wallet from '../models/Wallet';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 class TransactionConfirmationModal extends Component {
   static appListener = null;
@@ -37,16 +39,45 @@ class TransactionConfirmationModal extends Component {
             </div>
             <div className="field-body">
               <div className="field is-horizontal" style={styles.numberInputContainer}>
-                <div className="control" style={styles.numberInput}>
-                  <input
-                    className='input'
-                    type='number'
-                    value={this.gweiGasPrice()}
-                    onChange={(e) => this.onChangeGasPrice(e)}
-                  />
+                <Slider
+                  min={this.minGasPrice()}
+                  max={this.maxGasPrice()}
+                  value={this.gweiGasPrice()}
+                  onChange={(price) => this.onChangeGasPrice(price)}
+                  step={0.1}
+                  handleStyle={styles.coloredBorder}
+                  activeDotStyle={styles.coloredBorder}
+                  trackStyle={styles.coloredBackground}
+                  marks={{
+                    [this.minGasPrice()]: {
+                      label: 'Slow/Cheap',
+                      style: {
+                        marginLeft: '-41%',
+                      },
+                    },
+                    [this.maxGasPrice()]: {
+                      label: 'Fast/Expensive',
+                      style: {
+                        marginLeft: '-52%',
+                      },
+                    },
+                  }}
+                />
+                <div style={styles.gasPriceLabel}>
+                  {this.gweiGasPrice().toFixed(1)} Gwei
                 </div>
-                <div>
-                  Gwei
+              </div>
+            </div>
+          </div>
+
+          <div className="field is-horizontal">
+            <div className="field-label is-normal">
+              <label className="label">Estimated Time</label>
+            </div>
+            <div className="field-body">
+              <div className="field">
+                <div style={styles.fieldText}>
+                  {Wallet.timeEstimateForGasPrice(this.state.gasPrice)}
                 </div>
               </div>
             </div>
@@ -108,9 +139,9 @@ class TransactionConfirmationModal extends Component {
     );
   }
 
-  onChangeGasPrice(e, key) {
+  onChangeGasPrice(price) {
     this.setState({
-      gasPrice: e.target.value * 1000000000,
+      gasPrice: price * 1000000000,
     });
   }
 
@@ -140,6 +171,14 @@ class TransactionConfirmationModal extends Component {
 
   gweiGasPrice() {
     return this.state.gasPrice / 1000000000;
+  }
+
+  minGasPrice() {
+    return Wallet.minGasPrice() / 1000000000;
+  }
+
+  maxGasPrice() {
+    return Wallet.maxGasPrice() / 1000000000;
   }
 
   confirm() {
@@ -200,6 +239,16 @@ const styles = {
     maxWidth: '30%',
     flex: '1',
   },
+  gasPriceLabel: {
+    marginLeft: '20px',
+    whiteSpace: 'nowrap',
+  },
+  coloredBackground: {
+    backgroundColor: '#00d1b2',
+  },
+  coloredBorder: {
+    borderColor: '#00d1b2',
+  }
 };
 
 export default TransactionConfirmationModal;

@@ -151,8 +151,8 @@ class SideBar extends Component {
   renderUsersAccordian() {
     return (
       <Collapsible
-        triggerClassName="CustomTriggerCSS"
-        triggerOpenedClassName="CustomTriggerCSS--open"
+        triggerClassName="CustomTriggerCSS fa fa-chevron-right"
+        triggerOpenedClassName="CustomTriggerCSS--open fa fa-chevron-down"
         contentOuterClassName="CustomOuterContentCSS"
         contentInnerClassName="CustomInnerContentCSS"
         transitionTime={200}
@@ -213,25 +213,27 @@ class SideBar extends Component {
         {this.renderUsersAccordian()}
 
         <Collapsible
-      triggerClassName="CustomTriggerCSS"
-      triggerOpenedClassName="CustomTriggerCSS--open"
-      contentOuterClassName="CustomOuterContentCSS"
-      contentInnerClassName="CustomInnerContentCSS"
-      transitionTime={200}
-      easing="ease-in"
-      trigger="Ruleset">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
+          triggerClassName="CustomTriggerCSS fa fa-chevron-right"
+          triggerOpenedClassName="CustomTriggerCSS--open fa fa-chevron-down"
+          contentOuterClassName="CustomOuterContentCSS"
+          contentInnerClassName="CustomInnerContentCSS"
+          transitionTime={200}
+          easing="ease-in"
+          trigger="Ruleset"
+        >
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
         </Collapsible>
 
         <Collapsible
-      triggerClassName="CustomTriggerCSS"
-      triggerOpenedClassName="CustomTriggerCSS--open"
-      contentOuterClassName="CustomOuterContentCSS"
-      contentInnerClassName="CustomInnerContentCSS"
-      transitionTime={200}
-      easing="ease-in"
-      trigger="Content Types">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
+          triggerClassName="CustomTriggerCSS fa fa-chevron-right"
+          triggerOpenedClassName="CustomTriggerCSS--open fa fa-chevron-down"
+          contentOuterClassName="CustomOuterContentCSS"
+          contentInnerClassName="CustomInnerContentCSS"
+          transitionTime={200}
+          easing="ease-in"
+          trigger="Content Types"
+        >
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
         </Collapsible>
 
 

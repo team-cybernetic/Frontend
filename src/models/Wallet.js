@@ -142,6 +142,35 @@ export default class Wallet {
     }
   }
 
+  static minGasPrice() {
+    if (this.ethConfirmationSpeeds) {
+      return (Math.max(this.ethConfirmationSpeeds.safeLow, 1) / 10) * 1000000000;
+    } else {
+      return 0.1 * 1000000000;
+    }
+  }
+
+  static maxGasPrice() {
+    if (this.ethConfirmationSpeeds) {
+      return (Math.min(this.ethConfirmationSpeeds.fastest, 200) / 10) * 1000000000;
+    } else {
+      return 20 * 1000000000;
+    }
+  }
+
+  static timeEstimateForGasPrice(price) {
+    const priceInGwei = price / 1000000000;
+    if (this.ethConfirmationSpeeds) {
+      if (priceInGwei >= this.ethConfirmationSpeeds.fast / 10) {
+        return this.ethConfirmationSpeeds.fastWait + ' mins';
+      } else {
+        return (this.ethConfirmationSpeeds.safeLowWait - (this.ethConfirmationSpeeds.safeLowWait - this.ethConfirmationSpeeds.fastWait) * ((priceInGwei - (this.ethConfirmationSpeeds.safeLow / 10)) / (this.ethConfirmationSpeeds.fast / 10))).toFixed(1) + ' mins';
+      }
+    } else {
+      return 'Unknown';
+    }
+  }
+
   static registerBalanceUpdateListener(callback) {
     this.balanceUpdateListeners.push(callback);
     return ({
