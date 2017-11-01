@@ -1,15 +1,21 @@
 {
   "contract_name": "ContentLib",
   "abi": [],
-  "unlinked_binary": "0x60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a72305820828da8ea63c819091491858cfa3989fc502ef61871def3820d08fbd1cd2915f70029",
+  "unlinked_binary": "0x60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a723058200e01803f2bfd487396ef87df4f0f7ec7da1bcfd02ad7501d8e8a1e06f3d6fe9e0029",
   "networks": {
     "13": {
       "events": {},
       "links": {},
-      "address": "0x7f1788786d32dfc7ae9809087780b696106df32c",
-      "updated_at": 1509500692540
+      "address": "0x7316632f19d155ebf92e5327c961bbd7896afa70",
+      "updated_at": 1509503409466
+    },
+    "1509502320838": {
+      "events": {},
+      "links": {},
+      "address": "0x8a55ee945054aaf497c96c619bfe8dbb8558c9e1",
+      "updated_at": 1509503120428
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1509500692540
+  "updated_at": 1509503409466
 }

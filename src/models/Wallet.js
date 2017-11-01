@@ -15,11 +15,15 @@ export default class Wallet {
   static etherConfirmationSpeeds = {};
   static etherConfirmationSpeedsFailures = 0;
   static etherConfirmationSpeedsMaxFailures = 10;
+  static defaultGasPrice = 0;
 
   static initialize(web3, managedWeb3) {
     this.web3 = web3;
     this.managedWeb3 = managedWeb3;
     this.balanceUpdateListeners = [];
+    this.web3.eth.getGasPrice((error, price) => {
+      this.defaultGasPrice = price * 1;
+    });
     this.web3.eth.getAccounts((error, accounts) => {
       this.web3.eth.defaultAccount = accounts[0];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
@@ -93,7 +97,7 @@ export default class Wallet {
             resolve({ gas, gasPrice });
           }, reject);
         } else {
-          resolve({ gas, gasPrice: this.defaultGasPrice() });
+          resolve({ gas, gasPrice: this.defaultGasPrice });
         }
       });
     });
@@ -108,7 +112,7 @@ export default class Wallet {
             contractTC.new({ gas, gasPrice }).then(resolve);
           }, reject);
         } else {
-          contractTC.new({ gas, gasPrice: this.defaultGasPrice() }).then(resolve);
+          contractTC.new({ gas, gasPrice: this.defaultGasPrice }).then(resolve);
         }
       });
     });
@@ -124,10 +128,6 @@ export default class Wallet {
 
   static getCurrentEthBalance() {
     return this.web3.fromWei(this.balance, 'ether');
-  }
-
-  static defaultGasPrice() {
-    return this.web3.eth.gasPrice * 1;
   }
 
   static weiToEther(wei) {
