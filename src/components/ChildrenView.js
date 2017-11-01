@@ -5,7 +5,6 @@ import { some } from 'lodash';
 class ChildrenView extends Component {
   constructor(props) {
     super(props);
-    //console.log("creating new children view");
     this.state = {
       posts: null,
     };
@@ -13,44 +12,32 @@ class ChildrenView extends Component {
   }
 
   componentWillMount() {
-    //console.log("children view mounting");
     this.loadPosts(this.props.isLoaded, this.props.group);
   }
 
   componentWillReceiveProps(nextProps) {
-    //console.log("children view props updated -- getting posts");
     this.loadPosts(nextProps.isLoaded, nextProps.group);
   }
 
   componentWillUnmount() {
-    //console.log("children view unmounting");
     if (this.listenerHandle) {
       this.props.group.unregisterPostCreatedListener(this.listenerHandle);
       this.listenerHandle = null;
     }
   }
 
-  registerPostCreatedListener(isLoaded, group, callback) {
-    if (isLoaded) {
-    }
-  }
-
   loadPosts(isLoaded, group) {
     if (isLoaded) {
       if (!this.props.isLoaded) {
-        //console.log("children view done loading, getting posts");
         if (!this.listenerHandle) {
           this.listenerHandle = group.registerPostCreatedListener((post) => this.addToPosts(post));
         }
         group.getPosts().then((posts) => {
-          //console.log("children view got these posts from group:", posts);
-          this.setState({ posts });
+          this.setState({
+            posts: this.reorderPosts(posts)
+          });
         });
-      } else {
-        //console.log("children view was already loaded!");
       }
-    } else {
-      //console.log("children view still loading, not getting posts yet");
     }
   }
 
@@ -67,10 +54,14 @@ class ChildrenView extends Component {
   renderPosts() {
     if (this.props.isLoaded && this.state.posts) {
       return (this.state.posts.map((post) => {
-        if (this.props.post && (this.props.post.id === post.id))
-          console.log("post", post.id, "should be selected");
         return (
-          <PostView key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)} post={post} selected={this.props.post && (this.props.post.id === post.id)} group={this.props.group} parent={this.props.pathState.groupPath} />
+          <PostView
+            key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)}
+            post={post}
+            selected={this.props.post && (this.props.post.id === post.id)}
+            group={this.props.group}
+            parent={this.props.pathState.groupPath}
+          />
         );
       }));
     } else {
@@ -88,10 +79,23 @@ class ChildrenView extends Component {
         posts = [];
       }
       posts.push(post);
-      this.setState({ posts });
+      this.setState({
+        posts: this.reorderPosts(posts)
+      });
     } else {
       console.log("we already had this though");
     }
+  }
+
+  reorderPosts(posts) {
+    return posts.sort((post1, post2) => {
+      if (!post1.id) {
+        return -1;
+      } else if (!post2.id) {
+        return 1;
+      }
+      return parseInt(post2.id) - parseInt(post1.id);
+    });
   }
 
   alreadyHavePost(post) {
@@ -106,7 +110,7 @@ const styles = {
   },
   children: {
     display: 'flex',
-    flexWrap: 'wrap-reverse',
+    flexWrap: 'wrap',
     alignItems: 'flex-start',
     alignContent: 'flex-start',
   },
