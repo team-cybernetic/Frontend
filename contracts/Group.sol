@@ -4,6 +4,7 @@ import "./ContentLib.sol";
 import "./CurrencyLib.sol";
 import "./PostLib.sol";
 import "./UserLib.sol";
+import "./PermissionLib.sol";
 
 contract Group {
 
@@ -18,12 +19,18 @@ contract Group {
   using CurrencyLib for CurrencyLib.State;
   CurrencyLib.State currencylib;
 
+  using PermissionLib for PermissionLib.State;
+  PermissionLib.State permissionlib;
+
   event PostCreated(uint256 indexed postNumber);
   event SubgroupCreated(uint256 indexed postNumber, address groupAddress);
   event UserJoined(uint256 indexed userNumber, address indexed userAddress);
   event UserLeft(uint256 indexed userNumber, address indexed userAddress);
   event UserBalanceChanged(uint256 indexed userNumber, address indexed userAddress, uint256 amount, bool increased);
   event PostBalanceChanged(uint256 indexed postNumber, uint256 amount, bool increased);
+
+  event UserJoinDenied(address indexed userAddress, string reason);
+  event CreatePostDenied(address indexed userAddress, string reason);
 
   function Group(
     string title,
@@ -107,6 +114,7 @@ contract Group {
   ) returns (uint256) {
     return (postlib.createPost(
       userlib,
+      permissionlib,
       currencylib,
       title,
       mimeType,
@@ -127,7 +135,7 @@ contract Group {
 
   function joinGroup() {
     //TODO: payable
-    userlib.join();
+    userlib.join(permissionlib);
   }
 
   function leaveGroup() { 

@@ -1,0 +1,133 @@
+{
+  "contract_name": "PermissionLib",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "self",
+          "type": "PermissionLib.State storage"
+        },
+        {
+          "name": "userAddress",
+          "type": "address"
+        }
+      ],
+      "name": "createPost",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "self",
+          "type": "PermissionLib.State storage"
+        },
+        {
+          "name": "userlib",
+          "type": "UserLib.State storage"
+        },
+        {
+          "name": "userAddress",
+          "type": "address"
+        }
+      ],
+      "name": "userJoin",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "userAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "UserJoinDenied",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "userAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "CreatePostDenied",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b61026a8061001f6000396000f300606060405263ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663321f1ba98114610048578063da566c8f14610073575b600080fd5b61005f600435600160a060020a03602435166100a1565b604051901515815260200160405180910390f35b61005f600435602435600160a060020a0360443516610145565b604051901515815260200160405180910390f35b600160a060020a038116600090815260028301602052604081205460ff161561013b5781600160a060020a03167fb5ce7d3547e11a9f64dd74c7fd7aa7fd1e259a6dec8ae6e10e958d6b099d46cf6040516020808252600d908201527f55736572206973206d75746564000000000000000000000000000000000000006040808301919091526060909101905180910390a250600061013f565b5060015b92915050565b600160a060020a038116600090815260018401602052604081205460ff161561023357600160a060020a0382166000818152600386016020526040908190207f2a56046253416b6d131cec603452751bc96c39af8e4babb963d848bc43106eeb91516020808252825460026000196101006001841615020190911604908201819052819060408201908490801561021d5780601f106101f25761010080835404028352916020019161021d565b820191906000526020600020905b81548152906001019060200180831161020057829003601f168201915b50509250505060405180910390a2506000610237565b5060015b93925050505600a165627a7a7230582028cb704d69ddc243ca595c19e7530ce06f68b5e6671a3d1f1bf5d09f2f216fa90029",
+  "networks": {
+    "13": {
+      "events": {
+        "0x2a56046253416b6d131cec603452751bc96c39af8e4babb963d848bc43106eeb": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserJoinDenied",
+          "type": "event"
+        },
+        "0xb5ce7d3547e11a9f64dd74c7fd7aa7fd1e259a6dec8ae6e10e958d6b099d46cf": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "CreatePostDenied",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xa73fbd47f560c3d9e36e78a68a9878fbdb2e3feb",
+      "updated_at": 1509500692540
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1509500692540
+}

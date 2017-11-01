@@ -273,8 +273,8 @@ export default class User {
                 reject(error);
               });
             } else {
-              console.error("uhh, how did we get here? User not confirmed (no id), no txid, and no address??");
-              reject("uhh, how did we get here? User not confirmed (no id), no txid, and no address??");
+              console.error("User not confirmed (no id), no txid, and no address??");
+              reject(new Error("User not confirmed (no id), no txid, and no address??"));
             }
           }
         }

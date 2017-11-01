@@ -185,6 +185,7 @@ export default class Group {
   }
 
   loadUserByAddress(address) {
+    console.log("Group loading user by address", address);
     return (this.groupContract.getUserByAddress(address));
   }
 

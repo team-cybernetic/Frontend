@@ -2,12 +2,13 @@ pragma solidity ^0.4.11;
 
 import "./ContentLib.sol";
 import "./CurrencyLib.sol";
+import "./PermissionLib.sol";
 
 library UserLib {
 
   using UserLib for State;
-
   using CurrencyLib for CurrencyLib.State;
+  using PermissionLib for PermissionLib.State;
 
   event UserJoined(uint256 indexed userNumber, address indexed userAddress);
   event UserLeft(uint256 indexed userNumber, address indexed userAddress);
@@ -64,8 +65,12 @@ library UserLib {
     return (self.getUserByAddressRaw(userAddress));
   }
 
-  function join(State storage self) {
+  function join(State storage self, PermissionLib.State storage permissionlib) {
     require(!userExistsByAddress(self, msg.sender));
+
+    if (!permissionlib.userJoin(self, msg.sender)) {
+      return;
+    }
 
     self.count++;
     self.byAddress[msg.sender] = self.byNumber[self.count] = User({

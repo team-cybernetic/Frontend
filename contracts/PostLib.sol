@@ -3,17 +3,18 @@ pragma solidity ^0.4.11;
 import "./ContentLib.sol";
 import "./UserLib.sol";
 import "./CurrencyLib.sol";
+import "./PermissionLib.sol";
 
 library PostLib {
 
   using PostLib for State;
+  using UserLib for UserLib.State;
+  using CurrencyLib for CurrencyLib.State;
+  using PermissionLib for PermissionLib.State;
+
 
   event PostCreated(uint256 indexed postNumber);
   event SubgroupCreated(uint256 indexed postNumber, address groupAddress);
-
-  using UserLib for UserLib.State;
-
-  using CurrencyLib for CurrencyLib.State;
 
   struct Post {
     ContentLib.Content contents;
@@ -62,9 +63,25 @@ library PostLib {
     SubgroupCreated(num, groupAddress);
   }
 
+  function addPost(
+    State storage self,
+    ContentLib.Content contents,
+    uint256 number,
+    address groupAddress,
+    int256 permissions
+  ) private returns (Post) {
+    return (self.byNumber[self.count] = Post({
+      contents: contents,
+      number: number,
+      groupAddress: groupAddress,
+      permissions: permissions
+    }));
+  }
+
   function createPost(
     State storage self,
     UserLib.State storage userlib,
+    PermissionLib.State storage permissionlib,
     CurrencyLib.State storage currencylib,
     string title,
     string mimeType,
@@ -73,6 +90,9 @@ library PostLib {
     bytes ipfsHash,
     uint256 creationTime
   ) returns (uint256) {
+
+    require(permissionlib.createPost(msg.sender));
+
     //TODO: check title length via ruleset
     //TODO: UTF-8 length != bytes().length
     require(bytes(title).length <= 255);
@@ -94,18 +114,35 @@ library PostLib {
       creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
     }
 
-    address creator = msg.sender;
-
-    if (!userlib.userExistsByAddress(creator)) {
-      userlib.join(); //TODO: ruleset
+    if (!userlib.userExistsByAddress(msg.sender)) {
+      userlib.join(permissionlib); //TODO: ruleset
     }
 
-    UserLib.User storage u = userlib.getUserByAddress(creator);
+    UserLib.User storage u = userlib.getUserByAddress(msg.sender);
 
     currencylib.awardTokensToUser(u, 8, true); //TODO: ruleset
 
     self.count++;
 
+    addPost(
+      self,
+      ContentLib.Content({
+        title: title,
+        mimeType: mimeType,
+        multihash: ContentLib.IpfsMultihash({
+          hashFunction: ipfsHashFunction,
+          hashLength: ipfsHashLength,
+          hash: ipfsHash
+        }),
+        creator: msg.sender,
+        creationTime: creationTime
+      }),
+      self.count,
+      0x0,
+      0 //TODO: permissions from ruleset
+    );
+
+    /*
     self.byNumber[self.count] = Post({
       contents: ContentLib.Content({
         title: title,
@@ -115,13 +152,14 @@ library PostLib {
           hashLength: ipfsHashLength,
           hash: ipfsHash
         }),
-        creator: creator,
+        creator: msg.sender,
         creationTime: creationTime
       }),
       number: self.count,
       groupAddress: 0,
       permissions: 0 //TODO: default from ruleset
     });
+    */
 
     self.numbers.push(self.count);
 
