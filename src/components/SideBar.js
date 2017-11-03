@@ -250,8 +250,7 @@ class SideBar extends Component {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: '#a5a5a5',
-    borderLeft: '1px solid lightgrey',
+    backgroundColor: '#e6ecf0',
     margin: '0px',
     overflowY: 'auto',
   },

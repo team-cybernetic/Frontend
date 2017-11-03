@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import PostView from './PostView';
 import { some } from 'lodash';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 class ChildrenView extends Component {
+
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -43,11 +46,15 @@ class ChildrenView extends Component {
 
   render() {
     return (
-      <div style={styles.container}>
-        <div style={styles.children}>
-          {this.renderPosts()}
+      <Scrollbars style={styles.scrollBar}>
+        <div style={styles.container}>
+              <div style={styles.children}>
+                {this.renderPosts()}
+              </div>
+
         </div>
-      </div>
+      </Scrollbars>
+
     );
   }
 
@@ -104,15 +111,23 @@ class ChildrenView extends Component {
 }
 
 const styles = {
+
   container: {
-    overflowY: 'scroll',
     flex: '1 1 0%',
+    backgroundColor: '#e6ecf0',
+    padding: '1%',
   },
+
   children: {
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
     alignContent: 'flex-start',
+  },
+
+  scrollBar: {
+    width: '100%',
+    height: '96%',
   },
   loader: {
     flex: 1,

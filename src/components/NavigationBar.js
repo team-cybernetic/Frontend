@@ -54,11 +54,12 @@ class NavigationBar extends Component {
 
 const styles = {
   outerBar: {
-    backgroundColor: 'lightgray',
+    backgroundColor: 'white',
     display: 'flex',
     flex: '1 1 auto',
     paddingRight: '8px',
     paddingLeft: '8px',
+    borderBottom: '1px solid #aaafb2'
   },
   icon: {
     padding: '16px 5px',

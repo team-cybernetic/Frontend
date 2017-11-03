@@ -42,6 +42,7 @@ class Editor extends Component {
 
   render() {
     return (
+      <div style={styles.container0}>
       <div style={styles.container}>
         <div style={styles.earnings}>
           <p>Balances</p>
@@ -63,6 +64,7 @@ class Editor extends Component {
           Post<br />
         {!this.hasContent() ? (this.isValid() ? "[title only]" : "") : ""}
         </button>
+      </div>
       </div>
     );
   }
@@ -126,32 +128,40 @@ class Editor extends Component {
 }
 
 const styles = {
+  container0: {
+    backgroundColor: '#e6ecf0',
+    height: '20%',
+  },
   container: {
-    height: '100px',
-    backgroundColor: 'lightgray',
+    height: '100%',
+    backgroundColor: '#d7dce0',
     display: 'flex',
     flexFlow: 'row',
+    border: '1px solid #aaafb2',
+    marginRight: '1%',
   },
   earnings: {
-    width: '100px',
+    width: '5px',
     textAlign: 'center',
-    padding: '2px',
+    padding: '20px',
+    paddingTop: '5px',
     flex: '0 1 18%',
   },
   earningsText: {
     textAlign: 'left',
     fontSize: '12px',
     margin: '2px',
+    // marginRight: '10%',
   },
   postButton: {
     height: '100%',
-    width: '90px',
+    width: '10%',
     float: 'right',
   },
   textArea: {
     flex: 1,
     resize: 'none',
-    height: '100px',
+    height: '100%',
     minHeight: 'auto',
     maxHeight: 'none',
     minWidth: 'auto',

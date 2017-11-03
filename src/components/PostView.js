@@ -22,9 +22,6 @@ export default class PostView extends Component {
           <div style={this.styles.cardContent} className='card-content'>
             {this.renderTitle()}
             {this.renderTimestamp()}
-            {this.renderCreator()}
-            {this.renderGroup()}
-            {this.renderMultiHash()}
             {this.renderContent()}
           </div>
         </div>
@@ -52,7 +49,7 @@ export default class PostView extends Component {
 
   renderTitle() {
     return (
-      <Link to={this.getTargetPath()}>{this.renderId()}{this.props.post.title}</Link>
+        <Link to={this.getTargetPath()}>{this.renderId()}{this.props.post.title}</Link>
     );
   }
 
@@ -161,9 +158,9 @@ export default class PostView extends Component {
     let m = moment(this.props.post.creationTime, "X");
     return (
       <span style={this.styles.timestamp}>
-        Posted&nbsp;
         <span style={this.styles.date}>
-          {m.calendar()}
+          Posted&nbsp;
+          {m.calendar()} by {this.props.post.creator}
         </span>
       </span>
     );
@@ -176,16 +173,17 @@ export default class PostView extends Component {
           width: '96%',
           marginLeft: '2%',
           marginRight: '2%',
-          marginTop: '1.5%',
-          marginBottom: '1.5%',
+          marginTop: '2%',
+          marginBottom: '2%',
           backgroundColor: 'white',
         } : {
-          width: '46%',
-          marginLeft: '2%',
-          marginRight: '2%',
-          marginTop: '1.5%',
-          marginBottom: '1.5%',
-          backgroundColor: this.props.selected ? 'yellow' : 'white',
+          width: '48%',
+          marginLeft: '1%',
+          marginRight: '1%',
+          marginTop: '1%',
+          marginBottom: '1%',
+          backgroundColor: this.props.selected ? '#fdffea' : 'white',
+          border: 0,
         },
       contentWrapper: {
         flex: 1,
@@ -211,7 +209,8 @@ export default class PostView extends Component {
         fontSize: 'small',
       },
       date: {
-        fontSize: 'small',
+        color: '#858889',
+        fontSize: 'x-small',
       },
       number: {
         fontSize: 'small',

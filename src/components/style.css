@@ -1,6 +1,9 @@
 /* The main container element*/
 .Collapsible {
   background-color: $base;
+  margin-left: 2%;
+  margin-bottom: 2%;
+  width: 95%
 }
 
 
@@ -25,12 +28,12 @@
 
 span.CustomTriggerCSS,
 span.CustomTriggerCSS--open {
-  background-color: lightgrey;
+  background-color: #d7dce0;
   cursor: pointer;
   font-family: inherit;
   display: block;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 span.CustomTriggerCSS::before,
@@ -38,6 +41,7 @@ span.CustomTriggerCSS--open::before {
   font-family: 'FontAwesome';
   margin-right: 5px;
   font-size: 16px;
+
 }
 
 span.CustomTriggerCSS::before {
