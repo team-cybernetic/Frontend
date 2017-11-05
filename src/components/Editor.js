@@ -18,7 +18,7 @@ class Editor extends Component {
   }
 
   getBalances(isLoaded, group) {
-    if (isLoaded) {
+    if (isLoaded && !this.isUserProfile()) {
       const userAddress = Wallet.getAccountAddress();
       group.userExists(userAddress).then((exists) => {
         if (exists) {
@@ -125,17 +125,6 @@ class Editor extends Component {
     return this.props.pathState.userId === Wallet.getAccountAddress();
   }
 
-  getBalances(isLoaded, group) {
-    if (isLoaded && !this.isUserProfile()) {
-      const user = group.getUserByAddress(Wallet.getAccountAddress());
-      user.loadHeader().then(() => {
-        this.setState({
-          localBalance: user.getBalance().toLocaleString(),
-        });
-      });
-    }
-  }
-
   getGlobalBalance() {
     return (Wallet.getCurrentEthBalance().toFixed(6).toLocaleString());
   }
@@ -209,10 +198,10 @@ const styles = {
     marginRight: '1%',
   },
   earnings: {
-    width: '5px',
+    minWidth: '125px',
+    maxWidth: '155px',
     textAlign: 'center',
-    padding: '20px',
-    paddingTop: '5px',
+    padding: '5px',
     flex: '0 1 18%',
   },
   earningsText: {

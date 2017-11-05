@@ -2,6 +2,9 @@ import Group from '../models/Group'
 import PathParser from '../utils/PathParser';
 import Blockchain from '../blockchain/Blockchain';
 
+const ROOT_GROUP_NUMBER = 1;
+const ROOT_GROUP_PARENT_NUMBER = 1;
+
 export default class GroupStore {
   static rootInstance = null;
   static web3 = null;
@@ -9,7 +12,7 @@ export default class GroupStore {
   static initialize(web3, rootInstance) {
     this.web3 = web3;
     this.rootInstance = rootInstance;
-    this.treeRoot = new Group(1, 1);
+    this.treeRoot = new Group(ROOT_GROUP_PARENT_NUMBER, ROOT_GROUP_NUMBER);
     this.cache = [];
   }
 
@@ -22,23 +25,8 @@ export default class GroupStore {
   static resolvePath(parsedPath, startingGroup = null) {
     return new Promise((resolve, reject) => {
       let currentGroup = this.treeRoot;
-      let pathToWalk = [];
-      if (!parsedPath.absolute) {
-        if (!startingGroup) { //passing undefined is also bad, and 0/false doesn't make sense
-          reject({
-            error: new Error("Cannot browse to a relative path without a starting group!"), 
-            group: null,
-            partialPath: null,
-          }); 
-          return;
-        } else {
-          currentGroup = startingGroup;
-        }
-      } else {
-        console.log("GroupStore walking an absolute path");
-        pathToWalk.push(1);
-      }
       console.log("GroupStore descending into the forest...");
+      let pathToWalk = [ROOT_GROUP_NUMBER];
       pathToWalk = pathToWalk.concat(parsedPath.groupNums);
       console.log("GroupStore needs to walk the path:", pathToWalk);
       let pathWalked = [];
@@ -116,41 +104,6 @@ export default class GroupStore {
           error,
         });
       });
-      /*
-      currentGroup.getGroupAddressOfPost(nextStep).then((addr) => {
-        console.log("got address for", nextStep, ":", addr);
-        if (Blockchain.isAddressValid(addr)) {
-          console.log("it's a valid address!");
-          this.getGroup(addr).then((nextGroup) => {
-            pathWalked.push(nextStep);
-            if (pathToWalk.length > 0) {
-              this.walkTree(pathToWalk, pathWalked, nextGroup).then(resolve).catch(reject);
-            } else {
-              console.log("singleton resolved:", nextGroup);
-              resolve({
-                group: nextGroup,
-              });
-            }
-          }).catch((error) => {
-            reject(error);
-          });
-        } else {
-          console.error("post", nextStep, "has no group address!");
-          resolve({
-            group: currentGroup,
-            num: nextStep,
-          });
-        }
-      }).catch((error) => {
-        console.error("Failed to get group for post", nextStep, ":", error);
-        reject({
-          group: currentGroup,
-          num: nextStep,
-          partial: true,
-          error,
-        });
-      });
-      */
     });
   }
 
@@ -159,22 +112,5 @@ export default class GroupStore {
       this.cache[num] = new Group(parentNum, num);
     }
     return (this.cache[num]);
-    /*
-    return new Promise((resolve, reject) => {
-      if (!this.cache[addr]) {
-        console.log("group not cached");
-        this.groupContractTC.at(addr).then((contractInstance) => {
-          this.cache[addr] = new Group(this.web3, contractInstance, this.groupContractTC);
-          resolve(this.cache[addr]);
-        }).catch((error) => {
-          console.error("error while getting contractInstance at address", addr, ":", error);
-          reject(error);
-        });
-      } else {
-        console.log("group cached!");
-        resolve(this.cache[addr]);
-      }
-    });
-    */
   }
 }

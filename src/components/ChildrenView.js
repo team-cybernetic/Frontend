@@ -122,9 +122,11 @@ const styles = {
     alignItems: 'flex-start',
     alignContent: 'flex-start',
     padding: '1%',
-    minHeight: 'calc(100vh - 141px)',
+    height: '100%',
+    minHeight: 'calc(100vh - 141px)', //TODO: this causes a permenant scroll down
   },
   scrollBar: {
+    display: 'flex', //TODO: Why doesn't this go through?
     width: '100%',
     height: '96%',
     backgroundColor: '#e6ecf0',
