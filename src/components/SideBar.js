@@ -21,9 +21,10 @@ class SideBar extends Component {
   }
 
   updateBalance(group) {
-    group.getBalance().then((balance) => {
+    group.getTokens().then((tokens) => {
+      console.log("Sidebar got group tokens:", tokens);
       this.setState({
-        balance: balance.toLocaleString(),
+        tokens: tokens.toLocaleString(),
       });
     });
   }
@@ -34,7 +35,7 @@ class SideBar extends Component {
         return; //went from loaded -> loaded, no update
       }
       this.updateBalance(group);
-      group.registerUserBalanceChangedListener(() => {
+      group.registerTokensChangedListener(() => {
         this.updateBalance(group);
       });
       group.getUsers().then((users) => {
@@ -121,20 +122,11 @@ class SideBar extends Component {
     if (this.state.users) {
       return (this.state.users.map((user) => {
         const address = user.getAddress(); //user hasn't loaded yet, so this returns undefined
-        const id = user.getNumber();
         let key = 'u' + this.props.pathState.cleanPath;
-        if (!id) {
-          if (!this.userViewMap[address]) {
-            this.userViewMap[address] = user;
-          }
-          key = key + address;
-        } else {
-          if (this.userViewMap[address]) { //we cached it for the address before we saw the id
-            key = key + address;
-          } else {
-            key = key + id;
-          }
+        if (!this.userViewMap[address]) {
+          this.userViewMap[address] = user;
         }
+        key = key + address;
         return (
           <UserView key={key} sidebar={true} user={user} group={this.props.group} />
         );
@@ -197,7 +189,7 @@ class SideBar extends Component {
     }
     return (
       <div style={styles.stats}>
-        {this.state.userCount} Member{this.state.userCount === 1 ? '' : 's'} / {this.state.balance} Earnings
+        {this.state.userCount} Member{this.state.userCount === 1 ? '' : 's'} / {this.state.tokens} Earnings
       </div>
     );
   }

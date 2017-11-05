@@ -1,4 +1,5 @@
 import Ipfs from '../utils/Ipfs';
+import BigNumber from 'bignumber.js';
 
 export default class Post {
   constructor(parentGroup, post) {
@@ -15,6 +16,8 @@ export default class Post {
   }
 
   populate({
+    id,
+    parentNumber,
     title,
     content,
     contentType,
@@ -23,10 +26,9 @@ export default class Post {
     creationTime,
     creator,
     balance,
-    id,
-    transactionId,
+    tokens,
     permissions,
-    groupAddress 
+    transactionId,
   }) {
     this.title = title || this.title;
     this.content = content || this.content;
@@ -34,12 +36,13 @@ export default class Post {
     this.multiHashArray = multiHashArray || this.multiHashArray;
     this.multiHashString = (multiHashString === "" ? "" : (multiHashString || this.multiHashString));
     this.id = (id ? id.toString() : this.id);
+    this.parentNumber = (parentNumber ? parentNumber.toString() : this.parentNumber);
     this.transactionId = transactionId || this.transactionId;
     this.permissions = permissions || this.permissions;
-    this.groupAddress = groupAddress || this.groupAddress || '0x0000000000000000000000000000000000000000';
     this.creationTime = creationTime || this.creationTime;
     this.creator = creator || this.creator;
-    this.balance = 0 || this.balance || balance;
+    this.balance = balance || this.balance || new BigNumber(0);
+    this.tokens = tokens || this.tokens || new BigNumber(0);
     //this.confirmed = !!this.id;
     this.headerLoaded = !!this.title;
     this.contentLoaded = !!this.content || this.multiHashString === "";
@@ -62,6 +65,28 @@ export default class Post {
     return (this.isConfirmed() && this.isHeaderLoaded() && this.isContentLoaded());
   }
 
+  /**
+   * Get the balance this post owns in its parent group
+   */
+  getBalance() {
+    return (this.balance || new BigNumber(0));
+  }
+
+  /**
+   * Get the total number of tokens this post has issued to its subposts and users
+   */
+  getTokens() {
+    return (this.tokens || new BigNumber(0));
+  }
+
+  getNumber() {
+    return (this.id);
+  }
+
+  getParentNumber() {
+    return (this.parentNumber);
+  }
+
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.
   load() {
     return new Promise((resolve, reject) => {
@@ -74,22 +99,24 @@ export default class Post {
   }
 
   postStructToObject([
-    title,
     id,
+    parentNumber,
+    title,
     contentType,
     ipfsHashFunction,
     ipfsHashLength,
     ipfsHash,
     creator,
     creationTime,
-    groupAddress,
     balance,
+    tokens,
     permissions
   ]) {
     const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
     return ({
-      title,
       id,
+      parentNumber,
+      title,
       contentType,
       multiHashArray,
       multiHashString: Ipfs.assembleMultiHash(multiHashArray),
@@ -98,8 +125,8 @@ export default class Post {
       ipfsHash,
       creator,
       creationTime,
-      groupAddress,
       balance,
+      tokens,
       permissions,
     });
   }
@@ -231,7 +258,7 @@ export default class Post {
         } else {
           this.confirming = true;
           if (!!this.id) {
-            this.parentGroup.postExistsByNumber(this.id).then((result) => {
+            this.parentGroup.postExists(this.id).then((result) => {
               this.markConfirmed(result);
               resolve(result);
             }).catch((error) => {

@@ -2,114 +2,142 @@ pragma solidity ^0.4.11;
 
 import "./ContentLib.sol";
 import "./CurrencyLib.sol";
+import "./PostLib.sol";
 import "./PermissionLib.sol";
+import "./StateLib.sol";
 
 library UserLib {
 
   using UserLib for State;
+  using PostLib for PostLib.State;
   using CurrencyLib for CurrencyLib.State;
   using PermissionLib for PermissionLib.State;
 
-  event UserJoined(uint256 indexed userNumber, address indexed userAddress);
-  event UserLeft(uint256 indexed userNumber, address indexed userAddress);
+  event UserJoined(
+    uint256 indexed parentNumber,
+    address indexed userAddress
+  );
+  event UserLeft(
+    uint256 indexed parentNumber,
+    address indexed userAddress
+  );
+  event UserKicked(
+    uint256 indexed parentNumber,
+    address indexed kickedUserAddress,
+    address indexed kickingUserAddress,
+    string reason
+  );
+  event UserBanned(
+    uint256 indexed parentNumber,
+    address indexed bannedUserAddress,
+    address indexed banningUserAddress,
+    string reason
+  );
+  event UserMuted(
+    uint256 indexed parentNumber,
+    address indexed mutedUserAddress,
+    address indexed mutingUserAddress
+  );
+
 
   struct User {
     ContentLib.Content contents;
-    uint256 number; //must be > 0 if user exists, unique, immutable
-    address directAddress; //null when user has not created/linked a private group (for direct messaging)
+    uint256 parentNum;
+    uint256 balance;
     int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
+    bool joined;
+    bool banned;
+    string banReason;
   }
 
   struct State {
     uint256 count;
-    mapping (address => User) byAddress; //maps ethereum address (public key) to user objects
-    mapping (uint256 => User) byNumber;
-    uint256[] numbers;
-    address[] addresses;
+//    mapping (uint256 => mapping (address => User)) byAddress; //maps ethereum address (public key) to user objects
+//    mapping (uint256 => address[]) addresses;
   }
 
-  function getUserNumbers(State storage self) returns (uint256[]) {
-    return (self.numbers);
+  function getUserRaw(StateLib.State storage state, uint256 parentNum, address userAddress) constant internal returns (User storage) {
+    var p = PostLib.getPost(state, parentNum);
+    return (p.users[userAddress]);
   }
 
-  function userExistsByNumber(State storage self, uint256 num) internal returns (bool) {
-    require(num <= self.count);
-    return (self.byNumber[num].number != 0);
+  function userExists(StateLib.State storage state, uint256 parentNum, address userAddress) constant internal returns (bool) {
+    return (userAddress != 0x0 && getUserRaw(state, parentNum, userAddress).joined);
   }
 
-  function getUserByNumberRaw(State storage self, uint256 num) internal returns (User storage) {
-    return (self.byNumber[num]);
+  function getUser(StateLib.State storage state, uint256 parentNum, address userAddress) constant internal returns (User storage) {
+    require(userExists(state, parentNum, userAddress));
+    return (getUserRaw(state, parentNum, userAddress));
   }
 
-  function getUserByNumber(State storage self, uint256 num) internal returns (User storage) {
-    require(userExistsByNumber(self, num));
-    return (getUserByNumberRaw(self, num));
+  function getUsers(StateLib.State storage state, uint256 parentNum) constant internal returns (address[]) {
+    var p = PostLib.getPost(state, parentNum);
+    return (p.userAddresses);
   }
 
+  function join(StateLib.State storage state, uint256 parentNum) public {
+    require(!userExists(state, parentNum, msg.sender));
 
-  function getUserAddresses(State storage self) returns (address[]) {
-    return (self.addresses);
-  }
-
-  function userExistsByAddress(State storage self, address addr) internal returns (bool) {
-    require(addr != 0x0);
-    return (self.byAddress[addr].number != 0);
-  }
-
-  function getUserByAddressRaw(State storage self, address userAddress) internal returns (User storage) {
-    return (self.byAddress[userAddress]);
-  }
-
-  function getUserByAddress(State storage self, address userAddress) internal returns (User storage) {
-    require(self.userExistsByAddress(userAddress));
-    return (self.getUserByAddressRaw(userAddress));
-  }
-
-  function join(State storage self, PermissionLib.State storage permissionlib) {
-    require(!userExistsByAddress(self, msg.sender));
-
-    if (!permissionlib.userJoin(self, msg.sender)) {
-      return;
+    if (state.main.initialized) {
+      if (!PermissionLib.userJoin(state, parentNum, msg.sender)) {
+        //UserJoinDenied event emitted by permissionlib
+        return;
+      }
     }
 
-    self.count++;
-    self.byAddress[msg.sender] = self.byNumber[self.count] = User({
-      contents: ContentLib.Content({
-        title: "",
-        mimeType: "",
-        multihash: ContentLib.IpfsMultihash({
-          hashFunction: 0,
-          hashLength: 0,
-          hash: ""
+    var p = PostLib.getPost(state, parentNum);
+
+    if (p.userAddressesMap[msg.sender] == 0) { //user has never been in the group before
+      state.userLib.count++;
+      p.users[msg.sender] = User({
+        parentNum: parentNum,
+        contents: ContentLib.Content({
+          title: "",
+          mimeType: "",
+          multihash: ContentLib.IpfsMultihash({
+            hashFunction: 0,
+            hashLength: 0,
+            hash: ""
+          }),
+          creator: msg.sender,
+          creationTime: block.timestamp
         }),
-        creator: msg.sender,
-        creationTime: block.timestamp
-      }),
-      number: self.count,
-      directAddress: 0,
-      permissions: 0 //TODO: ruleset
-    });
+        balance: 0, //TODO: ruleset
+        joined: true,
+        banned: false,
+        banReason: "",
+        permissions: -1 //TODO: ruleset, permissions for new users
+      });
 
-    self.addresses.push(msg.sender);
-    self.numbers.push(self.count);
+      p.userAddressesMap[msg.sender] = p.userAddresses.length;
+      p.userAddresses.push(msg.sender);
+    } else { //user has been in the group before, just restore the profile
+      p.users[msg.sender].joined = true;
+      //p.users[msg.sender].parentNum = parentNum;
+      p.userAddresses[p.userAddressesMap[msg.sender]] = msg.sender;
+    }
 
-    UserJoined(self.count, msg.sender);
+    UserJoined(parentNum, msg.sender);
   }
 
-  function leave(State storage self) { 
-    require(self.userExistsByAddress(msg.sender));
+  function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) internal {
+    var p = PostLib.getPost(state, parentNum);
+    p.users[userAddress].joined = false;
+    p.userAddresses[p.userAddressesMap[userAddress]] = address(0x0);
+    UserLeft(parentNum, userAddress);
+  }
 
-    //TODO: send the user their ether
+  function leave(StateLib.State storage state, uint256 parentNum) public { 
+    require(userExists(state, parentNum, msg.sender));
 
-    uint256 old_num = self.byAddress[msg.sender].number;
+    removeUser(state, parentNum, msg.sender);
+    //TODO: send the user their ether, based on ruleset
 
-    self.byAddress[msg.sender].number = 0;
-
-    self.byNumber[old_num] = self.byAddress[msg.sender];
-    delete self.addresses[old_num - 1];
-    delete self.numbers[old_num - 1];
-
-    UserLeft(old_num, msg.sender);
+//    var u = getUser(state, parentNum, msg.sender);
+//    var p = PostLib.getPost(state, parentNum);
+    //u.parentNum = 0;
+    //p.users[msg.sender].parentNum = 0;
+    //p.userAddresses[p.userAddressesMap[msg.sender]] = 0;
   }
 
 }

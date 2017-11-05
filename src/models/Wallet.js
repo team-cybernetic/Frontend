@@ -1,4 +1,5 @@
-import Blockchain from '../ethWrappers/Blockchain';
+import Blockchain from '../blockchain/Blockchain';
+import CyberneticChat from '../blockchain/CyberneticChat';
 import GasEstimator from '../utils/GasEstimator';
 import TransactionConfirmationModal from '../components/TransactionConfirmationModal';
 import BigNumber from 'bignumber.js';
@@ -88,21 +89,53 @@ export default class Wallet {
     });
   }
 
-  //TODO: update this so it actually runs the transaction
-  static runTransaction(contract, methodName, description, ...args) {
-    return GasEstimator.estimate(contract, methodName, ...args).then((gas) => {
-      return new Promise((resolve, reject) => {
-        if (!this.managedWeb3 && description) {
-          TransactionConfirmationModal.show(gas, description, (gasPrice) => {
-            resolve({ gas, gasPrice });
-          }, reject);
+  static runTransaction(sync, methodName, description, ...args) {
+    return new Promise((resolve, reject) => {
+      new Promise((resolve, reject) => {
+        console.log("runTransaction(", methodName, ",", ...args);
+        resolve({gas: 4000000, gasPrice: 1}); //MASSIVE TODO
+        /*
+        GasEstimator.estimate(methodName, ...args).then((gas) => {
+          if (!this.managedWeb3 && description) {
+            TransactionConfirmationModal.show(gas, description, (gasPrice) => {
+              resolve({ gas, gasPrice });
+            }, reject);
+          } else {
+            resolve({ gas, gasPrice: this.defaultGasPrice });
+          }
+        });
+        */
+      }).then(({gas, gasPrice}) => {
+        const options = { gas, gasPrice, from: this.getAccountAddress() };
+        if (sync) {
+          CyberneticChat.getContractInstance()[methodName](...args, options).then(resolve).catch(reject);
         } else {
-          resolve({ gas, gasPrice: this.defaultGasPrice });
+          CyberneticChat.getContractInstance().contract[methodName](...args, options, (error, txid) => {
+            if (!error) {
+              resolve(txid);
+            } else {
+              reject(error);
+            }
+          });
         }
+      }).catch((error) => {
+        if (!error.cancel) {
+          console.error("Failed to run " + (sync ? '' : 'a') + "synchronous transaction:", error);
+        }
+        reject(error);
       });
     });
   }
 
+  static runTransactionSync(methodName, description, ...args) {
+    return (this.runTransaction(true, methodName, description, ...args));
+  }
+
+  static runTransactionAsync(methodName, description, ...args) {
+    return (this.runTransaction(false, methodName, description, ...args));
+  }
+
+  /*
   static deployContract(contractTC) {
     return GasEstimator.estimateContractCreation(contractTC).then((gas) => {
       console.log("Gas estimator estimates that this contract creation will take", gas, "gas");
@@ -117,6 +150,7 @@ export default class Wallet {
       });
     });
   }
+  */
 
   static getAccountAddress() {
     return this.web3.eth.defaultAccount;

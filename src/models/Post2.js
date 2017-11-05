@@ -1,48 +1,51 @@
 import Ipfs from '../utils/Ipfs';
 import BigNumber from 'bignumber.js';
 
-export default class User {
-  constructor(parentGroup, user) {
+export default class Post {
+  constructor(parentGroup, post) {
     this.parentGroup = parentGroup;
-    this.profileLoadListeners = [];
+    this.contentLoadListeners = [];
     this.headerLoadListeners = [];
     this.confirmationListeners = [];
     this.updateListeners = [];
-    this.populate(user);
+    this.populate(post);
     this.confirming = false;
     this.headerLoading = false;
-    this.profileLoading = false;
+    this.contentLoading = false;
+    this.confirmed = false;
   }
 
   populate({
-    nickname,
-    profile,
-    profileType,
+    id,
+    parentNumber,
+    title,
+    content,
+    contentType,
     multiHashArray,
     multiHashString,
-    joinTime,
-    address,
+    creationTime,
+    creator,
     balance,
-    parentNumber,
-    transactionId,
+    tokens,
     permissions,
-    banned,
+    transactionId,
   }) {
-    this.nickname = nickname || this.nickname;
-    this.profile = profile || this.profile;
-    this.profileType = profileType || this.profileType;
+    this.title = title || this.title;
+    this.content = content || this.content;
+    this.contentType = contentType || this.contentType;
     this.multiHashArray = multiHashArray || this.multiHashArray;
     this.multiHashString = (multiHashString === "" ? "" : (multiHashString || this.multiHashString));
+    this.id = (id ? id.toString() : this.id);
     this.parentNumber = (parentNumber ? parentNumber.toString() : this.parentNumber);
     this.transactionId = transactionId || this.transactionId;
     this.permissions = permissions || this.permissions;
-    this.joinTime = joinTime || this.joinTime;
-    this.banned = banned || this.banned;
-    this.address = address || this.address;
+    this.creationTime = creationTime || this.creationTime;
+    this.creator = creator || this.creator;
     this.balance = balance || this.balance || new BigNumber(0);
-    this.confirmed = !!this.parentNumber;
-    this.headerLoaded = !!this.nickname || (this.confirmed && !!this.address);
-    this.profileLoaded = !!this.profile || this.multiHashString === "";
+    this.tokens = tokens || this.tokens || new BigNumber(0);
+    //this.confirmed = !!this.id;
+    this.headerLoaded = !!this.title;
+    this.contentLoaded = !!this.content || this.multiHashString === "";
     this.fireUpdateListeners();
   }
 
@@ -54,30 +57,35 @@ export default class User {
     return (this.headerLoaded);
   }
 
-  isProfileLoaded() {
-    return (this.profileLoaded);
+  isContentLoaded() {
+    return (this.contentLoaded);
   }
 
   isLoaded() {
-    return (this.isConfirmed() && this.isHeaderLoaded() && this.isProfileLoaded());
+    return (this.isConfirmed() && this.isHeaderLoaded() && this.isContentLoaded());
   }
 
-  getAddress() {
-    return (this.address);
-  }
-
-  getParentNumber() {
-    return (this.parentNumber);
-  }
-
+  /**
+   * Get the balance this post owns in its parent group
+   */
   getBalance() {
     return (this.balance || new BigNumber(0));
+  }
+
+  /**
+   * Get the total number of tokens this post has issued to its subposts and users
+   */
+  getTokens() {
+    return (this.tokens || new BigNumber(0));
+  }
+
+  getNumber() {
   }
 
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.
   load() {
     return new Promise((resolve, reject) => {
-      this.loadProfile().then(() => { //loadProfile calls loadHeader which calls waitForConfirmation
+      this.loadContent().then(() => { //loadContent calls loadHeader which calls waitForConfirmation
         resolve();
       }).catch((error) => {
         reject(error);
@@ -85,34 +93,36 @@ export default class User {
     });
   }
 
-  userStructToObject([
+  postStructToObject([
+    id,
     parentNumber,
-    nickname,
-    profileType,
+    title,
+    contentType,
     ipfsHashFunction,
     ipfsHashLength,
     ipfsHash,
-    address,
-    joinTime,
+    creator,
+    creationTime,
     balance,
-    permissions,
-    banned,
+    tokens,
+    permissions
   ]) {
     const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
     return ({
+      id,
       parentNumber,
-      nickname,
-      profileType,
+      title,
+      contentType,
       multiHashArray,
       multiHashString: Ipfs.assembleMultiHash(multiHashArray),
       ipfsHashFunction,
       ipfsHashLength,
       ipfsHash,
-      address,
-      joinTime,
+      creator,
+      creationTime,
       balance,
+      tokens,
       permissions,
-      banned,
     });
   }
 
@@ -136,26 +146,25 @@ export default class User {
           this.headerLoadListeners.push({ resolve, reject });
         } else {
           this.headerLoading = true;
-          this.waitForConfirmation().then((userExists) => {
-            if (!userExists) {
-              let error = new Error("User " + this.id + " does not exist!");
+          //console.log("waiting for confirmation of post", this.id);
+          this.waitForConfirmation().then((postExists) => {
+            if (!postExists) {
+              let error = new Error("Post " + this.id + " does not exist!");
               this.markHeaderLoadedFailure(error);
               reject(error);
               return;
             }
-            if (!this.headerLoaded) { //waitForConfirmation can load header on an edge case
-              this.parentGroup.loadUser(this.address).then((userStruct) => {
-                console.log("User loaded struct:", userStruct);
-                this.populate(this.userStructToObject(userStruct));
-                this.markHeaderLoaded();
-                resolve();
-              }).catch((error) => {
-                this.markHeaderLoadedFailure(error);
-                reject(error);
-              });
-            } else {
+            //console.log("post", this.id, "confirmed");
+            this.parentGroup.loadPost(this.id).then((postStruct) => {
+              //console.log("post", this.id, "loaded", postStruct);
+              this.populate(this.postStructToObject(postStruct));
+              //console.log(this);
+              this.markHeaderLoaded();
               resolve();
-            }
+            }).catch((error) => {
+              this.markHeaderLoadedFailure(error);
+              reject(error);
+            });
           }).catch((error) => {
             this.markHeaderLoadedFailure(error);
             reject(error);
@@ -174,39 +183,39 @@ export default class User {
     return (this.loadHeader());
   }
 
-  markProfileLoaded() {
-    this.profileLoaded = true;
-    this.profileLoading = false;
-    this.profileLoadListeners.forEach((listener) => { listener.resolve() });
-    this.profileLoadListeners = [];
+  markContentLoaded() {
+    this.contentLoaded = true;
+    this.contentLoading = false;
+    this.contentLoadListeners.forEach((listener) => { listener.resolve() });
+    this.contentLoadListeners = [];
   }
 
-  markProfileLoadedFailure(error) {
-    this.profileLoading = false;
-    this.profileLoadListeners.forEach((listener) => { listener.reject(error) });
-    this.profileLoadListeners = [];
+  markContentLoadedFailure(error) {
+    this.contentLoading = false;
+    this.contentLoadListeners.forEach((listener) => { listener.reject(error) });
+    this.contentLoadListeners = [];
   }
 
-  loadProfile() {
+  loadContent() {
     return new Promise((resolve, reject) => {
-      if (!this.profileLoaded) {
-        if (this.profileLoading) {
-          this.profileLoadListeners.push({ resolve, reject });
+      if (!this.contentLoaded) {
+        if (this.contentLoading) {
+          this.contentLoadListeners.push({ resolve, reject });
         } else {
-          this.profileLoading = true;
+          this.contentLoading = true;
           this.loadHeader().then(() => {
-            Ipfs.getContent(this.multiHashString).then((profile) => {
+            Ipfs.getContent(this.multiHashString).then((content) => {
               this.populate({
-                profile,
+                content,
               });
-              this.markProfileLoaded();
+              this.markContentLoaded();
               resolve();
             }).catch((error) => {
-              this.markProfileLoadedFailure(error);
+              this.markContentLoadedFailure(error);
               reject(error);
             });
           }).catch((error) => {
-            this.markProfileLoadedFailure(error);
+            this.markContentLoadedFailure(error);
             reject(error);
           });
         }
@@ -216,17 +225,17 @@ export default class User {
     });
   }
 
-  reloadProfile() {
-    if (this.profileLoaded) {
-      this.profileLoaded = false;
+  reloadContent() {
+    if (this.contentLoaded) {
+      this.contentLoaded = false;
     }
-    return (this.loadProfile());
+    return (this.loadContent());
   }
 
-  markConfirmed() {
-    this.confirmed = true;
+  markConfirmed(result = true) {
+    this.confirmed = result;
     this.confirming = false;
-    this.confirmationListeners.forEach((listener) => { listener.resolve() });
+    this.confirmationListeners.forEach((listener) => { listener.resolve(result) });
     this.confirmationListeners = [];
   }
 
@@ -243,13 +252,20 @@ export default class User {
           this.confirmationListeners.push({ resolve, reject });
         } else {
           this.confirming = true;
-          if (this.transactionId) {
-            var eventListenerHandle = this.parentGroup.registerUserJoinedEventListener((error, response) => { //TODO: parentGroup.waitForNewUserEvent(txid).then((response) =>
+          if (!!this.id) {
+            this.parentGroup.postExists(this.id).then((result) => {
+              this.markConfirmed(result);
+              resolve(result);
+            }).catch((error) => {
+              this.markConfirmedFailure(error);
+              reject(error);
+            });
+          } else {
+            var eventListenerHandle = this.parentGroup.registerPostCreatedEventListener((error, response) => {
               if (!error) {
                 if (response.transactionHash === this.transactionId) {
                   this.populate({
-                    id: response.args.userNumber.toString(),
-                    address: response.args.userAddress.toString(),
+                    id: response.args.postNumber.toString(),
                   });
                   this.markConfirmed();
                   this.parentGroup.unregisterEventListener(eventListenerHandle);
@@ -261,28 +277,6 @@ export default class User {
                 reject(error);
               }
             });
-          } else {
-            if (this.address) {
-              console.log("waitForConfirmation: confirming user by address:", this.address);
-              this.parentGroup.loadUser(this.address).then((userStruct) => {
-                console.log("waitForConfirmation: loaded user:", userStruct);
-                const userFields = this.userStructToObject(userStruct);
-                console.log("waitForConfirmation: loaded struct:", userFields);
-                this.populate(userFields);
-                console.log("waitForConfirmation: marking user as loaded");
-                this.markConfirmed();
-                console.log("waitForConfirmation: marking header as loaded");
-                this.markHeaderLoaded();
-                console.log("waitForConfirmation: resolving true");
-                resolve(true);
-              }).catch((error) => {
-                this.markConfirmedFailure(error);
-                reject(error);
-              });
-            } else {
-              console.error("User not confirmed (no id), no txid, and no address??");
-              reject(new Error("User not confirmed (no id), no txid, and no address??"));
-            }
           }
         }
       } else {

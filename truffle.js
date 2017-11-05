@@ -4,13 +4,15 @@ module.exports = {
       host: "localhost",
       port: 8545,
       network_id: "*", // Match any network id
-      gas: 4712388,
-      gasPrice: 10000000000,
+      gas: '0x47E7C4',
+      gasPrice: 1000000000,
     },
     blokkchat: {
         host: "ttt222.org",
         port: 8545,
-        network_id: "*"
+        network_id: "*",
+        gas: '0x47E7C4',
+        gasPrice: 1000000000,
     }
   }
 };

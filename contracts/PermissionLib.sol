@@ -1,21 +1,25 @@
 pragma solidity ^0.4.11;
 
 import "./UserLib.sol";
+import "./PostLib.sol";
+import "./StateLib.sol";
 
 library PermissionLib {
 
   struct State {
-    mapping (address => int256) userPermissions;
-    mapping (address => bool) userBanned;
-    mapping (address => bool) userMuted;
-    mapping (address => string) userBanReason;
-    bool flagsMode;
   }
 
-  event UserJoinDenied(address indexed userAddress, string reason);
-  event CreatePostDenied(address indexed userAddress, string reason);
+  event UserJoinDenied(
+    uint256 indexed parentNumber,
+    address indexed userAddress,
+    string reason
+  );
+  event PostCreationDenied(
+    uint256 indexed parentNumber,
+    address indexed userAddress,
+    string reason
+  );
 
-  /*
   enum Action {
     User_join,                //user wants to join the group
     User_leave,               //user wants to leave the group
@@ -42,21 +46,39 @@ library PermissionLib {
     Group_content_edit,       //user wants to edit the content of the group
     Group_lock,               //user wants to lock the group
     Group_unlock,             //user wants to unlock the group
-    Group_permissions_edit,   //user wants to edit the assignable permissions of the group
+    Group_permissions_edit    //user wants to edit the assignable permissions of the group
   }
-  */
 
-  function userJoin(State storage self, UserLib.State storage userlib, address userAddress) returns (bool) {
-    if (self.userBanned[userAddress]) {
-      UserJoinDenied(userAddress, self.userBanReason[userAddress]);
+  function isPermitted(StateLib.State storage state, uint256 parentNum, int256 permissions, Action action) constant public returns (bool) {
+    var p = PostLib.getPost(state, parentNum);
+    if (!p.userPermissionsFlagsMode) {
+      permissions = p.userPermissions[permissions]; //user.permissions just maps to some flags
+    }
+    require(uint256(action) < 256);
+    return ((uint256(permissions) & (uint256(1) << uint256(action))) != 0);
+  }
+
+  function userJoin(StateLib.State storage state, uint256 parentNum, address userAddress) public returns (bool) {
+    var u = UserLib.getUserRaw(state, parentNum, userAddress);
+    if (u.banned) {
+      UserJoinDenied(
+        parentNum,
+        userAddress,
+        (bytes(u.banReason).length != 0) ?
+          u.banReason
+        :
+          "User is banned"
+      );
       return (false);
     }
     return (true);
   }
 
-  function createPost(State storage self, address userAddress) returns (bool) {
-    if (self.userMuted[userAddress]) {
-      CreatePostDenied(userAddress, "User is muted");
+  function createPost(StateLib.State storage state, uint256 parentNum, address userAddress) public returns (bool) {
+    var u = UserLib.getUser(state, parentNum, userAddress);
+    //if (u.muted) {
+    if (!isPermitted(state, parentNum, u.permissions, Action.Post_create)) {
+      PostCreationDenied(parentNum, userAddress, "User is muted");
       return (false);
     }
     return (true);

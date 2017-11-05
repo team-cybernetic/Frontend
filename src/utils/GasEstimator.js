@@ -1,3 +1,5 @@
+import CyberneticChat from '../blockchain/CyberneticChat';
+
 const GAS_MULTIPLIER = 1.5; //this ensures the calculated gas amount will actually work
 
 export default class GasEstimator {
@@ -7,9 +9,9 @@ export default class GasEstimator {
     this.web3 = web3;
   }
 
-  static estimate(contract, methodName, ...args) {
+  static estimate(methodName, ...args) {
     return new Promise((resolve, reject) => {
-      contract[methodName].estimateGas(...args).then((gas) => {
+      CyberneticChat.getContractInstance()[methodName].estimateGas(...args).then((gas) => {
         resolve(Math.ceil(gas * GAS_MULTIPLIER));
       }).catch((error) => {
         reject(error);
@@ -17,6 +19,7 @@ export default class GasEstimator {
     });
   }
 
+  /*
   static estimateContractCreation() {
     return new Promise((resolve, reject) => {
       let args = Array.prototype.slice.call(arguments);
@@ -33,4 +36,5 @@ export default class GasEstimator {
       });
     });
   }
+  */
 }

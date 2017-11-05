@@ -12,16 +12,49 @@ class Editor extends Component {
       isPosting: false,
       localBalance: "",
     }
+    this.userListener = null;
+    this.oldUser = null;
   }
 
   getBalances(isLoaded, group) {
     if (isLoaded) {
-      const user = group.getUserByAddress(Wallet.getAccountAddress());
-      user.loadHeader().then(() => {
-        this.setState({
-          localBalance: user.getBalance().toLocaleString(),
-        });
+      const userAddress = Wallet.getAccountAddress();
+      group.userExists(userAddress).then((exists) => {
+        if (exists) {
+          const user = group.getUser(userAddress);
+          user.loadHeader().then(() => {
+            console.log("Editor loaded user header:", user);
+            if (this.userListener) {
+              this.oldUser.unregisterUpdateListener(this.userListener);
+            }
+            this.userListener = user.registerUpdateListener(() => {
+              console.log("Editor got user update:", user);
+              this.setState({
+                localBalance: user.getBalance().toLocaleString(),
+              });
+            });
+
+            this.setState({
+              localBalance: user.getBalance().toLocaleString(),
+            });
+          }).catch((error) => {
+            console.error("Editor failed to load balance of self user", userAddress, ":", error);
+          });
+          this.oldUser = user;
+        } else {
+          console.log("Editor detect that self user", userAddress, "is not in group!");
+        }
+      }).catch((error) => {
+        console.error("Editor failed to get status of self user", userAddress, ":", error);
       });
+
+      /*
+      user.loadHeader().then(() => {
+        console.log("Editor loaded user header:", user);
+      }).catch((error) => {
+        console.error("Editor failed to get balances:", error);
+      });
+      */
     }
   }
 
@@ -75,7 +108,7 @@ class Editor extends Component {
     return (this.state.localBalance);
     /*
     if (this.props.isLoaded) {
-      const user = this.props.group.getUserByAddress(Wallet.getAccountAddress());
+      const user = this.props.group.getUser(Wallet.getAccountAddress());
       console.log("user = ", user);
       if (user) {
         return (user.getBalance().toLocaleString());
@@ -99,10 +132,11 @@ class Editor extends Component {
     const title = matches[1];
     const content = matches[3] ? matches[3] : '';
     const contentType = "text/plain";
+    const userPermissionsFlagsMode = true; //TODO: flags or levels mode?
     this.setState({
       isPosting: true,
     });
-    this.props.group.createPost({title: title.trim(), content, contentType}).then((post) => {
+    this.props.group.createPost({title: title.trim(), content, contentType, userPermissionsFlagsMode}).then((post) => {
       console.log("post created:", post);
       this.setState({
         textAreaValue: '',

@@ -1,32 +1,15 @@
 import Group from '../models/Group'
 import PathParser from '../utils/PathParser';
-import Blockchain from '../ethWrappers/Blockchain';
+import Blockchain from '../blockchain/Blockchain';
 
 export default class GroupStore {
-
-  /**
-   * This class maintains the system's view of the group tree.
-   * It must contain a reference to the root group, and the group TruffleContract 
-   * It will be able to perform arbitrary lookups for subnodes in the tree
-   * A subnode can be either a group or a post.
-   * Lookups are performed on strings (a path), which define the path to the subnode.
-   * A path that starts with a / is an absolute path, which navigates from the root node down
-   * A path that ends with a / specifies that if the lookup is successful, it should return a group.
-   * If the path does not end with a /, it means that the lookup should return a post.
-   * The GroupStore must caches all intermediate nodes for future lookups.
-   * The GroupStore must watch for NewGroup events on all of the cached nodes to react to dynamic changes in tree structure
-   * The GroupStore must provide an event listener for changes on cached nodes, so components which use the content of such nodes can react to changes in tree structure
-   **/
-
-  static contractTC = null;
-  //  static contractRootInstance = null;
-  static treeRoot = null;
+  static rootInstance = null;
   static web3 = null;
 
-  static initialize(web3, contractRootInstance, contractTC) {
+  static initialize(web3, rootInstance) {
     this.web3 = web3;
-    this.groupContractTC = contractTC;
-    this.treeRoot = new Group(this.web3, contractRootInstance, contractTC);
+    this.rootInstance = rootInstance;
+    this.treeRoot = new Group(1, 1);
     this.cache = [];
   }
 
@@ -38,20 +21,8 @@ export default class GroupStore {
 
   static resolvePath(parsedPath, startingGroup = null) {
     return new Promise((resolve, reject) => {
-      //need to do resolve({group, post, parsedPath}) or reject({error, group, partialPath})
-      /*
-       * steps needed to navigate to given path:
-       *  validate path
-       *  starting at the root group:
-       *    get each subgroup
-       *    if success
-       *      continue
-       *    if error
-       *      reject
-       */
-
-      
-      var currentGroup = this.treeRoot;
+      let currentGroup = this.treeRoot;
+      let pathToWalk = [];
       if (!parsedPath.absolute) {
         if (!startingGroup) { //passing undefined is also bad, and 0/false doesn't make sense
           reject({
@@ -65,12 +36,13 @@ export default class GroupStore {
         }
       } else {
         console.log("GroupStore walking an absolute path");
+        pathToWalk.push(1);
       }
       console.log("GroupStore descending into the forest...");
-      let groupNums = parsedPath.groupNums.slice(0); //clone the array
-      console.log("GroupStore needs to walk the path:", groupNums);
+      pathToWalk = pathToWalk.concat(parsedPath.groupNums);
+      console.log("GroupStore needs to walk the path:", pathToWalk);
       let pathWalked = [];
-      this.walkTree(groupNums, pathWalked, currentGroup).then((result) => {
+      this.walkTree(pathToWalk, pathWalked, currentGroup).then((result) => {
         console.log("Successfully walked tree:", result);
         console.log("path walked", pathWalked);
         if (!parsedPath.isGroup) {
@@ -83,11 +55,12 @@ export default class GroupStore {
           console.log("need to rebuild partialPath from:");
           console.log("pathWalked:", pathWalked);
           console.log("Failed on:", error.num);
-          console.log("groupNums:", groupNums);
+          console.log("pathToWalk:", pathToWalk);
           console.log("parsedPath:", parsedPath);
           let partial = "";
           if (parsedPath.absolute) {
             partial = parsedPath.separator;
+            pathWalked.shift(); //drop the root group
           }
           for (var i = 0; i < pathWalked.length; i++) {
             partial = partial + parsedPath.titleArray[i];
@@ -105,11 +78,45 @@ export default class GroupStore {
     return new Promise((resolve, reject) => {
       console.log("Walking the group tree; pathToWalk:", pathToWalk, "; pathWalked:", pathWalked);
       if (pathToWalk.length === 0) {
+        console.log("singleton resolved:", currentGroup);
         resolve({group: currentGroup});
         return;
       }
       var nextStep = pathToWalk.shift();
       console.log("nextStep:", nextStep);
+      currentGroup.postExists(nextStep).then((exists) => {
+        if (exists) {
+          currentGroup.getNumber().then((parentNum) => {
+            pathWalked.push(nextStep);
+            let nextGroup = this.getGroup(parentNum, nextStep);
+            this.walkTree(pathToWalk, pathWalked, nextGroup).then(resolve).catch(reject);
+          }).catch((error) => {
+            console.error("Error while getting number of group", nextStep, ":", error);
+            reject({
+              group: currentGroup,
+              num: nextStep,
+              partial: true,
+              error,
+            });
+          });
+        } else {
+          console.error("post", nextStep, "does not exist in group:", currentGroup);
+          reject({
+            group: currentGroup,
+            num: nextStep,
+            partial: true,
+          });
+        }
+      }).catch((error) => {
+        console.error("Failed to check if post", nextStep, " exists:", error);
+        reject({
+          group: currentGroup,
+          num: nextStep,
+          partial: true,
+          error,
+        });
+      });
+      /*
       currentGroup.getGroupAddressOfPost(nextStep).then((addr) => {
         console.log("got address for", nextStep, ":", addr);
         if (Blockchain.isAddressValid(addr)) {
@@ -143,10 +150,16 @@ export default class GroupStore {
           error,
         });
       });
+      */
     });
   }
 
-  static getGroup(addr) {
+  static getGroup(parentNum, num) {
+    if (!this.cache[num]) {
+      this.cache[num] = new Group(parentNum, num);
+    }
+    return (this.cache[num]);
+    /*
     return new Promise((resolve, reject) => {
       if (!this.cache[addr]) {
         console.log("group not cached");
@@ -162,5 +175,6 @@ export default class GroupStore {
         resolve(this.cache[addr]);
       }
     });
+    */
   }
 }

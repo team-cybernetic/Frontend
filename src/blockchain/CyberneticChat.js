@@ -1,87 +1,81 @@
 const EVENT_POST_CREATED = 'PostCreated';
-const EVENT_GROUP_CREATED = 'SubgroupCreated';
 const EVENT_USER_JOINED = 'UserJoined';
 const EVENT_USER_LEFT = 'UserLeft';
 const EVENT_USER_BALANCE_CHANGED = 'UserBalanceChanged';
+const EVENT_POST_BALANCE_CHANGED = 'PostBalanceChanged';
 
-export default class GroupContract {
-  constructor(web3, contractInstance) {
+export default class CyberneticChat {
+  static eventListeners = [[]];
+
+  static initialize(web3, contractInstance) {
     this.web3 = web3;
     this.contractInstance = contractInstance;
-    this.eventListeners = [[]];
     this.watchForEvent(EVENT_POST_CREATED, {}, (error, response) => {
+      console.log("EVENT: Post created! response:", response);
       this.fireEventListener(EVENT_POST_CREATED, error, response);
     });
-    this.watchForEvent(EVENT_GROUP_CREATED, {}, (error, response) => {
-      this.fireEventListener(EVENT_GROUP_CREATED, error, response);
-    });
     this.watchForEvent(EVENT_USER_JOINED, {}, (error, response) => {
+      console.log("EVENT: User joined! response:", response);
       this.fireEventListener(EVENT_USER_JOINED, error, response);
     });
     this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
+      console.log("EVENT: User left! response:", response);
       this.fireEventListener(EVENT_USER_LEFT, error, response);
     });
     this.watchForEvent(EVENT_USER_BALANCE_CHANGED, {}, (error, response) => {
+      console.log("EVENT: User balance changed! response:", response);
       this.fireEventListener(EVENT_USER_BALANCE_CHANGED, error, response);
+    });
+    this.watchForEvent(EVENT_POST_BALANCE_CHANGED, {}, (error, response) => {
+      console.log("EVENT: Post balance changed! response:", response);
+      this.fireEventListener(EVENT_POST_BALANCE_CHANGED, error, response);
     });
   }
 
-  getContractInstance() {
+  static getContractInstance() {
     return (this.contractInstance);
   }
 
-  watchEvent(eventName, filter, options, callback) {
+  static watchEvent(eventName, filter, options, callback) {
     this.contractInstance[eventName](filter, options).watch(callback);
   }
 
-  watchForEvent(eventName, filter, callback) {
+  static watchForEvent(eventName, filter, callback) {
     this.watchEvent(eventName, filter, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'}, callback);
   }
 
-  getPost(id) {
-    return (this.contractInstance.getPostByNumber.call(id));
+  static getPost(id) {
+    return (this.contractInstance.getPost.call(id));
   }
 
-  getPostIds() {
-    return (this.contractInstance.getPostNumbers.call());
+  static getChildren(parentNumber) {
+    return (this.contractInstance.getChildren.call(parentNumber));
   }
 
-  getUserIds() {
-    return (this.contractInstance.getUserNumbers.call());
+  static getUsers(parentNumber) {
+    return (this.contractInstance.getUsers.call(parentNumber));
   }
 
-  userExistsByAddress(addr) {
-    return (this.contractInstance.userExistsByAddress.call(addr));
+  static userExists(parentNumber, addr) {
+    return (this.contractInstance.userExists.call(parentNumber, addr));
   }
 
-  userExistsByNumber(num) {
-    return (this.contractInstance.userExistsByNumber.call(num));
+  static postExists(id) {
+    return (this.contractInstance.postExists.call(id));
   }
 
-  postExistsByNumber(num) {
-    return (this.contractInstance.postExistsByNumber.call(num));
+  static getUser(parentNumber, addr) {
+    return (this.contractInstance.getUser.call(parentNumber, addr));
   }
 
-  getUserByNumber(num) {
-    return (this.contractInstance.getUserByNumber.call(num));
-  }
-
-  getUserByAddress(address) {
-    return (this.contractInstance.getUserByAddress.call(address));
-  }
-
-  getTotalBalance() {
-    return (this.contractInstance.getTotalBalance.call());
-  }
-
-  unregisterEventListener(handle) {
+  static unregisterEventListener(handle) {
     if (handle) {
       let {eventName, num} = handle;
       delete (this.eventListeners[eventName][num - 1]);
     }
   }
 
-  registerEventListener(eventName, callback) {
+  static registerEventListener(eventName, callback) {
     if (!this.eventListeners[eventName]) {
       this.eventListeners[eventName] = [];
     }
@@ -92,27 +86,27 @@ export default class GroupContract {
     });
   }
 
-  registerPostCreatedEventListener(callback) {
+  static registerPostCreatedEventListener(callback) {
     return (this.registerEventListener(EVENT_POST_CREATED, callback));
   }
 
-  registerSubgroupCreatedEventListener(callback) {
-    return (this.registerEventListener(EVENT_GROUP_CREATED, callback));
-  }
-
-  registerUserJoinedEventListener(callback) {
+  static registerUserJoinedEventListener(callback) {
     return (this.registerEventListener(EVENT_USER_JOINED, callback));
   }
 
-  registerUserLeftEventListener(callback) {
+  static registerUserLeftEventListener(callback) {
     return (this.registerEventListener(EVENT_USER_LEFT, callback));
   }
 
-  registerUserBalanceChangedListener(callback) {
+  static registerUserBalanceChangedListener(callback) {
     return (this.registerEventListener(EVENT_USER_BALANCE_CHANGED, callback));
   }
 
-  fireEventListener(eventName, error, response) {
+  static registerPostBalanceChangedListener(callback) {
+    return (this.registerEventListener(EVENT_POST_BALANCE_CHANGED, callback));
+  }
+
+  static fireEventListener(eventName, error, response) {
     if (this.eventListeners[eventName] && this.eventListeners[eventName].length > 0) {
       this.eventListeners[eventName].forEach((listener) => {
         listener(error, response);

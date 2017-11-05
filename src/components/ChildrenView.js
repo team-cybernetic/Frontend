@@ -21,7 +21,7 @@ class ChildrenView extends Component {
 
   componentWillUnmount() {
     if (this.listenerHandle) {
-      this.props.group.unregisterPostCreatedListener(this.listenerHandle);
+      this.props.group.unregisterPostCreationListener(this.listenerHandle);
       this.listenerHandle = null;
     }
   }
@@ -30,9 +30,9 @@ class ChildrenView extends Component {
     if (isLoaded) {
       if (!this.props.isLoaded) {
         if (!this.listenerHandle) {
-          this.listenerHandle = group.registerPostCreatedListener((post) => this.addToPosts(post));
+          this.listenerHandle = group.registerPostCreationListener((post) => this.addToPosts(post));
         }
-        group.getPosts().then((posts) => {
+        group.getChildren().then((posts) => {
           this.setState({
             posts: this.reorderPosts(posts)
           });

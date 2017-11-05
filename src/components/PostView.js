@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
-import Blockchain from '../ethWrappers/Blockchain';
+import Blockchain from '../blockchain/Blockchain';
 
 export default class PostView extends Component {
   componentWillMount() {
+    console.log("props post:", this.props.post);
     this.listenerHandle = this.props.post.registerUpdateListener((post) => {
       this.forceUpdate();
     });
@@ -23,7 +24,6 @@ export default class PostView extends Component {
             {this.renderTitle()}
             {this.renderTimestamp()}
             {this.renderCreator()}
-            {this.renderGroup()}
             {this.renderMultiHash()}
             {this.renderContent()}
           </div>
@@ -52,7 +52,9 @@ export default class PostView extends Component {
 
   renderTitle() {
     return (
-      <Link to={this.getTargetPath()}>{this.renderId()}{this.props.post.title}</Link>
+      <div>
+        <Link to={this.getTargetPath()}>{this.renderId()}</Link>&nbsp;--&nbsp;<Link to={this.getTargetPath() + '/'}>{this.props.post.title}</Link>
+      </div>
     );
   }
 
@@ -63,42 +65,6 @@ export default class PostView extends Component {
         <span style={this.styles.creatorHash}>
           {this.props.post.creator}
         </span>
-      </span>
-    );
-  }
-
-  renderConvertToGroupButton() {
-    if (!Blockchain.isAddressNull(this.props.post.groupAddress)) {
-      return ('');
-    }
-    return (
-      <button style={this.styles.joinButton} onClick={() => this.createGroup(this.props.post.id)}>Create group!</button>
-    );
-  }
-
-  createGroup(id) {
-    console.log("creating group on post", id);
-    this.props.group.convertPostToGroup(id).then((result) => {
-      console.log("successfully created group on post", id, ":", result);
-      this.forceUpdate();
-    });
-  }
-
-
-  renderGroupAddress() {
-    if (!Blockchain.isAddressNull(this.props.post.groupAddress)) {
-      return (
-        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>
-      );
-    } else {
-      return ('');
-    }
-  }
-
-  renderGroup() {
-    return (
-      <span style={this.styles.multiHash}>
-        Group:&nbsp;{this.renderGroupAddress()}{this.renderConvertToGroupButton()}
       </span>
     );
   }
@@ -120,13 +86,13 @@ export default class PostView extends Component {
     if (this.props.post.id) {
       return (
         <span style={this.styles.number}>
-          #{this.props.post.id} --&nbsp;
+          #{this.props.post.id}
         </span>
       );
     } else {
       return (
         <span style={this.styles.number}>
-          Pending --&nbsp;
+          Pending
         </span>
       );
     }

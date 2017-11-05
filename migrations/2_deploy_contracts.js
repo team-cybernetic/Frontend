@@ -1,4 +1,4 @@
-var Group = artifacts.require("./Group.sol");
+var CyberneticChat = artifacts.require("./CyberneticChat.sol");
 var PostLib = artifacts.require("./PostLib.sol");
 var UserLib = artifacts.require("./UserLib.sol");
 var ContentLib = artifacts.require("./ContentLib.sol");
@@ -18,8 +18,10 @@ module.exports = function(deployer) {
   deployer.link(PermissionLib, PostLib);
   deployer.deploy(PostLib);
 
-  deployer.link(UserLib, Group);
-  deployer.link(PostLib, Group);
-  deployer.link(ContentLib, Group);
-  deployer.link(CurrencyLib, Group);
+  deployer.link(UserLib, CyberneticChat);
+  deployer.link(PostLib, CyberneticChat);
+  deployer.link(ContentLib, CyberneticChat);
+  deployer.link(CurrencyLib, CyberneticChat);
+
+  deployer.deploy(CyberneticChat, "title", "text/plain", 0, 0, "", 0);
 };

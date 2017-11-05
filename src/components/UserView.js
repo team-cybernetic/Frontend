@@ -37,6 +37,7 @@ export default class UserView extends Component {
     );
   }
 
+  /*
   renderNumber() {
     return (
       <div style={this.styles.numberWrapper}>
@@ -47,6 +48,7 @@ export default class UserView extends Component {
       </div>
     );
   }
+  */
 
   renderBalance() {
     return (
@@ -64,7 +66,6 @@ export default class UserView extends Component {
       return (
         <div style={this.styles.container} className='card'>
           <div style={this.styles.cardContent} className='card-content'>
-            {this.renderNumber()}
             {this.renderAddress()}
             {this.renderBalance()}
           </div>

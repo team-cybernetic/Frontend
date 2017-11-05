@@ -5,108 +5,132 @@ import "./PostLib.sol";
 
 library CurrencyLib {
   struct State {
-    mapping (address => uint256) userBalance;
-    mapping (uint256 => uint256) postBalance;
     uint256 total;
   }
 
-  using UserLib for UserLib.State;
-  using PostLib for PostLib.State;
+  event UserBalanceChanged(
+    uint256 indexed parentNumber,
+    address indexed userAddress,
+    uint256 amount,
+    bool increased
+  );
+  event PostBalanceChanged(
+    uint256 indexed parentNumber,
+    uint256 indexed postNumber,
+    uint256 amount,
+    bool increased
+  );
 
-  event UserBalanceChanged(uint256 indexed userNumber, address indexed userAddress, uint256 amount, bool increased);
-  event PostBalanceChanged(uint256 indexed postNumber, uint256 amount, bool increased);
+
 
   function transferTokensToUser(
-    State storage self,
-    UserLib.State storage userlib,
+    StateLib.State storage state,
+//    uint256 parentNum,
+    PostLib.Post storage parent,
     address receiverAddress,
     uint256 amount,
     bool increase
-  ) {
+  ) public {
     if (amount == 0) {
       return;
     }
-    awardTokensToUser(self, userlib.getUserByAddress(msg.sender), amount, false);
-    awardTokensToUser(self, userlib.getUserByAddress(receiverAddress), amount, increase);
+    uint256 parentNum = parent.number;
+    var sender = UserLib.getUser(state, parentNum, msg.sender);
+    var receiver = UserLib.getUser(state, parentNum, receiverAddress);
+    //var parent = PostLib.getPost(state, parentNum);
+    //doing the getUser calls here lets them do their requires() for validation
+
+    awardTokensToUser(parent, sender, amount, false);
+    awardTokensToUser(parent, receiver, amount, increase);
     //TODO: ruleset taxes, not 1:1 deduction?
   }
 
   function transferTokensToPost(
-    State storage self,
-    UserLib.State storage userlib,
-    PostLib.State storage postlib,
-    uint256 postNum,
+    StateLib.State storage state,
+//    uint256 parentNum,
+    PostLib.Post storage parent,
+    PostLib.Post storage receiver,
+//    uint256 postNum,
     uint256 amount,
     bool increase
-  ) {
+  ) public {
     if (amount == 0) {
       return;
     }
-    awardTokensToUser(self, userlib.getUserByAddress(msg.sender), amount, false);
-    awardTokensToPost(self, postlib.getPostByNumber(postNum), amount, increase);
+//    uint256 parentNum = parent.number;
+//    uint256 postNum = receiver.number;
+    require(PostLib.isChild(state, parent.number, receiver.number));
+
+    var sender = UserLib.getUser(state, parent.number, msg.sender);
+//    var receiver = PostLib.getPost(state, postNum);
+    //var parent = PostLib.getPost(state, parentNum);
+
+    awardTokensToUser(parent, sender, amount, false);
+    awardTokensToPost(parent, receiver, amount, increase);
     //TODO: ruleset taxes, not 1:1 deduction?
   }
 
-  function add(uint256 x, uint256 y) internal returns (uint256 z) {
+  function add(uint256 x, uint256 y) pure internal returns (uint256 z) {
     if ((z = x + y) < x) {
       return (2**256 - 1);
     }
   }
 
-  function subtract(uint256 x, uint256 y) internal returns (uint256 z) {
+  function subtract(uint256 x, uint256 y) pure internal returns (uint256 z) {
     if ((z = x - y) > x) {
       return (0);
     }
   }
 
   function awardTokensToUser(
-    State storage self,
+//    StateLib.State storage state,
+    PostLib.Post storage parent,
     UserLib.User storage user,
     uint256 amount,
     bool increase
-  ) {
-    address userAddress = user.contents.creator;
-    uint256 oldBalance = self.userBalance[userAddress];
+  ) internal {
+    uint256 oldUserBalance = user.balance;
+    uint256 oldParentBalance = parent.tokens;
+    uint256 userDelta;
+    uint256 parentDelta;
     if (increase) {
-      self.total = add(self.total, amount);
-      self.userBalance[userAddress] = add(self.userBalance[userAddress], amount);
-      UserBalanceChanged(user.number, userAddress, subtract(self.userBalance[userAddress], oldBalance), increase);
+      parent.tokens = add(parent.tokens, amount);
+      parentDelta = subtract(parent.tokens, oldParentBalance);
+      user.balance = add(user.balance, amount);
+      userDelta = subtract(user.balance, oldUserBalance);
     } else {
-      self.total = subtract(self.total, amount);
-      self.userBalance[userAddress] = subtract(self.userBalance[userAddress], amount);
-      UserBalanceChanged(user.number, userAddress, subtract(oldBalance, self.userBalance[userAddress]), increase);
+      parent.tokens = subtract(parent.tokens, amount);
+      parentDelta = subtract(oldParentBalance, parent.tokens);
+      user.balance = subtract(user.balance, amount);
+      userDelta = subtract(oldUserBalance, user.balance);
     }
+    UserBalanceChanged(parent.number, user.contents.creator, userDelta, increase);
+    PostBalanceChanged(parent.parentNum, parent.number, parentDelta, increase);
   }
 
   function awardTokensToPost(
-    State storage self,
+//    StateLib.State storage state,
+    PostLib.Post storage parent,
     PostLib.Post storage post,
     uint256 amount,
     bool increase
-  ) {
-    uint256 postNum = post.number;
-    uint256 oldBalance = self.postBalance[postNum];
+  ) internal {
+    uint256 oldPostBalance = post.balance;
+    uint256 oldParentBalance = parent.tokens;
+    uint256 postDelta;
+    uint256 parentDelta;
     if (increase) {
-      self.total = add(self.total, amount);
-      self.postBalance[postNum] = add(self.postBalance[postNum], amount);
-      PostBalanceChanged(postNum, subtract(self.postBalance[postNum], oldBalance), increase);
+      parent.tokens = add(parent.tokens, amount);
+      parentDelta = subtract(parent.tokens, oldParentBalance);
+      post.balance = add(post.balance, amount);
+      postDelta = subtract(post.balance, oldPostBalance);
     } else {
-      self.total = subtract(self.total, amount);
-      self.postBalance[postNum] = subtract(self.postBalance[postNum], amount);
-      PostBalanceChanged(postNum, subtract(oldBalance, self.postBalance[postNum]), increase);
+      parent.tokens = subtract(parent.tokens, amount);
+      parentDelta = subtract(oldParentBalance, parent.tokens);
+      post.balance = subtract(post.balance, amount);
+      postDelta = subtract(oldPostBalance, post.balance);
     }
-  }
-
-  function getUserBalance(State storage self, UserLib.User storage user) returns (uint256) {
-    address userAddress = user.contents.creator;
-    return (self.userBalance[userAddress]);
-  }
-
-  function getPostBalance(State storage self, PostLib.Post storage post) returns (uint256) {
-    return (self.postBalance[post.number]);
-  }
-
-  function getTotalBalance(State storage self) returns (uint256) {
-    return (self.total);
+    PostBalanceChanged(parent.number, post.number, postDelta, increase);
+    PostBalanceChanged(parent.parentNum, parent.number, parentDelta, increase);
   }
 }

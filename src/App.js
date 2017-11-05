@@ -29,22 +29,40 @@ export default class InitializationWrapper extends Component {
       });
     }).catch((error) => {
       console.error("Error while initializing app:", error);
+      if (error.notDeployed) {
+        this.setState({
+          error: {
+            notDeployed: true,
+            message: "The Cybernetic Chat contract has not yet been deployed to this network (" + error.network + ")!",
+          },
+        });
+      }
     });
     registerServiceWorker();
   }
 
   render() {
-    if (!this.state.isLoaded) {
-      return (
-        <div style={styles.container}>
-          <button style={styles.loader} className='button is-loading'></button>
-        </div>
-      );
+    if (!this.state.error) {
+      if (!this.state.isLoaded) {
+        return (
+          <div style={styles.container}>
+            <button style={styles.loader} className='button is-loading'></button>
+          </div>
+        );
+      } else {
+        return (
+          <Router>
+            <Route path="/:path*" component={App} />
+          </Router>
+        );
+      }
     } else {
       return (
-        <Router>
-          <Route path="/:path*" component={App} />
-        </Router>
+        <div style={styles.errorContainer}>
+          <span style={styles.error}>
+            {this.state.error.message}
+          </span>
+        </div>
       );
     }
   }
@@ -87,7 +105,7 @@ class App extends Component {
         });
       }).catch((errorState) => {
         if (errorState.partial) {
-          console.log("App was able to partially navigate to", errorState.partialPath.path);
+          console.log("App was able to partially navigate to", errorState.partialPath.path, "instead of the desired", parsedPath.path);
           this.context.router.history.replace({ pathname: errorState.partialPath.path });
           this.setState({
             isGroupLoaded: true,
@@ -167,5 +185,15 @@ const styles = {
     border: 0,
     fontSize: '3em',
     alignSelf: 'center',
+  },
+  errorContainer: {
+    width: '100%',
+    height: '100%',
+    textAlign: 'center',
+  },
+  error: {
+    position: 'relative',
+    top: '50%',
+    transform: 'translateY(-50%)', 
   },
 };

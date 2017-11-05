@@ -4,94 +4,107 @@ import "./ContentLib.sol";
 import "./UserLib.sol";
 import "./CurrencyLib.sol";
 import "./PermissionLib.sol";
+import "./StateLib.sol";
 
 library PostLib {
 
-  using PostLib for State;
-  using UserLib for UserLib.State;
-  using CurrencyLib for CurrencyLib.State;
-  using PermissionLib for PermissionLib.State;
+  event PostCreated(
+    uint256 indexed parentNumber,
+    uint256 indexed postNumber,
+    address indexed userAddress
+  );
 
-
-  event PostCreated(uint256 indexed postNumber);
-  event SubgroupCreated(uint256 indexed postNumber, address groupAddress);
+  struct State {
+    uint256 count;
+    mapping (uint256 => address[]) userAddressesBacking;
+    mapping (uint256 => uint256[]) childrenBacking;
+  }
 
   struct Post {
     ContentLib.Content contents;
     uint256 number; //must be > 0 if post exists, unique, immutable
-    address groupAddress; //null when group has not been created for this post
-    int256 permissions; //permission level of post
+    uint256 parentNum; //0 == no parent, but only the root should have parentNum == 0
+    uint256 balance; //balance in the parent group
+    uint256 tokens; //total balance of all sub-objects
+    int256 permissions; //permission level of post in parent group
+    mapping (int256 => int256) userPermissions; //for levels mode, permissions maps to the flags the level posesses
+    bool userPermissionsFlagsMode;
+    mapping (address => UserLib.User) users;
+    address[] userAddresses;
+    mapping (address => uint256) userAddressesMap; //maps a user address to the corresponding index in userAddresses, for deleting users
+    uint256[] children;
+    mapping (uint256 => uint256) childrenMap; //given the child post number, get the index at which it is stored in the children array
   }
 
-  struct State {
-    uint256 count;
-    mapping (uint256 => Post) byNumber;
-    uint256[] numbers;
+  function getPostRaw(StateLib.State storage state, uint256 num) constant internal returns (Post storage) {
+    return (state.main.posts[num]);
   }
 
-  function getPostNumbers(State storage self) returns (uint256[]) {
-    return (self.numbers);
+  function postExists(StateLib.State storage state, uint256 num) constant internal returns (bool) {
+    return (num <= state.postLib.count && getPostRaw(state, num).number != 0);
   }
 
-  function postExistsByNumber(State storage self, uint256 num) internal returns (bool) {
-    require(num <= self.count);
-    return (self.byNumber[num].number != 0);
+  function getPost(StateLib.State storage state, uint256 num) constant internal returns (Post storage) {
+    require(postExists(state, num));
+    return (getPostRaw(state, num));
   }
 
-  function getPostByNumberRaw(State storage self, uint256 num) internal returns (Post storage) {
-    return (self.byNumber[num]);
+  function getChildren(StateLib.State storage state, uint256 num) constant internal returns (uint256[]) {
+    var p = getPost(state, num);
+    return (p.children);
   }
 
-  function getPostByNumber(State storage self, uint256 num) internal returns (Post storage) {
-    require(postExistsByNumber(self, num));
-    return (getPostByNumberRaw(self, num));
-  }
-
-  function setGroupAddressOfPost(
-    State storage self,
-    uint256 num,
-    address groupAddress
-  ) {
-    require(self.postExistsByNumber(num));
-
-    //TODO: ruleset check permissions to add associate a group to this post
-
-    //TODO: check if addr is a valid contract?
-
-    self.byNumber[num].groupAddress = groupAddress;
-
-    SubgroupCreated(num, groupAddress);
+  function isChild(StateLib.State storage state, uint256 parentNum, uint256 num) constant internal returns (bool) {
+    var p = getPost(state, parentNum);
+    return (p.childrenMap[num] != 0);
   }
 
   function addPost(
-    State storage self,
-    ContentLib.Content contents,
+    StateLib.State storage state,
+    uint256 parentNum,
     uint256 number,
-    address groupAddress,
+    ContentLib.Content contents,
+    uint256 balance,
+    uint256 tokens,
+    bool userPermissionsFlagsMode,
     int256 permissions
   ) private returns (Post) {
-    return (self.byNumber[self.count] = Post({
+    if (state.main.initialized) {
+      var parent = getPostRaw(state, parentNum);
+      parent.childrenMap[number] = parent.children.length;
+      parent.children.push(number);
+    }
+    return (state.main.posts[number] = Post({
       contents: contents,
       number: number,
-      groupAddress: groupAddress,
-      permissions: permissions
+      parentNum: parentNum,
+      balance: balance,
+      tokens: tokens, //TODO: ruleset
+      permissions: permissions,
+      userPermissionsFlagsMode: userPermissionsFlagsMode,
+      userAddresses: state.postLib.userAddressesBacking[number],
+      children: state.postLib.childrenBacking[number] //TODO: test if this really works
     }));
   }
 
-  function createPost(
-    State storage self,
-    UserLib.State storage userlib,
-    PermissionLib.State storage permissionlib,
-    CurrencyLib.State storage currencylib,
+  function createPostPreflightChecks(
+    StateLib.State storage state,
+    uint256 parentNum,
     string title,
     string mimeType,
     uint8 ipfsHashFunction,
     uint8 ipfsHashLength,
     bytes ipfsHash,
     uint256 creationTime
-  ) returns (uint256) {
+  ) private returns (
+    uint256 _creationTime
+  ) {
+    if (state.main.initialized) {
+      require(PermissionLib.createPost(state, parentNum, msg.sender));
+      require(postExists(state, parentNum));
+    }
 
-    require(permissionlib.createPost(msg.sender));
+    //require(!PermissionLib.postLocked(parentNum)); //TODO: self.byNumber[parentNum].locked ??
 
     //TODO: check title length via ruleset
     //TODO: UTF-8 length != bytes().length
@@ -102,6 +115,11 @@ library PostLib {
     require(ipfsHashLength == ipfsHash.length);
 
     //TODO: check if ipfs hash length matches expected size for hash function (function 0x12 should always be 0x20 bytes long)
+    if (ipfsHashLength != 0) {
+      if (ipfsHashFunction == 0x12) {
+        require(ipfsHashLength == 0x20);
+      }
+    }
 
     uint256 ctLen = bytes(mimeType).length;
 
@@ -113,19 +131,41 @@ library PostLib {
     if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) { //TODO ruleset? moving average across all posts in the last hour?
       creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
     }
+    _creationTime = creationTime;
+  }
 
-    if (!userlib.userExistsByAddress(msg.sender)) {
-      userlib.join(permissionlib); //TODO: ruleset
-    }
+  function createPost(
+    StateLib.State storage state,
+    uint256 parentNum,
+    string title,
+    string mimeType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash,
+    uint256 creationTime,
+    bool userPermissionsFlagsMode
+  ) public returns (uint256) {
 
-    UserLib.User storage u = userlib.getUserByAddress(msg.sender);
+    (creationTime) = createPostPreflightChecks(
+      state,
+      parentNum,
+      title,
+      mimeType,
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      creationTime
+    );
 
-    currencylib.awardTokensToUser(u, 8, true); //TODO: ruleset
 
-    self.count++;
+    state.postLib.count++;
+
+    uint256 newNum = state.postLib.count;
 
     addPost(
-      self,
+      state,
+      parentNum,
+      newNum,
       ContentLib.Content({
         title: title,
         mimeType: mimeType,
@@ -137,34 +177,30 @@ library PostLib {
         creator: msg.sender,
         creationTime: creationTime
       }),
-      self.count,
-      0x0,
-      0 //TODO: permissions from ruleset
+      0,    //TODO: ruleset, default balance in parent group of newly created post
+      0,    //TODO: ruleset? default tokens (shouldn't it always be 0?)
+      userPermissionsFlagsMode,
+      0     //TODO: ruleset, default permissions for new post
     );
 
-    /*
-    self.byNumber[self.count] = Post({
-      contents: ContentLib.Content({
-        title: title,
-        mimeType: mimeType,
-        multihash: ContentLib.IpfsMultihash({
-          hashFunction: ipfsHashFunction,
-          hashLength: ipfsHashLength,
-          hash: ipfsHash
-        }),
-        creator: msg.sender,
-        creationTime: creationTime
-      }),
-      number: self.count,
-      groupAddress: 0,
-      permissions: 0 //TODO: default from ruleset
-    });
-    */
+    //should the user join the new group?
+    UserLib.join(state, newNum); //TODO: ruleset? does it make sense to create a group but not be part of it?
 
-    self.numbers.push(self.count);
+    var u = UserLib.getUser(state, newNum, msg.sender);
+    u.permissions = -1; //TODO: ruleset, permissions of creator
 
-    PostCreated(self.count);
+    //should the user join the parent group? TODO: ruleset
+    if (!UserLib.userExists(state, parentNum, msg.sender)) {
+      UserLib.join(state, parentNum);
+    }
 
-    return (self.count);
+    u = UserLib.getUser(state, parentNum, msg.sender);
+
+    CurrencyLib.awardTokensToUser(getPost(state, parentNum), u, 8, true); //TODO: ruleset; how much should they get, if anything? also TODO msg.value for money paid in
+
+
+    PostCreated(parentNum, newNum, msg.sender);
+
+    return (newNum);
   }
 }
