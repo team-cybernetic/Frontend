@@ -23,8 +23,6 @@ export default class PostView extends Component {
           <div style={this.styles.cardContent} className='card-content'>
             {this.renderTitle()}
             {this.renderTimestamp()}
-            {this.renderCreator()}
-            {this.renderMultiHash()}
             {this.renderContent()}
           </div>
         </div>
@@ -45,7 +43,7 @@ export default class PostView extends Component {
 
     if (post && post.id) {
       const prefix = parent || '/';
-      return prefix + post.id + '-' + encodeURIComponent(post.title) + '';
+      return prefix + post.id + '-' + encodeURIComponent(post.title.replace(' ', '-')) + '';
     }
     return '';
   }
@@ -67,19 +65,6 @@ export default class PostView extends Component {
         </span>
       </span>
     );
-  }
-
-  renderMultiHash() {
-    if (this.props.post.multiHashString) {
-      return (
-        <span style={this.styles.multiHash}>
-          IPFS:&nbsp;
-          <a href={"https://ipfs.io/ipfs/" + this.props.post.multiHashString} target="_blank" style={this.styles.multiHashIpfs}>
-            {this.props.post.multiHashString}
-          </a>
-        </span>
-      );
-    }
   }
 
   renderId() {
@@ -104,7 +89,7 @@ export default class PostView extends Component {
     if (this.props.post.isContentLoaded()) {
       content = this.props.post.content;
     } else {
-      content = "Loading content...";
+      content = 'Loading content...';
       loaded = false;
     }
     content = xss(content).replace(/\n/g, '<br />');
@@ -124,12 +109,12 @@ export default class PostView extends Component {
   }
 
   renderTimestamp() {
-    let m = moment(this.props.post.creationTime, "X");
+    let m = moment(this.props.post.creationTime, 'X');
     return (
       <span style={this.styles.timestamp}>
-        Posted&nbsp;
         <span style={this.styles.date}>
-          {m.calendar()}
+          Posted&nbsp;
+          {m.calendar()} by <Link to={`/user/${this.props.post.creator}`}>{this.props.post.creator}</Link>
         </span>
       </span>
     );
@@ -142,16 +127,17 @@ export default class PostView extends Component {
           width: '96%',
           marginLeft: '2%',
           marginRight: '2%',
-          marginTop: '1.5%',
-          marginBottom: '1.5%',
+          marginTop: '2%',
+          marginBottom: '2%',
           backgroundColor: 'white',
         } : {
-          width: '46%',
-          marginLeft: '2%',
-          marginRight: '2%',
-          marginTop: '1.5%',
-          marginBottom: '1.5%',
-          backgroundColor: this.props.selected ? 'yellow' : 'white',
+          width: '48%',
+          marginLeft: '1%',
+          marginRight: '1%',
+          marginTop: '1%',
+          marginBottom: '1%',
+          backgroundColor: this.props.selected ? '#fdffea' : 'white',
+          border: 0,
         },
       contentWrapper: {
         flex: 1,
@@ -177,7 +163,8 @@ export default class PostView extends Component {
         fontSize: 'small',
       },
       date: {
-        fontSize: 'small',
+        color: '#858889',
+        fontSize: 'x-small',
       },
       number: {
         fontSize: 'small',

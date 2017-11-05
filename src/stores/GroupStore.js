@@ -16,7 +16,7 @@ export default class GroupStore {
   /**
    * Takes a parsedPath from PathParser.parse(path_string)
    * Returns a Promise
-   * If the path is a group (ends with a /) and the group can be fully resolved, resolves 
+   * If the path is a group (ends with a /) and the group can be fully resolved, resolves
    */
 
   static resolvePath(parsedPath, startingGroup = null) {

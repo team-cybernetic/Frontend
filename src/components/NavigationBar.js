@@ -18,9 +18,9 @@ class NavigationBar extends Component {
 
   parentPath() {
     if (!this.props.isLoaded || !this.props.pathState.parent) {
-      return ('');
+      return '';
     } else {
-      return (this.props.pathState.parent);
+      return this.props.pathState.parent;
     }
   }
 
@@ -32,18 +32,11 @@ class NavigationBar extends Component {
 
   getGroupTitle() {
     if (this.props.isLoaded) {
-      return (this.props.pathState.path);
+      return this.props.pathState.titleOnlyPath || this.props.pathState.path;
     } else {
-      return ("Loading...");
+      return "Loading...";
     }
-    /*
-    var url = this.props.path;
-    if(url === undefined) {
-      return 'root';
-    }
-    return url.substring(url.indexOf('-') + 1).trim();
-    */
-  }  
+  }
 
   renderIcon(name) {
     return (
@@ -54,11 +47,12 @@ class NavigationBar extends Component {
 
 const styles = {
   outerBar: {
-    backgroundColor: 'lightgray',
+    backgroundColor: 'white',
     display: 'flex',
     flex: '1 1 auto',
     paddingRight: '8px',
     paddingLeft: '8px',
+    borderBottom: '1px solid #aaafb2'
   },
   icon: {
     padding: '16px 5px',

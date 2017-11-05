@@ -6,9 +6,11 @@ import ChildrenView from './components/ChildrenView';
 import SideBar from './components/SideBar';
 import Editor from './components/Editor';
 import GroupStore from './stores/GroupStore';
-import PathParser from './utils/PathParser';
+import PathParser, { Type } from './utils/PathParser';
 import PropTypes from 'prop-types';
 import TransactionConfirmationModal from './components/TransactionConfirmationModal';
+import UserProfileSideBar from './components/UserProfileSideBar';
+import UserProfileView from './components/UserProfileView';
 import {
   BrowserRouter as Router,
   Route
@@ -85,15 +87,11 @@ class App extends Component {
 
   browseTo(path) {
     const parsedPath = PathParser.parse(path);
-    if (!parsedPath.equals(this.state.pathState)) {
+    if (!parsedPath.equals(this.state.pathState) && parsedPath.type === Type.POST) {
       let isGroupLoaded = this.state.pathState && parsedPath.sameGroup(this.state.pathState);
-      if (this.state.pathState)
-        console.log("App testing if", this.state.pathState.cleanGroupPath, "==", parsedPath.cleanGroupPath);
       this.setState({
         isGroupLoaded,
       });
-      if (this.state.pathState)
-        console.log("App testing if", this.state.pathState.cleanGroupPath, "==", parsedPath.cleanGroupPath, ":", parsedPath.sameGroup(this.state.pathState) ? 'true' : 'false', " -- which means that isGroupLoaded ==", isGroupLoaded ? 'true' : 'false');
       console.log("App path changed from", this.state.pathState, "to", parsedPath);
       GroupStore.resolvePath(parsedPath).then(({group, post}) => {
         console.log("App successfully resolved path for", path, "with post:", post);
@@ -140,7 +138,7 @@ class App extends Component {
   render() {
     const { group, post, pathState, transactionConfirmationInfo } = this.state;
     const sharedState = {
-      isLoaded: this.state.isGroupLoaded,
+      isLoaded: this.state.isGroupLoaded || this.state.pathState.type === Type.USER,
       group,
       post,
       pathState,
@@ -154,13 +152,37 @@ class App extends Component {
         <NavigationBar key={`navbar-${pathState.path}`} {...sharedState} />
         <div style={styles.content}>
           <div style={styles.childrenAndEditor}>
-            <ChildrenView key={`children-${pathState.cleanGroupPath}`} {...sharedState} />
+            {this.renderMainView(sharedState)}
             <Editor key={`editor-${pathState.cleanGroupPath}`} {...sharedState} />
           </div>
-          <SideBar key={`sidebar-${pathState.cleanGroupPath}`} {...sharedState} />
+          {this.renderSidebar(sharedState)}
         </div>
       </div>
     );
+  }
+
+  renderMainView(sharedState) {
+    if (sharedState.pathState.type === Type.USER) {
+      return (
+        <UserProfileView key={`user-profile-${sharedState.pathState.cleanGroupPath}`} {...sharedState} />
+      );
+    } else {
+      return (
+        <ChildrenView key={`children-${sharedState.pathState.cleanGroupPath}`} {...sharedState} />
+      );
+    }
+  }
+
+  renderSidebar(sharedState) {
+    if (sharedState.pathState.type === Type.USER) {
+      return (
+        <UserProfileSideBar key={`user-profile-sidebar-${sharedState.pathState.cleanGroupPath}`} {...sharedState} />
+      );
+    } else {
+      return (
+        <SideBar key={`sidebar-${sharedState.pathState.cleanGroupPath}`} {...sharedState} />
+      );
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PostView from './PostView';
 import { some } from 'lodash';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 class ChildrenView extends Component {
   constructor(props) {
@@ -43,27 +44,35 @@ class ChildrenView extends Component {
 
   render() {
     return (
-      <div style={styles.container}>
-        <div style={styles.children}>
-          {this.renderPosts()}
+      <Scrollbars style={styles.scrollBar}>
+        <div style={styles.container}>
+          <div style={styles.children}>
+            {this.renderPosts()}
+          </div>
         </div>
-      </div>
+      </Scrollbars>
     );
   }
 
   renderPosts() {
     if (this.props.isLoaded && this.state.posts) {
-      return (this.state.posts.map((post) => {
+      if (this.state.posts.length > 0) {
+        return (this.state.posts.map((post) => {
+          return (
+            <PostView
+              key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)}
+              post={post}
+              selected={this.props.post && (this.props.post.id === post.id)}
+              group={this.props.group}
+              parent={this.props.pathState.groupPath}
+            />
+          );
+        }));
+      } else {
         return (
-          <PostView
-            key={'post-' + this.props.pathState.cleanGroupPath + (post.id ? post.id : post.transactionId)}
-            post={post}
-            selected={this.props.post && (this.props.post.id === post.id)}
-            group={this.props.group}
-            parent={this.props.pathState.groupPath}
-          />
+          <div style={styles.noPosts}>No comments or posts to see here.</div>
         );
-      }));
+      }
     } else {
       return (
         <button style={styles.loader} className='button is-loading'></button>
@@ -105,7 +114,6 @@ class ChildrenView extends Component {
 
 const styles = {
   container: {
-    overflowY: 'scroll',
     flex: '1 1 0%',
   },
   children: {
@@ -113,6 +121,13 @@ const styles = {
     flexWrap: 'wrap',
     alignItems: 'flex-start',
     alignContent: 'flex-start',
+    padding: '1%',
+    minHeight: 'calc(100vh - 141px)',
+  },
+  scrollBar: {
+    width: '100%',
+    height: '96%',
+    backgroundColor: '#e6ecf0',
   },
   loader: {
     flex: 1,
@@ -122,6 +137,11 @@ const styles = {
   },
   loading: {
     margin: 'auto',
+  },
+  noPosts: {
+    alignSelf: 'center',
+    flex: 1,
+    textAlign: 'center',
   },
 };
 

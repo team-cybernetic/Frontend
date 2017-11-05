@@ -216,20 +216,22 @@ const styles = {
     right: '0',
   },
   modal: {
-    width: '960px',
-    minHeight: '250px',
+    width: '50%',
+    minHeight: '25%',
     backgroundColor: 'white',
-    padding: '10px',
+    padding: '20px',
+    border: '2px solid #aaafb2',
   },
   fieldText: {
     marginTop: '6px',
   },
   modalHeader: {
+    textAlign: 'center',
     fontSize: '24px',
   },
   modalDescription: {
     marginTop: '5px',
-    marginBottom: '5px',
+    marginBottom: '10px',
   },
   numberInputContainer: {
     alignItems: 'center',
