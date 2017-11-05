@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import cx from 'classnames';
 import Wallet from '../models/Wallet';
+import { Type } from '../utils/PathParser';
 
 const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*((.*\n?)+)\s*)?/;
 
@@ -11,17 +12,6 @@ class Editor extends Component {
       textAreaValue: '',
       isPosting: false,
       localBalance: "",
-    }
-  }
-
-  getBalances(isLoaded, group) {
-    if (isLoaded) {
-      const user = group.getUserByAddress(Wallet.getAccountAddress());
-      user.loadHeader().then(() => {
-        this.setState({
-          localBalance: user.getBalance().toLocaleString(),
-        });
-      });
     }
   }
 
@@ -52,9 +42,11 @@ class Editor extends Component {
         <textarea
           style={styles.textArea}
           className='textarea'
-          placeholder={'Clever Title\n[Witty content...]'}
+          placeholder={this.placeholder()}
           value={this.state.textAreaValue}
-          onChange={(e) => this.changeContent(e)} />
+          onChange={(e) => this.changeContent(e)}
+          disabled={this.isUserProfile() && !this.isOwnUserProfile()}
+        />
         <button
           style={styles.postButton}
           className={cx('button', {'is-loading': this.state.isPosting})}
@@ -67,6 +59,37 @@ class Editor extends Component {
       </div>
       </div>
     );
+  }
+
+  placeholder() {
+    if (this.isUserProfile()) {
+      if (this.isOwnUserProfile()) {
+        return 'Update your profile details.';
+      } else {
+        return 'Can\'t update someone else\'s profile.';
+      }
+    } else {
+      return 'Clever Title\n[Witty content...]'
+    }
+  }
+
+  isUserProfile() {
+    return this.props.pathState.type === Type.USER;
+  }
+
+  isOwnUserProfile() {
+    return this.props.pathState.userId === Wallet.getAccountAddress();
+  }
+
+  getBalances(isLoaded, group) {
+    if (isLoaded && !this.isUserProfile()) {
+      const user = group.getUserByAddress(Wallet.getAccountAddress());
+      user.loadHeader().then(() => {
+        this.setState({
+          localBalance: user.getBalance().toLocaleString(),
+        });
+      });
+    }
   }
 
   getGlobalBalance() {

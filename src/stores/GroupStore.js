@@ -6,7 +6,7 @@ export default class GroupStore {
 
   /**
    * This class maintains the system's view of the group tree.
-   * It must contain a reference to the root group, and the group TruffleContract 
+   * It must contain a reference to the root group, and the group TruffleContract
    * It will be able to perform arbitrary lookups for subnodes in the tree
    * A subnode can be either a group or a post.
    * Lookups are performed on strings (a path), which define the path to the subnode.
@@ -33,7 +33,7 @@ export default class GroupStore {
   /**
    * Takes a parsedPath from PathParser.parse(path_string)
    * Returns a Promise
-   * If the path is a group (ends with a /) and the group can be fully resolved, resolves 
+   * If the path is a group (ends with a /) and the group can be fully resolved, resolves
    */
 
   static resolvePath(parsedPath, startingGroup = null) {
@@ -50,22 +50,7 @@ export default class GroupStore {
        *      reject
        */
 
-      
       var currentGroup = this.treeRoot;
-      if (!parsedPath.absolute) {
-        if (!startingGroup) { //passing undefined is also bad, and 0/false doesn't make sense
-          reject({
-            error: new Error("Cannot browse to a relative path without a starting group!"), 
-            group: null,
-            partialPath: null,
-          }); 
-          return;
-        } else {
-          currentGroup = startingGroup;
-        }
-      } else {
-        console.log("GroupStore walking an absolute path");
-      }
       console.log("GroupStore descending into the forest...");
       let groupNums = parsedPath.groupNums.slice(0); //clone the array
       console.log("GroupStore needs to walk the path:", groupNums);

@@ -67,8 +67,6 @@ class SideBar extends Component {
         post,
         pathState,
       });
-    } else {
-      //console.log("Sidebar loading...");
     }
   }
 
@@ -207,9 +205,7 @@ class SideBar extends Component {
       <div style={styles.container}>
         {this.renderPost()}
         {this.renderStats()}
-
         {this.renderJoinButton()}
-
         {this.renderUsersAccordian()}
 
         <Collapsible
@@ -221,7 +217,7 @@ class SideBar extends Component {
           easing="ease-in"
           trigger="Ruleset"
         >
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
+          <p>Ruleset</p>
         </Collapsible>
 
         <Collapsible
@@ -233,19 +229,12 @@ class SideBar extends Component {
           easing="ease-in"
           trigger="Content Types"
         >
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed nisi diam. Suspendisse pulvinar ipsum facilisis, blandit nisi sit amet, ornare risus. Suspendisse enim sapien, viverra sit amet pharetra in, efficitur in sapien.</p>
+          <p>Content Types</p>
         </Collapsible>
-
-
-        </div>
-
+      </div>
     );
   }
 }
-
-
-
-
 
 const styles = {
   container: {

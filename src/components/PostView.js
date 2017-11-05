@@ -42,14 +42,14 @@ export default class PostView extends Component {
 
     if (post && post.id) {
       const prefix = parent || '/';
-      return prefix + post.id + '-' + encodeURIComponent(post.title) + '';
+      return prefix + post.id + '-' + encodeURIComponent(post.title.replace(' ', '-')) + '';
     }
     return '';
   }
 
   renderTitle() {
     return (
-        <Link to={this.getTargetPath()}>{this.renderId()}{this.props.post.title}</Link>
+      <Link to={this.getTargetPath()}>{this.props.post.title}</Link>
     );
   }
 
@@ -74,43 +74,11 @@ export default class PostView extends Component {
   }
 
   createGroup(id) {
-    console.log("creating group on post", id);
+    console.log('creating group on post', id);
     this.props.group.convertPostToGroup(id).then((result) => {
-      console.log("successfully created group on post", id, ":", result);
+      console.log('successfully created group on post', id, ':', result);
       this.forceUpdate();
     });
-  }
-
-
-  renderGroupAddress() {
-    if (!Blockchain.isAddressNull(this.props.post.groupAddress)) {
-      return (
-        <Link style={this.styles.multiHashIpfs} to={`${this.getTargetPath()}/`}>{this.props.post.groupAddress}</Link>
-      );
-    } else {
-      return ('');
-    }
-  }
-
-  renderGroup() {
-    return (
-      <span style={this.styles.multiHash}>
-        Group:&nbsp;{this.renderGroupAddress()}{this.renderConvertToGroupButton()}
-      </span>
-    );
-  }
-
-  renderMultiHash() {
-    if (this.props.post.multiHashString) {
-      return (
-        <span style={this.styles.multiHash}>
-          IPFS:&nbsp;
-          <a href={"https://ipfs.io/ipfs/" + this.props.post.multiHashString} target="_blank" style={this.styles.multiHashIpfs}>
-            {this.props.post.multiHashString}
-          </a>
-        </span>
-      );
-    }
   }
 
   renderId() {
@@ -135,7 +103,7 @@ export default class PostView extends Component {
     if (this.props.post.isContentLoaded()) {
       content = this.props.post.content;
     } else {
-      content = "Loading content...";
+      content = 'Loading content...';
       loaded = false;
     }
     content = xss(content).replace(/\n/g, '<br />');
@@ -155,12 +123,12 @@ export default class PostView extends Component {
   }
 
   renderTimestamp() {
-    let m = moment(this.props.post.creationTime, "X");
+    let m = moment(this.props.post.creationTime, 'X');
     return (
       <span style={this.styles.timestamp}>
         <span style={this.styles.date}>
           Posted&nbsp;
-          {m.calendar()} by {this.props.post.creator}
+          {m.calendar()} by <Link to={`/user/${this.props.post.creator}`}>{this.props.post.creator}</Link>
         </span>
       </span>
     );
