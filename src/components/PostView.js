@@ -20,23 +20,38 @@ export default class PostView extends Component {
     if (this.props.post.isHeaderLoaded()) {
       return (
         <div style={this.styles.container} className='card'>
-          <div style={this.styles.cardContent} className='card-content'>
-            {this.renderTitle()}
-            {this.renderTimestamp()}
-            {this.renderContent()}
+          <div style={this.styles.cardContent}>
+            <div style={this.styles.container2}>
+
+            <div style={this.styles.title}>
+              {this.renderTitle()}
+              {this.renderTimestamp()}
+            </div>
+
+            <div style={this.styles.voting}>
+              {this.renderUpvote()}
+              {this.renderBalance()}
+              {this.renderDownvote()}
+            </div>
+
+      </div>
+            <div style={this.styles.body}>
+              {this.renderContent()}
+            </div>
           </div>
         </div>
-      );
+    );
     } else {
       return (
         <div style={this.styles.container} className='card'>
-          <div style={this.styles.cardContent} className='card-content'>
-            {this.renderId()}Loading...
-          </div>
-        </div>
-      );
+        <div style={this.styles.cardContent} className='card-content'>
+        {this.renderId()}Loading...
+      </div>
+      </div>
+    );
     }
   }
+
 
   getTargetPath() {
     const { post, parent } = this.props;
@@ -53,6 +68,37 @@ export default class PostView extends Component {
       <div>
         <Link to={this.getTargetPath()}>{this.renderId()}</Link>&nbsp;--&nbsp;<Link to={this.getTargetPath() + '/'}>{this.props.post.title}</Link>
       </div>
+    );
+  }
+
+  renderBalance() {
+      return (
+        <span style={this.styles.balance}>
+          {this.props.post.balance.toString()}
+        </span>
+    );
+  }
+
+  renderUpvote() {
+    return (
+
+      <a href="#"
+        style={this.styles.voteArrow}
+        onClick={() => this.upvote()}
+      >
+        ▲
+      </a>
+    );
+  }
+
+  renderDownvote() {
+    return (
+      <a href="#"
+        style={this.styles.voteArrow}
+        onClick={() => this.downvote()}
+      >
+        ▼
+      </a>
     );
   }
 
@@ -120,25 +166,33 @@ export default class PostView extends Component {
     );
   }
 
+  upvote() {
+    /* TODO: actually make this work */
+    this.props.post.balance++;
+  }
+
+  downvote() {
+    /* TODO: actually make this work */
+    this.props.post.balance--;
+  }
+
   get styles() {
     return {
       container:
         this.props.sidebar ? {
           width: '96%',
-          marginLeft: '2%',
-          marginRight: '2%',
-          marginTop: '2%',
-          marginBottom: '2%',
+          margin: '2%',
           backgroundColor: 'white',
         } : {
           width: '48%',
-          marginLeft: '1%',
-          marginRight: '1%',
-          marginTop: '1%',
-          marginBottom: '1%',
+          margin: '1%',
           backgroundColor: this.props.selected ? '#fdffea' : 'white',
           border: 0,
         },
+      container2: {
+        display: 'flex',
+        flexFlow: 'row',
+      },
       contentWrapper: {
         flex: 1,
         display: 'flex',
@@ -156,10 +210,37 @@ export default class PostView extends Component {
         display: 'flex',
         flexDirection: 'column',
         overflowWrap: 'break-word',
-        maxHeight: '500px',
         padding: '1rem',
+
+      },
+      title: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: '90%',
+      },
+
+      voting: {
+        lineHeight: '20px',
+        float: 'right',
+        display: 'flex',
+        flexDirection: 'column',
+      },
+      body: {
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: '400px',
       },
       timestamp: {
+        fontSize: 'small',
+      },
+      voteArrow: {
+        backgroundColor: this.props.selected ? '#fdffea' : 'white',
+        border: 'none',
+        textAlign: 'center',
+        cursor: 'pointer',
+      },
+      balance: {
+        textAlign: 'center',
         fontSize: 'small',
       },
       date: {
@@ -181,6 +262,33 @@ export default class PostView extends Component {
       creatorHash: {
         fontSize: 'x-small',
       },
+      earnings: {
+        minWidth: '125px',
+        maxWidth: '155px',
+        textAlign: 'center',
+        padding: '5px',
+        flex: '0 1 18%',
+      },
+      earningsText: {
+        textAlign: 'left',
+        fontSize: '12px',
+        margin: '2px',
+        // marginRight: '10%',
+      },
+      postButton: {
+        height: '100%',
+        width: '10%',
+        float: 'right',
+      },
+      textArea: {
+        flex: 1,
+        resize: 'none',
+        height: '100%',
+        minHeight: 'auto',
+        maxHeight: 'none',
+        minWidth: 'auto',
+        maxWidth: 'none',
+      }
     }
   };
 }
