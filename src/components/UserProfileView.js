@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
+import CyberneticChat from '../blockchain/CyberneticChat';
+import Wallet from '../models/Wallet';
+import User from '../models/User';
+import xss from 'xss';
 
 class UserProfileView extends Component {
   constructor(props) {
@@ -7,11 +11,24 @@ class UserProfileView extends Component {
   }
 
   componentWillMount() {
-    //load profile
+    this.loadProfile(this.userAddress());
   }
 
   componentWillReceiveProps(nextProps) {
-    //load profile
+    if (this.userAddress() !== nextProps.pathState.userAddress) {
+      this.loadProfile(nextProps.pathState.userAddress);
+    }
+  }
+
+  loadProfile(address) {
+    this.setState({ isLoading: true });
+    CyberneticChat.getUserProfile(address).then((profileStruct) => {
+      const user = new User(null, User.userProfileStructToObject(profileStruct));
+      user.loadProfile().then(() => {
+        this.setState({ isLoading: false });
+      });
+      this.setState({ user });
+    });
   }
 
   render() {
@@ -19,11 +36,35 @@ class UserProfileView extends Component {
       <Scrollbars style={styles.scrollBar}>
         <div style={styles.container}>
           <div style={styles.children}>
-            This is a user's profile
+            {this.renderContent()}
           </div>
         </div>
       </Scrollbars>
     );
+  }
+
+  renderContent() {
+    let content;
+    let loaded = true;
+    if (this.state.isLoading) {
+      content = 'Loading content...';
+    } else if (!this.state.user.profile) {
+      if (this.userAddress() === Wallet.getAccountAddress()) {
+        content = 'You haven\'t created a profile yet.';
+      } else {
+        content = 'This user hasn\'t created a profile yet.';
+      }
+    } else {
+      content = xss(this.state.user.profile).replace(/\n/g, '<br />');
+    }
+    const html = { __html: content };
+    return (
+      <span dangerouslySetInnerHTML={html}></span>
+    );
+  }
+
+  userAddress() {
+    return this.props.pathState.userAddress;
   }
 }
 

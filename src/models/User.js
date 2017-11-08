@@ -27,6 +27,7 @@ export default class User {
     transactionId,
     permissions,
     banned,
+    updateTime,
   }) {
     this.nickname = nickname || this.nickname;
     this.profile = profile || this.profile;
@@ -37,6 +38,7 @@ export default class User {
     this.transactionId = transactionId || this.transactionId;
     this.permissions = permissions || this.permissions;
     this.joinTime = joinTime || this.joinTime;
+    this.updateTime = updateTime || this.updateTime;
     this.banned = banned || this.banned;
     this.address = address || this.address;
     this.balance = balance || this.balance || new BigNumber(0);
@@ -85,7 +87,7 @@ export default class User {
     });
   }
 
-  userStructToObject([
+  static userStructToObject([
     parentNumber,
     nickname,
     profileType,
@@ -113,6 +115,27 @@ export default class User {
       balance,
       permissions,
       banned,
+    });
+  }
+
+  static userProfileStructToObject([
+    nickname,
+    profileType,
+    ipfsHashFunction,
+    ipfsHashLength,
+    ipfsHash,
+    updateTime,
+  ]) {
+    const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
+    return ({
+      nickname,
+      profileType,
+      multiHashArray,
+      multiHashString: Ipfs.assembleMultiHash(multiHashArray),
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      updateTime,
     });
   }
 
@@ -144,9 +167,9 @@ export default class User {
               return;
             }
             if (!this.headerLoaded) { //waitForConfirmation can load header on an edge case
-              this.parentGroup.loadUser(this.address).then((userStruct) => {
+              this.parentGroup.loadUserProperties(this.address).then((userStruct) => {
                 console.log("User loaded struct:", userStruct);
-                this.populate(this.userStructToObject(userStruct));
+                this.populate(User.userStructToObject(userStruct));
                 this.markHeaderLoaded();
                 resolve();
               }).catch((error) => {
@@ -264,9 +287,9 @@ export default class User {
           } else {
             if (this.address) {
               console.log("waitForConfirmation: confirming user by address:", this.address);
-              this.parentGroup.loadUser(this.address).then((userStruct) => {
+              this.parentGroup.loadUserProperties(this.address).then((userStruct) => {
                 console.log("waitForConfirmation: loaded user:", userStruct);
-                const userFields = this.userStructToObject(userStruct);
+                const userFields = User.userStructToObject(userStruct);
                 console.log("waitForConfirmation: loaded struct:", userFields);
                 this.populate(userFields);
                 console.log("waitForConfirmation: marking user as loaded");

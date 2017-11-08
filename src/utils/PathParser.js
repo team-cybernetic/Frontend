@@ -20,10 +20,10 @@ export default class PathParser {
     let userMatch = USER.exec(path);
     if (userMatch) {
       type = Type.USER;
-      const userId = userMatch[1];
+      const userAddress = userMatch[1];
       return new Path({
         path,
-        userId,
+        userAddress,
         type,
         cleanPath: path,
       });
@@ -127,7 +127,7 @@ class Path {
     if (this === otherPathState || this.path === otherPathState.path || this.cleanPath === otherPathState.cleanPath) {
       return true;
     }
-    if (this.type === Type.USER && otherPathState.type === Type.USER && this.userId === otherPathState.userId) {
+    if (this.type === Type.USER && otherPathState.type === Type.USER && this.userAddress === otherPathState.userAddress) {
       return true;
     }
     if (this.isGroup === otherPathState.isGroup && this.postNum === otherPathState.postNum && this.pathArray.length === otherPathState.pathArray.length) {

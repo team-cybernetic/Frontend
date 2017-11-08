@@ -48,14 +48,6 @@ class Editor extends Component {
       }).catch((error) => {
         console.error("Editor failed to get status of self user", userAddress, ":", error);
       });
-
-      /*
-      user.loadHeader().then(() => {
-        console.log("Editor loaded user header:", user);
-      }).catch((error) => {
-        console.error("Editor failed to get balances:", error);
-      });
-      */
     }
   }
 
@@ -81,7 +73,7 @@ class Editor extends Component {
         <div style={styles.earnings}>
           <p>Balances</p>
           <p style={styles.earningsText}>Global: <span className='is-pulled-right'>{this.getGlobalBalance()}</span></p>
-          <p style={styles.earningsText}>Local: <span className='is-pulled-right'>{this.getLocalBalance()}</span></p>
+          {!this.isUserProfile() && <p style={styles.earningsText}>Local: <span className='is-pulled-right'>{this.getLocalBalance()}</span></p>}
         </div>
         <textarea
           style={styles.textArea}
@@ -122,7 +114,7 @@ class Editor extends Component {
   }
 
   isOwnUserProfile() {
-    return this.props.pathState.userId === Wallet.getAccountAddress();
+    return this.props.pathState.userAddress === Wallet.getAccountAddress();
   }
 
   getGlobalBalance() {
@@ -131,16 +123,6 @@ class Editor extends Component {
 
   getLocalBalance() {
     return (this.state.localBalance);
-    /*
-    if (this.props.isLoaded) {
-      const user = this.props.group.getUser(Wallet.getAccountAddress());
-      console.log("user = ", user);
-      if (user) {
-        return (user.getBalance().toLocaleString());
-      }
-    }
-    return ("");
-    */
   }
 
   isValid() {
@@ -208,7 +190,6 @@ const styles = {
     textAlign: 'left',
     fontSize: '12px',
     margin: '2px',
-    // marginRight: '10%',
   },
   postButton: {
     height: '100%',

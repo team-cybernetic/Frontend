@@ -86,7 +86,7 @@ export default class Ipfs {
   }
 
   static assembleMultiHash([ipfsHashFunction, ipfsHashLength, ipfsHash]) {
-    if (ipfsHash.length === 0 || ipfsHash === '0x') {
+    if (!ipfsHash || ipfsHash.length === 0 || ipfsHash === '0x') {
       return ('');
     }
     let multiHex = ipfsHashFunction.toString(16) + ipfsHashLength.toString(16) + ipfsHash.slice(2);
