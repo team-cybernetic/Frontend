@@ -32,6 +32,11 @@ contract CyberneticChat {
     uint256 amount,
     bool increased
   );
+  event PostTokensChanged(
+    uint256 indexed postNumber,
+    uint256 amount,
+    bool increased
+  );
 
 
   event UserJoined(
@@ -120,20 +125,20 @@ contract CyberneticChat {
     uint256 tokens,
     int256 permissions
   ) {
-    var p = PostLib.getPost(state, num);
+    var post = PostLib.getPost(state, num);
     return (
-      p.number,
-      p.parentNum,
-      p.contents.title,
-      p.contents.mimeType,
-      p.contents.multihash.hashFunction,
-      p.contents.multihash.hashLength,
-      p.contents.multihash.hash,
-      p.contents.creator,
-      p.contents.creationTime,
-      p.balance,
-      p.tokens,
-      p.permissions
+      post.number,
+      post.parentNum,
+      post.contents.title,
+      post.contents.mimeType,
+      post.contents.multihash.hashFunction,
+      post.contents.multihash.hashLength,
+      post.contents.multihash.hash,
+      post.contents.creator,
+      post.contents.creationTime,
+      post.balance,
+      post.tokens,
+      post.permissions
     );
   }
 
@@ -150,7 +155,7 @@ contract CyberneticChat {
     bytes ipfsHash,
     uint256 creationTime,
     bool userPermissionsFlagsMode
-  ) public returns (uint256) {
+  ) public returns (uint256 newPostNum) {
     return (PostLib.createPost(
       state,
       parentNum,
@@ -168,12 +173,12 @@ contract CyberneticChat {
     return (UserLib.userExists(state, parentNum, addr));
   }
 
-  function joinGroup(uint256 parentNum) public {
+  function joinGroup(uint256 parentNum) public returns (bool) {
     //TODO: payable
     UserLib.join(state, parentNum);
   }
 
-  function leaveGroup(uint256 parentNum) public { 
+  function leaveGroup(uint256 parentNum) public returns (bool) { 
     UserLib.leave(state, parentNum);
   }
 
@@ -181,38 +186,44 @@ contract CyberneticChat {
     return (UserLib.getUsers(state, parentNum));
   }
 
-  function getUser(uint256 parentNum, address userAddress) constant public returns (
-    uint256 parentNumber,
+  function userProfileExists(address userAddress) constant public returns (bool) {
+    return (UserLib.userProfileExists(state, userAddress));
+  }
+
+  function getUserProfile(address userAddress) constant public returns (
     string nickname,
     string profileMimeType,
     uint8 ipfsHashFunction,
     uint8 ipfsHashLength,
     bytes ipfsHash,
-    address addr,
-    uint256 joinTime,
-    uint256 balance,
-    int256 permissions,
-    bool banned
+    uint256 profileLastUpdateTime
   ) {
-    var u = UserLib.getUser(state, parentNum, userAddress);
+    var profile = UserLib.getUserProfile(state, userAddress);
     return (
-      u.parentNum,
-      u.contents.title,
-      u.contents.mimeType,
-      u.contents.multihash.hashFunction,
-      u.contents.multihash.hashLength,
-      u.contents.multihash.hash,
-      u.contents.creator,
-      u.contents.creationTime,
-      u.balance,
-      u.permissions,
-      u.banned
+      profile.title,
+      profile.mimeType,
+      profile.multihash.hashFunction,
+      profile.multihash.hashLength,
+      profile.multihash.hash,
+      profile.creationTime
     );
   }
 
-  function getUserBanReason(uint256 parentNum, address userAddress) constant public returns (string) {
-    var u = UserLib.getUser(state, parentNum, userAddress);
-    return (u.banReason);
+  function getUserProperties(uint256 parentNum, address userAddress) constant public returns (
+    uint256 joinTime,
+    uint256 balance,
+    int256 permissions,
+    bool banned,
+    string banReason
+  ) {
+    var user = UserLib.getUser(state, parentNum, userAddress);
+    return (
+      user.joinTime,
+      user.balance,
+      user.permissions,
+      user.banned,
+      user.banReason
+    );
   }
 
   function transferTokensToUser(uint256 parentNum, address userAddress, uint256 amount, bool increase) public {

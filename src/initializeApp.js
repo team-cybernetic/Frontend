@@ -32,8 +32,7 @@ export default function initializeApp() {
       }).catch((error) => {
         console.error('Error getting deployed instance of root contract: ', error);
         if (error.message.indexOf("has not been deployed to detected network") !== -1) {
-          error.notDeployed = true;
-          error.network = web3.version.network;
+          error.userMessage = "The Cybernetic Chat contract has not yet been deployed to this network (" + web3.version.network + ")!";
         }
         reject(error);
       });

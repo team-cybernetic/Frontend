@@ -31,14 +31,9 @@ export default class InitializationWrapper extends Component {
       });
     }).catch((error) => {
       console.error("Error while initializing app:", error);
-      if (error.notDeployed) {
-        this.setState({
-          error: {
-            notDeployed: true,
-            message: "The Cybernetic Chat contract has not yet been deployed to this network (" + error.network + ")!",
-          },
-        });
-      }
+      this.setState({
+        error,
+      });
     });
     registerServiceWorker();
   }
@@ -62,7 +57,7 @@ export default class InitializationWrapper extends Component {
       return (
         <div style={styles.errorContainer}>
           <span style={styles.error}>
-            {this.state.error.message}
+            {this.state.error.userMessage ? this.state.error.userMessage : this.state.error.message}
           </span>
         </div>
       );

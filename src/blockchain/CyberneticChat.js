@@ -64,8 +64,12 @@ export default class CyberneticChat {
     return (this.contractInstance.postExists.call(id));
   }
 
-  static getUser(parentNumber, addr) {
-    return (this.contractInstance.getUser.call(parentNumber, addr));
+  static getUserProfile(addr) {
+    return (this.contractInstance.getUserProfile.call(addr));
+  }
+
+  static getUserProperties(parentNumber, addr) {
+    return (this.contractInstance.getUserProperties.call(parentNumber, addr));
   }
 
   static unregisterEventListener(handle) {

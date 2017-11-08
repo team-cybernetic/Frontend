@@ -1,18 +1,18 @@
 {
   "contractName": "StateLib",
   "abi": [],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058205621565bf88f3af7dda5e0329a4e33ffdebf61c8f8965718441176d2de5c963e0029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058205621565bf88f3af7dda5e0329a4e33ffdebf61c8f8965718441176d2de5c963e0029",
-  "sourceMap": "164:273:6:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "164:273:6:-;;;;;",
-  "source": "pragma solidity ^0.4.11;\n\nimport \"./CyberneticChat.sol\";\nimport \"./UserLib.sol\";\nimport \"./PostLib.sol\";\nimport \"./CurrencyLib.sol\";\nimport \"./PermissionLib.sol\";\n\nlibrary StateLib {\n\n  struct Main {\n    mapping (uint256 => PostLib.Post) posts;\n    bool initialized;\n  }\n\n  struct State {\n    Main main;\n    PostLib.State postLib;\n    UserLib.State userLib;\n    PermissionLib.State permissionLib;\n    CurrencyLib.State currencyLib;\n  }\n}\n",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058204f400c609ac689bb5a1875f2c7b0bd006901f71915ccbb5ebc183d399ae800b10029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058204f400c609ac689bb5a1875f2c7b0bd006901f71915ccbb5ebc183d399ae800b10029",
+  "sourceMap": "164:331:5:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "164:331:5:-;;;;;",
+  "source": "pragma solidity ^0.4.11;\n\nimport \"./CyberneticChat.sol\";\nimport \"./UserLib.sol\";\nimport \"./PostLib.sol\";\nimport \"./CurrencyLib.sol\";\nimport \"./PermissionLib.sol\";\n\nlibrary StateLib {\n\n  struct Main {\n    mapping (uint256 => PostLib.Post) posts;\n    mapping (address => ContentLib.Content) userProfiles;\n    bool initialized;\n  }\n\n  struct State {\n    Main main;\n    PostLib.State postLib;\n    UserLib.State userLib;\n    PermissionLib.State permissionLib;\n    CurrencyLib.State currencyLib;\n  }\n}\n",
   "sourcePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/StateLib.sol",
   "ast": {
     "attributes": {
       "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/StateLib.sol",
       "exportedSymbols": {
         "StateLib": [
-          1760
+          1723
         ]
       }
     },
@@ -26,84 +26,84 @@
             ".11"
           ]
         },
-        "id": 1736,
+        "id": 1695,
         "name": "PragmaDirective",
-        "src": "0:24:6"
+        "src": "0:24:5"
       },
       {
         "attributes": {
-          "SourceUnit": 954,
+          "SourceUnit": 970,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/CyberneticChat.sol",
           "file": "./CyberneticChat.sol",
-          "scope": 1761,
+          "scope": 1724,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 1737,
+        "id": 1696,
         "name": "ImportDirective",
-        "src": "26:30:6"
+        "src": "26:30:5"
       },
       {
         "attributes": {
-          "SourceUnit": 2144,
+          "SourceUnit": 2137,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/UserLib.sol",
           "file": "./UserLib.sol",
-          "scope": 1761,
+          "scope": 1724,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 1738,
+        "id": 1697,
         "name": "ImportDirective",
-        "src": "57:23:6"
+        "src": "57:23:5"
       },
       {
         "attributes": {
-          "SourceUnit": 1735,
+          "SourceUnit": 1694,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/PostLib.sol",
           "file": "./PostLib.sol",
-          "scope": 1761,
+          "scope": 1724,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 1739,
+        "id": 1698,
         "name": "ImportDirective",
-        "src": "81:23:6"
+        "src": "81:23:5"
       },
       {
         "attributes": {
-          "SourceUnit": 455,
+          "SourceUnit": 458,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/CurrencyLib.sol",
           "file": "./CurrencyLib.sol",
-          "scope": 1761,
+          "scope": 1724,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 1740,
+        "id": 1699,
         "name": "ImportDirective",
-        "src": "105:27:6"
+        "src": "105:27:5"
       },
       {
         "attributes": {
-          "SourceUnit": 1209,
+          "SourceUnit": 1168,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/PermissionLib.sol",
           "file": "./PermissionLib.sol",
-          "scope": 1761,
+          "scope": 1724,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 1741,
+        "id": 1700,
         "name": "ImportDirective",
-        "src": "133:29:6"
+        "src": "133:29:5"
       },
       {
         "attributes": {
@@ -117,17 +117,17 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            1760
+            1723
           ],
           "name": "StateLib",
-          "scope": 1761
+          "scope": 1724
         },
         "children": [
           {
             "attributes": {
               "canonicalName": "StateLib.Main",
               "name": "Main",
-              "scope": 1760,
+              "scope": 1723,
               "visibility": "public"
             },
             "children": [
@@ -135,7 +135,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "posts",
-                  "scope": 1748,
+                  "scope": 1711,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "mapping(uint256 => struct PostLib.Post storage ref)",
@@ -153,36 +153,84 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 1742,
+                        "id": 1701,
                         "name": "ElementaryTypeName",
-                        "src": "213:7:6"
+                        "src": "213:7:5"
                       },
                       {
                         "attributes": {
                           "contractScope": null,
                           "name": "PostLib.Post",
-                          "referencedDeclaration": 1273,
+                          "referencedDeclaration": 1232,
                           "type": "struct PostLib.Post storage pointer"
                         },
-                        "id": 1743,
+                        "id": 1702,
                         "name": "UserDefinedTypeName",
-                        "src": "224:12:6"
+                        "src": "224:12:5"
                       }
                     ],
-                    "id": 1744,
+                    "id": 1703,
                     "name": "Mapping",
-                    "src": "204:33:6"
+                    "src": "204:33:5"
                   }
                 ],
-                "id": 1745,
+                "id": 1704,
                 "name": "VariableDeclaration",
-                "src": "204:39:6"
+                "src": "204:39:5"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "userProfiles",
+                  "scope": 1711,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "mapping(address => struct ContentLib.Content storage ref)",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "bool",
+                      "type": "mapping(address => struct ContentLib.Content storage ref)"
+                    },
+                    "id": 1707,
+                    "name": "Mapping",
+                    "src": "249:39:5",
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 1705,
+                        "name": "ElementaryTypeName",
+                        "src": "258:7:5"
+                      },
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "ContentLib.Content",
+                          "referencedDeclaration": 19,
+                          "type": "struct ContentLib.Content storage pointer"
+                        },
+                        "id": 1706,
+                        "name": "UserDefinedTypeName",
+                        "src": "269:18:5"
+                      }
+                    ]
+                  }
+                ],
+                "id": 1708,
+                "name": "VariableDeclaration",
+                "src": "249:52:5"
               },
               {
                 "attributes": {
                   "constant": false,
                   "name": "initialized",
-                  "scope": 1748,
+                  "scope": 1711,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "bool",
@@ -195,25 +243,25 @@
                       "name": "bool",
                       "type": "bool"
                     },
-                    "id": 1746,
+                    "id": 1709,
                     "name": "ElementaryTypeName",
-                    "src": "249:4:6"
+                    "src": "307:4:5"
                   }
                 ],
-                "id": 1747,
+                "id": 1710,
                 "name": "VariableDeclaration",
-                "src": "249:16:6"
+                "src": "307:16:5"
               }
             ],
-            "id": 1748,
+            "id": 1711,
             "name": "StructDefinition",
-            "src": "186:84:6"
+            "src": "186:142:5"
           },
           {
             "attributes": {
               "canonicalName": "StateLib.State",
               "name": "State",
-              "scope": 1760,
+              "scope": 1723,
               "visibility": "public"
             },
             "children": [
@@ -221,7 +269,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "main",
-                  "scope": 1759,
+                  "scope": 1722,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "struct StateLib.Main storage pointer",
@@ -233,23 +281,23 @@
                     "attributes": {
                       "contractScope": null,
                       "name": "Main",
-                      "referencedDeclaration": 1748,
+                      "referencedDeclaration": 1711,
                       "type": "struct StateLib.Main storage pointer"
                     },
-                    "id": 1749,
+                    "id": 1712,
                     "name": "UserDefinedTypeName",
-                    "src": "293:4:6"
+                    "src": "351:4:5"
                   }
                 ],
-                "id": 1750,
+                "id": 1713,
                 "name": "VariableDeclaration",
-                "src": "293:9:6"
+                "src": "351:9:5"
               },
               {
                 "attributes": {
                   "constant": false,
                   "name": "postLib",
-                  "scope": 1759,
+                  "scope": 1722,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "struct PostLib.State storage pointer",
@@ -261,23 +309,23 @@
                     "attributes": {
                       "contractScope": null,
                       "name": "PostLib.State",
-                      "referencedDeclaration": 1236,
+                      "referencedDeclaration": 1195,
                       "type": "struct PostLib.State storage pointer"
                     },
-                    "id": 1751,
+                    "id": 1714,
                     "name": "UserDefinedTypeName",
-                    "src": "308:13:6"
+                    "src": "366:13:5"
                   }
                 ],
-                "id": 1752,
+                "id": 1715,
                 "name": "VariableDeclaration",
-                "src": "308:21:6"
+                "src": "366:21:5"
               },
               {
                 "attributes": {
                   "constant": false,
                   "name": "userLib",
-                  "scope": 1759,
+                  "scope": 1722,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "struct UserLib.State storage pointer",
@@ -289,23 +337,23 @@
                     "attributes": {
                       "contractScope": null,
                       "name": "UserLib.State",
-                      "referencedDeclaration": 1837,
+                      "referencedDeclaration": 1802,
                       "type": "struct UserLib.State storage pointer"
                     },
-                    "id": 1753,
+                    "id": 1716,
                     "name": "UserDefinedTypeName",
-                    "src": "335:13:6"
+                    "src": "393:13:5"
                   }
                 ],
-                "id": 1754,
+                "id": 1717,
                 "name": "VariableDeclaration",
-                "src": "335:21:6"
+                "src": "393:21:5"
               },
               {
                 "attributes": {
                   "constant": false,
                   "name": "permissionLib",
-                  "scope": 1759,
+                  "scope": 1722,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "struct PermissionLib.State storage pointer",
@@ -317,23 +365,23 @@
                     "attributes": {
                       "contractScope": null,
                       "name": "PermissionLib.State",
-                      "referencedDeclaration": 1016,
+                      "referencedDeclaration": 975,
                       "type": "struct PermissionLib.State storage pointer"
                     },
-                    "id": 1755,
+                    "id": 1718,
                     "name": "UserDefinedTypeName",
-                    "src": "362:19:6"
+                    "src": "420:19:5"
                   }
                 ],
-                "id": 1756,
+                "id": 1719,
                 "name": "VariableDeclaration",
-                "src": "362:33:6"
+                "src": "420:33:5"
               },
               {
                 "attributes": {
                   "constant": false,
                   "name": "currencyLib",
-                  "scope": 1759,
+                  "scope": 1722,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "struct CurrencyLib.State storage pointer",
@@ -348,29 +396,29 @@
                       "referencedDeclaration": 27,
                       "type": "struct CurrencyLib.State storage pointer"
                     },
-                    "id": 1757,
+                    "id": 1720,
                     "name": "UserDefinedTypeName",
-                    "src": "401:17:6"
+                    "src": "459:17:5"
                   }
                 ],
-                "id": 1758,
+                "id": 1721,
                 "name": "VariableDeclaration",
-                "src": "401:29:6"
+                "src": "459:29:5"
               }
             ],
-            "id": 1759,
+            "id": 1722,
             "name": "StructDefinition",
-            "src": "274:161:6"
+            "src": "332:161:5"
           }
         ],
-        "id": 1760,
+        "id": 1723,
         "name": "ContractDefinition",
-        "src": "164:273:6"
+        "src": "164:331:5"
       }
     ],
-    "id": 1761,
+    "id": 1724,
     "name": "SourceUnit",
-    "src": "0:438:6"
+    "src": "0:496:5"
   },
   "compiler": {
     "name": "solc",
@@ -378,5 +426,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-05T21:46:21.059Z"
+  "updatedAt": "2017-11-08T01:27:44.697Z"
 }

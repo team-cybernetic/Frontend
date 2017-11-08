@@ -10,6 +10,7 @@ library StateLib {
 
   struct Main {
     mapping (uint256 => PostLib.Post) posts;
+    mapping (address => ContentLib.Content) userProfiles;
     bool initialized;
   }
 

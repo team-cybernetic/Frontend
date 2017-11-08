@@ -20,6 +20,11 @@ library CurrencyLib {
     uint256 amount,
     bool increased
   );
+  event PostTokensChanged(
+    uint256 indexed postNumber,
+    uint256 amount,
+    bool increased
+  );
 
 
 
@@ -96,16 +101,16 @@ library CurrencyLib {
     if (increase) {
       parent.tokens = add(parent.tokens, amount);
       parentDelta = subtract(parent.tokens, oldParentBalance);
-      user.balance = add(user.balance, amount);
+      user.balance = add(user.balance, parentDelta); //parent tokens >= user balance, so if parent tokens maxes out at 2^256, then the user can't get any more tokens
       userDelta = subtract(user.balance, oldUserBalance);
     } else {
-      parent.tokens = subtract(parent.tokens, amount);
-      parentDelta = subtract(oldParentBalance, parent.tokens);
       user.balance = subtract(user.balance, amount);
       userDelta = subtract(oldUserBalance, user.balance);
+      parent.tokens = subtract(parent.tokens, userDelta); //if the user runs out of tokens part of the way through the transfer, only subtract the amount the user did have from the parent tokens
+      parentDelta = subtract(oldParentBalance, parent.tokens);
     }
-    UserBalanceChanged(parent.number, user.contents.creator, userDelta, increase);
-    PostBalanceChanged(parent.parentNum, parent.number, parentDelta, increase);
+    UserBalanceChanged(parent.number, user.addr, userDelta, increase);
+    PostTokensChanged(parent.number, parentDelta, increase);
   }
 
   function awardTokensToPost(
@@ -122,15 +127,15 @@ library CurrencyLib {
     if (increase) {
       parent.tokens = add(parent.tokens, amount);
       parentDelta = subtract(parent.tokens, oldParentBalance);
-      post.balance = add(post.balance, amount);
+      post.balance = add(post.balance, parentDelta);
       postDelta = subtract(post.balance, oldPostBalance);
     } else {
-      parent.tokens = subtract(parent.tokens, amount);
-      parentDelta = subtract(oldParentBalance, parent.tokens);
       post.balance = subtract(post.balance, amount);
       postDelta = subtract(oldPostBalance, post.balance);
+      parent.tokens = subtract(parent.tokens, postDelta);
+      parentDelta = subtract(oldParentBalance, parent.tokens);
     }
     PostBalanceChanged(parent.number, post.number, postDelta, increase);
-    PostBalanceChanged(parent.parentNum, parent.number, parentDelta, increase);
+    PostTokensChanged(parent.number, parentDelta, increase);
   }
 }

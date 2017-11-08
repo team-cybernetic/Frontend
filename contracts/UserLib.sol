@@ -41,10 +41,11 @@ library UserLib {
 
 
   struct User {
-    ContentLib.Content contents;
     uint256 parentNum;
     uint256 balance;
+    uint256 joinTime;
     int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
+    address addr;
     bool joined;
     bool banned;
     string banReason;
@@ -70,6 +71,15 @@ library UserLib {
     return (getUserRaw(state, parentNum, userAddress));
   }
 
+  function getUserProfile(StateLib.State storage state, address userAddress) constant internal returns (ContentLib.Content) {
+    return (state.main.userProfiles[userAddress]);
+  }
+
+  function userProfileExists(StateLib.State storage state, address userAddress) constant internal returns (bool) {
+    var profile = getUserProfile(state, userAddress);
+    return (profile.creationTime != 0);
+  }
+
   function getUsers(StateLib.State storage state, uint256 parentNum) constant internal returns (address[]) {
     var p = PostLib.getPost(state, parentNum);
     return (p.userAddresses);
@@ -91,19 +101,10 @@ library UserLib {
       state.userLib.count++;
       p.users[msg.sender] = User({
         parentNum: parentNum,
-        contents: ContentLib.Content({
-          title: "",
-          mimeType: "",
-          multihash: ContentLib.IpfsMultihash({
-            hashFunction: 0,
-            hashLength: 0,
-            hash: ""
-          }),
-          creator: msg.sender,
-          creationTime: block.timestamp
-        }),
+        addr: msg.sender,
         balance: 0, //TODO: ruleset
         joined: true,
+        joinTime: block.timestamp,
         banned: false,
         banReason: "",
         permissions: -1 //TODO: ruleset, permissions for new users
@@ -130,14 +131,8 @@ library UserLib {
   function leave(StateLib.State storage state, uint256 parentNum) public { 
     require(userExists(state, parentNum, msg.sender));
 
-    removeUser(state, parentNum, msg.sender);
     //TODO: send the user their ether, based on ruleset
-
-//    var u = getUser(state, parentNum, msg.sender);
-//    var p = PostLib.getPost(state, parentNum);
-    //u.parentNum = 0;
-    //p.users[msg.sender].parentNum = 0;
-    //p.userAddresses[p.userAddressesMap[msg.sender]] = 0;
+    removeUser(state, parentNum, msg.sender);
   }
 
 }

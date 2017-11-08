@@ -251,8 +251,8 @@ export default class Group {
     return (CyberneticChat.getPost(id));
   }
 
-  loadUser(address) {
-    return (CyberneticChat.getUser(this.number, address));
+  loadUserProperties(address) {
+    return (CyberneticChat.getUserProperties(this.number, address));
   }
 
   userExists(address) {
