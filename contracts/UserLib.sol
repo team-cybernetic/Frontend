@@ -80,6 +80,71 @@ library UserLib {
     return (profile.creationTime != 0);
   }
 
+  function setProfileChecks(
+//    StateLib.State storage state,
+    address userAddress,
+    string nickname,
+    string profileMimeType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash,
+    uint256 updateTime
+  ) private view returns (
+    uint256 _updateTime
+  ) {
+
+    require(userAddress != 0x0);
+    //TODO: check nickname length via global ruleset
+    //TODO: UTF-8 length != bytes().length
+    require(bytes(nickname).length <= 64);
+
+    bool checksPassed;
+    (checksPassed, _updateTime) = ContentLib.contentCheck(
+//      state,
+      nickname,
+      profileMimeType,
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      updateTime
+    );
+    require(checksPassed);
+  }
+
+  function setProfile(
+    StateLib.State storage state,
+    address userAddress,
+    string nickname,
+    string profileMimeType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash,
+    uint256 updateTime
+  ) public {
+    (updateTime) = setProfileChecks(
+//      state,
+      userAddress,
+      nickname,
+      profileMimeType,
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      updateTime
+    );
+
+    state.main.userProfiles[userAddress] = ContentLib.Content({
+      title: nickname,
+      mimeType: profileMimeType,
+      multihash: ContentLib.IpfsMultihash({
+        hashFunction: ipfsHashFunction,
+        hashLength: ipfsHashLength,
+        hash: ipfsHash
+      }),
+      creator: userAddress,
+      creationTime: updateTime
+    });
+  }
+
   function getUsers(StateLib.State storage state, uint256 parentNum) constant internal returns (address[]) {
     var p = PostLib.getPost(state, parentNum);
     return (p.userAddresses);

@@ -209,6 +209,25 @@ contract CyberneticChat {
     );
   }
 
+  function setUserProfile(
+    string nickname,
+    string profileMimeType,
+    uint8 ipfsHashFunction,
+    uint8 ipfsHashLength,
+    bytes ipfsHash
+  ) public {
+    UserLib.setProfile(
+      state,
+      msg.sender,
+      nickname,
+      profileMimeType,
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      block.timestamp
+    );
+  }
+
   function getUserProperties(uint256 parentNum, address userAddress) constant public returns (
     uint256 joinTime,
     uint256 balance,

@@ -11,10 +11,12 @@ module.exports = function(deployer) {
   deployer.deploy(PermissionLib);
 
   deployer.link(PermissionLib, UserLib);
+  deployer.link(ContentLib, UserLib);
   deployer.deploy(UserLib);
 
   deployer.link(UserLib, PostLib);
   deployer.link(CurrencyLib, PostLib);
+  deployer.link(ContentLib, PostLib);
   deployer.link(PermissionLib, PostLib);
   deployer.deploy(PostLib);
 

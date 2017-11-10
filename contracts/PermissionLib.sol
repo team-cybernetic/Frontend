@@ -76,7 +76,6 @@ library PermissionLib {
 
   function createPost(StateLib.State storage state, uint256 parentNum, address userAddress) public returns (bool) {
     var u = UserLib.getUser(state, parentNum, userAddress);
-    //if (u.muted) {
     if (!isPermitted(state, parentNum, u.permissions, Action.Post_create)) {
       PostCreationDenied(parentNum, userAddress, "User is muted");
       return (false);

@@ -87,7 +87,7 @@ library PostLib {
     }));
   }
 
-  function createPostPreflightChecks(
+  function createPostChecks(
     StateLib.State storage state,
     uint256 parentNum,
     string title,
@@ -99,39 +99,28 @@ library PostLib {
   ) private returns (
     uint256 _creationTime
   ) {
-    if (state.main.initialized) {
+    if (state.main.initialized) { //if the contract hasn't been fully deployed yet (I.E. it's being deployed right now, in this call), the original creator won't even have permissions to create the first post, so just skip these checks
       require(PermissionLib.createPost(state, parentNum, msg.sender));
       require(postExists(state, parentNum));
     }
 
     //require(!PermissionLib.postLocked(parentNum)); //TODO: self.byNumber[parentNum].locked ??
 
-    //TODO: check title length via ruleset
+    //TODO: check title length via group's ruleset
     //TODO: UTF-8 length != bytes().length
     require(bytes(title).length <= 255);
 
-    //        require(ipfsHashLength != 0); //permit content-less posts TODO: ruleset
-
-    require(ipfsHashLength == ipfsHash.length);
-
-    //TODO: check if ipfs hash length matches expected size for hash function (function 0x12 should always be 0x20 bytes long)
-    if (ipfsHashLength != 0) {
-      if (ipfsHashFunction == 0x12) {
-        require(ipfsHashLength == 0x20);
-      }
-    }
-
-    uint256 ctLen = bytes(mimeType).length;
-
-    if (ipfsHashLength > 0) { //if there's no content, don't bother checking if there's a content type given
-      require(ctLen > 0);
-    }
-    require(ctLen <= 255); //RFC 6838 limits mime types to 127 bytes for each of the major and minor types, plus the separating slash
-
-    if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) { //TODO ruleset? moving average across all posts in the last hour?
-      creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
-    }
-    _creationTime = creationTime;
+    bool checksPassed;
+    (checksPassed, _creationTime) = ContentLib.contentCheck(
+//      state,
+      title,
+      mimeType,
+      ipfsHashFunction,
+      ipfsHashLength,
+      ipfsHash,
+      creationTime
+    );
+    require(checksPassed);
   }
 
   function createPost(
@@ -146,7 +135,7 @@ library PostLib {
     bool userPermissionsFlagsMode
   ) public returns (uint256) {
 
-    (creationTime) = createPostPreflightChecks(
+    (creationTime) = createPostChecks(
       state,
       parentNum,
       title,
