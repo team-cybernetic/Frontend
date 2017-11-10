@@ -251,8 +251,8 @@ export default class Group {
     return (CyberneticChat.getPost(id));
   }
 
-  loadUserProperties(address) {
-    return (CyberneticChat.getUserProperties(this.number, address));
+  loadUser(address) {
+    return (CyberneticChat.getUser(this.number, address));
   }
 
   userExists(address) {
@@ -348,6 +348,27 @@ export default class Group {
         reject(error);
       });
     });
+  }
+
+  sendUserCurrency(address, amount, isPos) {
+    return new Promise((resolve, reject) => {
+        Wallet.runTransactionAsync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((transactionId) => {
+          Blockchain.waitForPendingTransaction(transactionId).then((txid) => {
+            resolve(true);
+          }).catch((error) => {
+            reject(error);
+          });
+        }).catch((error) => {
+          if (error.cancel) {
+            console.log("Transaction cancelled by user");
+          } else {
+            console.error("Error while executing transferTokensToUser contract function:", error);
+          }
+          reject(error);
+        });
+      }).catch((error) => {
+        console.error("Error with promise.", error);
+      });
   }
 
   registerPostCreatedEventListener(callback) {
