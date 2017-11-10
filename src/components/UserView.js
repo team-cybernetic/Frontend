@@ -6,6 +6,7 @@ export default class UserView extends Component {
     super(props);
     this.state = {
       isSelf: undefined,
+      inputTip: '1.0',
     };
   }
 
@@ -61,6 +62,45 @@ export default class UserView extends Component {
     );
   }
 
+  renderTip() {
+    return (
+        <div style={this.styles.tipWrapper}>
+          Tip:&nbsp;
+          <input type='text' 
+          value={this.state.inputTip}
+          onChange={(e) => this.changeTip(e)}
+          />
+          <input type='submit' 
+          value='send' 
+          onClick={() => this.sendTip()}
+          />
+        </div>
+      );
+  }
+
+  sendTip() {
+    var amount = parseInt(this.state.inputTip);
+    if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
+        return;
+    }
+    var address = this.props.user.getAddress();
+    var isPos = true;
+    if (amount === NaN) {
+      return;
+    }
+    this.props.group.sendUserCurrency(address, amount, isPos).then(() => {
+      console.log("successfully sent currency!");
+    }).catch((error) => {
+      console.error("failed to send currency:", error);
+    });
+  }
+
+  changeTip(event) {
+    this.setState({
+      inputTip: event.target.value,
+    });
+  }
+
   render() {
     if (this.props.user.isHeaderLoaded()) {
       return (
@@ -68,6 +108,7 @@ export default class UserView extends Component {
           <div style={this.styles.cardContent} className='card-content'>
             {this.renderAddress()}
             {this.renderBalance()}
+            {this.renderTip()}
           </div>
         </div>
       );
