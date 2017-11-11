@@ -395,6 +395,43 @@ export default class Group {
     });
   }
 
+  sendPostCurrency(postNumber, amount, isPos) {
+    return new Promise((resolve, reject) => {
+      const walletAddr = Wallet.getAccountAddress();
+      this.userExists(walletAddr).then((result) => {
+        if (result) {
+          this.postExists(postNumber).then((result) => {
+            if (result) {
+              Wallet.runTransactionSync('transferTokensToPost', 'send currency to post #' + postNumber, this.number, postNumber, amount, isPos).then((txid) => {
+                console.log("successfully sent", amount, "currency to post #", postNumber, ", txid:", txid);
+                resolve(true);
+              }).catch((error) => {
+                if (error.cancel) {
+                  console.log("Transaction cancelled by user");
+                } else {
+                  console.error("Error while executing transferTokensToUser contract function:", error);
+                }
+                reject(error);
+              });
+            } else {
+              console.log("post", postNumber, "does not exist!");
+              resolve(false);
+            }
+          }).catch((error) => {
+            console.error("Error while checking if post", postNumber, "exists:", error);
+            reject(error);
+          });
+        } else {
+          console.log("self user", walletAddr, "was not in group!");
+          resolve(false);
+        }
+      }).catch((error) => {
+        console.error("Error while checking if self user is in group:", error);
+        reject(error);
+      });
+    });
+  }
+
   registerPostCreatedEventListener(callback) {
     return (CyberneticChat.registerPostCreatedEventListener(callback));
   }

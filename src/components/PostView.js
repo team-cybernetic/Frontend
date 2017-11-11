@@ -82,7 +82,7 @@ export default class PostView extends Component {
   renderUpvote() {
     return (
 
-      <a href="#"
+      <a 
         style={this.styles.voteArrow}
         onClick={() => this.upvote()}
       >
@@ -93,7 +93,7 @@ export default class PostView extends Component {
 
   renderDownvote() {
     return (
-      <a href="#"
+      <a
         style={this.styles.voteArrow}
         onClick={() => this.downvote()}
       >
@@ -166,14 +166,23 @@ export default class PostView extends Component {
     );
   }
 
+  vote(amount) {
+    if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
+        return;
+    }
+    this.props.group.sendPostCurrency(this.props.post.id, amount, amount >= 0).then(() => {
+      console.log("successfully upvoted post #" + this.props.post.id + "!");
+    }).catch((error) => {
+      console.error("failed to send currency:", error);
+    });
+  }
+
   upvote() {
-    /* TODO: actually make this work */
-    this.props.post.balance++;
+    this.vote(1);
   }
 
   downvote() {
-    /* TODO: actually make this work */
-    this.props.post.balance--;
+    this.vote(-1);
   }
 
   get styles() {
