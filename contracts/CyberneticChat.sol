@@ -229,6 +229,7 @@ contract CyberneticChat {
   }
 
   function getUserProperties(uint256 parentNum, address userAddress) constant public returns (
+    uint256 parentNumber,
     uint256 joinTime,
     uint256 balance,
     int256 permissions,
@@ -237,6 +238,7 @@ contract CyberneticChat {
   ) {
     var user = UserLib.getUser(state, parentNum, userAddress);
     return (
+      parentNum,
       user.joinTime,
       user.balance,
       user.permissions,

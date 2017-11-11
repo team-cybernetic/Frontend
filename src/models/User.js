@@ -87,34 +87,21 @@ export default class User {
     });
   }
 
-  static userStructToObject([
+  static userPropertiesStructToObject([
     parentNumber,
-    nickname,
-    profileType,
-    ipfsHashFunction,
-    ipfsHashLength,
-    ipfsHash,
-    address,
     joinTime,
     balance,
     permissions,
     banned,
+    banReason,
   ]) {
-    const multiHashArray = [ipfsHashFunction, ipfsHashLength, ipfsHash];
     return ({
       parentNumber,
-      nickname,
-      profileType,
-      multiHashArray,
-      multiHashString: Ipfs.assembleMultiHash(multiHashArray),
-      ipfsHashFunction,
-      ipfsHashLength,
-      ipfsHash,
-      address,
       joinTime,
       balance,
       permissions,
       banned,
+      banReason,
     });
   }
 
@@ -159,17 +146,11 @@ export default class User {
           this.headerLoadListeners.push({ resolve, reject });
         } else {
           this.headerLoading = true;
-          this.waitForConfirmation().then((userExists) => {
-            if (!userExists) {
-              let error = new Error("User " + this.id + " does not exist!");
-              this.markHeaderLoadedFailure(error);
-              reject(error);
-              return;
-            }
+          this.waitForConfirmation().then(() => {
             if (!this.headerLoaded) { //waitForConfirmation can load header on an edge case
               this.parentGroup.loadUserProperties(this.address).then((userStruct) => {
                 console.log("User loaded struct:", userStruct);
-                this.populate(User.userStructToObject(userStruct));
+                this.populate(User.userPropertiesStructToObject(userStruct));
                 this.markHeaderLoaded();
                 resolve();
               }).catch((error) => {
@@ -276,7 +257,7 @@ export default class User {
                   });
                   this.markConfirmed();
                   this.parentGroup.unregisterEventListener(eventListenerHandle);
-                  resolve(true);
+                  resolve();
                 }
               } else {
                 this.markConfirmedFailure(error);
@@ -289,7 +270,7 @@ export default class User {
               console.log("waitForConfirmation: confirming user by address:", this.address);
               this.parentGroup.loadUserProperties(this.address).then((userStruct) => {
                 console.log("waitForConfirmation: loaded user:", userStruct);
-                const userFields = User.userStructToObject(userStruct);
+                const userFields = User.userPropertiesStructToObject(userStruct);
                 console.log("waitForConfirmation: loaded struct:", userFields);
                 this.populate(userFields);
                 console.log("waitForConfirmation: marking user as loaded");
@@ -297,7 +278,7 @@ export default class User {
                 console.log("waitForConfirmation: marking header as loaded");
                 this.markHeaderLoaded();
                 console.log("waitForConfirmation: resolving true");
-                resolve(true);
+                resolve();
               }).catch((error) => {
                 this.markConfirmedFailure(error);
                 reject(error);
@@ -309,7 +290,7 @@ export default class User {
           }
         }
       } else {
-        resolve(true);
+        resolve();
       }
     });
   }
