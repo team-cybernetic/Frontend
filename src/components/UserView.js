@@ -7,7 +7,7 @@ export default class UserView extends Component {
     super(props);
     this.state = {
       isSelf: undefined,
-      inputTip: '1.0',
+      inputTip: '1',
     };
   }
 

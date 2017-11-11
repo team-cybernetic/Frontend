@@ -5,6 +5,14 @@ import { Link } from 'react-router-dom';
 import Blockchain from '../blockchain/Blockchain';
 
 export default class PostView extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+      countActive: false,
+    };
+  }
+
   componentWillMount() {
     console.log("props post:", this.props.post);
     this.listenerHandle = this.props.post.registerUpdateListener((post) => {
@@ -28,27 +36,33 @@ export default class PostView extends Component {
               {this.renderTimestamp()}
             </div>
 
-            <div style={this.styles.voting}>
-              {this.renderUpvote()}
-              {this.renderBalance()}
-              {this.renderDownvote()}
-            </div>
-
-      </div>
-            <div style={this.styles.body}>
-              {this.renderContent()}
+            <div style={this.styles.votingContainer}>
+              <div style={this.styles.voting}>
+                {this.renderUpvote()}
+                {this.renderBalance()}
+                {this.renderDownvote()}
+              </div>
+              <div style={this.styles.votingCountContainer}>
+                <span style={this.styles.votingCount}>
+                  {this.renderCount()}
+                </span>
+              </div>
             </div>
           </div>
+          <div style={this.styles.body}>
+            {this.renderContent()}
+          </div>
         </div>
+      </div>
     );
     } else {
       return (
         <div style={this.styles.container} className='card'>
-        <div style={this.styles.cardContent} className='card-content'>
-        {this.renderId()}Loading...
-      </div>
-      </div>
-    );
+          <div style={this.styles.cardContent} className='card-content'>
+            {this.renderId()}Loading...
+          </div>
+        </div>
+      );
     }
   }
 
@@ -79,12 +93,20 @@ export default class PostView extends Component {
     );
   }
 
+  renderCount() {
+    if (this.state.countActive) {
+      return (this.state.count >= 0 ? '+' : '') + this.state.count;
+    }
+  }
+
   renderUpvote() {
     return (
 
       <a 
         style={this.styles.voteArrow}
-        onClick={() => this.upvote()}
+        onMouseDown={() => this.upvoteMouseDown()}
+        onMouseUp={() => this.upvoteMouseUp()}
+        onMouseOut={() => this.upvoteMouseOut()}
       >
         ▲
       </a>
@@ -95,7 +117,9 @@ export default class PostView extends Component {
     return (
       <a
         style={this.styles.voteArrow}
-        onClick={() => this.downvote()}
+        onMouseDown={() => this.downvoteMouseDown()}
+        onMouseUp={() => this.downvoteMouseUp()}
+        onMouseOut={() => this.downvoteMouseOut()}
       >
         ▼
       </a>
@@ -167,22 +191,76 @@ export default class PostView extends Component {
   }
 
   vote(amount) {
+    const isPos = amount >= 0;
+    amount = Math.abs(amount);
     if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
         return;
     }
-    this.props.group.sendPostCurrency(this.props.post.id, amount, amount >= 0).then(() => {
-      console.log("successfully upvoted post #" + this.props.post.id + "!");
+    this.props.group.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
+      console.log("successfully " + (isPos ? "up" : "down") + "voted post #" + this.props.post.id + " by " + amount + "!");
     }).catch((error) => {
       console.error("failed to send currency:", error);
     });
   }
 
-  upvote() {
-    this.vote(1);
+  changeCount(amount) {
+    if (this.state.countActive) {
+      console.log("counting active, changing count to", this.state.count + amount);
+      this.setState({
+        count: this.state.count + amount,
+      });
+      setTimeout(() => {
+        this.changeCount(amount);
+      }, 500);
+    }
   }
 
-  downvote() {
-    this.vote(-1);
+  upvoteMouseDown() {
+    //mouse down, reset count and begin counting up
+    this.state.count = 0;
+    this.state.countActive = true;
+    this.changeCount(1);
+  }
+
+  upvoteMouseUp() {
+    //mouse up over the element, send the tip
+    this.state.countActive = false;
+    this.vote(this.state.count);
+    this.setState({
+      count: 0,
+    });
+  }
+
+  upvoteMouseOut() {
+    //mouse out, stop counting, reset counter (cancelled)
+    this.setState({
+      count: 0,
+      countActive: false,
+    });
+  }
+
+  downvoteMouseDown() {
+    //mouse down, reset count and begin counting up
+    this.state.count = 0;
+    this.state.countActive = true;
+    this.changeCount(-1);
+  }
+
+  downvoteMouseUp() {
+    //mouse up over the element, send the tip
+    this.state.countActive = false;
+    this.vote(this.state.count);
+    this.setState({
+      count: 0,
+    });
+  }
+
+  downvoteMouseOut() {
+    //mouse out, stop counting, reset counter (cancelled)
+    this.setState({
+      count: 0,
+      countActive: false,
+    });
   }
 
   get styles() {
@@ -228,11 +306,22 @@ export default class PostView extends Component {
         width: '90%',
       },
 
+      votingContainer: {
+        display: 'flex',
+      },
       voting: {
         lineHeight: '20px',
         float: 'right',
         display: 'flex',
         flexDirection: 'column',
+      },
+      votingCountContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      votingCount: {
+        fontSize: 'small',
       },
       body: {
         display: 'flex',
