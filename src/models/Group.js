@@ -355,19 +355,19 @@ export default class Group {
       const walletAddr = Wallet.getAccountAddress();
       this.userExists(walletAddr).then((result) => {
         if (result) {
-					this.userExists(address).then((result) => {
-						if (result) {
-							Wallet.runTransactionSync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((txid) => {
-								console.log("successfully sent", amount, "currency to", address, "txid:", txid);
-								resolve(true);
-							}).catch((error) => {
-								if (error.cancel) {
-									console.log("Transaction cancelled by user");
-								} else {
-									console.error("Error while executing transferTokensToUser contract function:", error);
-								}
-								reject(error);
-							});
+          this.userExists(address).then((result) => {
+            if (result) {
+              Wallet.runTransactionSync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((txid) => {
+                console.log("successfully sent", amount, "currency to", address, "txid:", txid);
+                resolve(true);
+              }).catch((error) => {
+                if (error.cancel) {
+                  console.log("Transaction cancelled by user");
+                } else {
+                  console.error("Error while executing transferTokensToUser contract function:", error);
+                }
+                reject(error);
+              });
             } else {
               console.log("user", address, "was not in group!");
               resolve(false);
@@ -384,7 +384,7 @@ export default class Group {
         console.error("Error while checking if self user is in group:", error);
         reject(error);
       });
-		});
+    });
   }
 
   registerPostCreatedEventListener(callback) {
