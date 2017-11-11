@@ -151,7 +151,11 @@ class Editor extends Component {
       });
     }).catch((error) => {
       if (error) {
-        console.error(error);
+        if (!error.cancel) {
+          console.error(error);
+        } else {
+          console.log("User cancelled creating the post!");
+        }
       }
       this.setState({
         isPosting: false,

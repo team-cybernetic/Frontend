@@ -187,7 +187,7 @@ class TransactionConfirmationModal extends Component {
   }
 
   cancel() {
-    this.props.cancelCallback();
+    this.props.cancelCallback({cancel: true});
     this.props.closeModal();
   }
 
