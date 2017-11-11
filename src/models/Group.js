@@ -78,28 +78,12 @@ export default class Group {
     });
 
     this.registerPostBalanceChangedListener((error, result) => {
+      //the post got some money from one of its peers
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         const postNumber = result.args.postNumber.toString();
-        if (parentNumber === this.parentNumber && postNumber === this.number) {
-          //our balance just updated
+        if (parentNumber === this.number) {
           console.log("Group", this.number, "got a balance change notification:", result);
-          const amount = result.args.amount;
-          const increased = result.args.increased;
-
-          if (increased) {
-            this.post.populate({
-              tokens: this.post.getTokens().add(amount),
-            });
-          } else {
-            this.post.populate({
-              tokens: this.post.getTokens().sub(amount),
-            });
-          }
-          console.log("Tokens of group is now", this.post.getTokens());
-          this.fireTokensChangedListeners(this.post.getTokens());
-        } else if (parentNumber === this.number) {
-          console.log("Group", this.number, "got a post balance change notification:", result);
           const amount = result.args.amount;
           const increased = result.args.increased;
 
@@ -114,6 +98,30 @@ export default class Group {
             });
           }
           console.log("Balance of post is now", post.getBalance());
+        }
+      }
+    });
+
+    this.registerPostTokensChangedListener((error, result) => {
+      //the number of tokens issued to the children of this post has changed
+      if (!error) {
+        const postNumber = result.args.postNumber.toString();
+        if (postNumber === this.number) {
+          console.log("Group", this.number, "got a tokens change notification:", result);
+          const amount = result.args.amount;
+          const increased = result.args.increased;
+
+          if (increased) {
+            this.post.populate({
+              tokens: this.post.getTokens().add(amount),
+            });
+          } else {
+            this.post.populate({
+              tokens: this.post.getTokens().sub(amount),
+            });
+          }
+          console.log("Tokens of group is now", this.post.getTokens());
+          this.fireTokensChangedListeners(this.post.getTokens());
         }
       }
     });
@@ -405,6 +413,10 @@ export default class Group {
 
   registerPostBalanceChangedListener(callback) {
     return (CyberneticChat.registerPostBalanceChangedListener(callback));
+  }
+
+  registerPostTokensChangedListener(callback) {
+    return (CyberneticChat.registerPostTokensChangedListener(callback));
   }
 
   registerEventListener(eventName, callback) {

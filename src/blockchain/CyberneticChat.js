@@ -3,6 +3,7 @@ const EVENT_USER_JOINED = 'UserJoined';
 const EVENT_USER_LEFT = 'UserLeft';
 const EVENT_USER_BALANCE_CHANGED = 'UserBalanceChanged';
 const EVENT_POST_BALANCE_CHANGED = 'PostBalanceChanged';
+const EVENT_POST_TOKENS_CHANGED = 'PostTokensChanged';
 
 export default class CyberneticChat {
   static eventListeners = [[]];
@@ -29,6 +30,10 @@ export default class CyberneticChat {
     this.watchForEvent(EVENT_POST_BALANCE_CHANGED, {}, (error, response) => {
       console.log("EVENT: Post balance changed! response:", response);
       this.fireEventListener(EVENT_POST_BALANCE_CHANGED, error, response);
+    });
+    this.watchForEvent(EVENT_POST_TOKENS_CHANGED, {}, (error, response) => {
+      console.log("EVENT: Post tokens changed! response:", response);
+      this.fireEventListener(EVENT_POST_TOKENS_CHANGED, error, response);
     });
   }
 
@@ -108,6 +113,10 @@ export default class CyberneticChat {
 
   static registerPostBalanceChangedListener(callback) {
     return (this.registerEventListener(EVENT_POST_BALANCE_CHANGED, callback));
+  }
+
+  static registerPostTokensChangedListener(callback) {
+    return (this.registerEventListener(EVENT_POST_TOKENS_CHANGED, callback));
   }
 
   static fireEventListener(eventName, error, response) {
