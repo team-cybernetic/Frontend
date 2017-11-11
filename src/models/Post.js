@@ -43,7 +43,7 @@ export default class Post {
     this.creator = creator || this.creator;
     this.balance = balance || this.balance || new BigNumber(0);
     this.tokens = tokens || this.tokens || new BigNumber(0);
-    //this.confirmed = !!this.id;
+    this.confirmed = !!this.id;
     this.headerLoaded = !!this.title;
     this.contentLoaded = !!this.content || this.multiHashString === "";
     this.fireUpdateListeners();
@@ -151,7 +151,7 @@ export default class Post {
           this.headerLoadListeners.push({ resolve, reject });
         } else {
           this.headerLoading = true;
-          //console.log("waiting for confirmation of post", this.id);
+          // console.log("waiting for confirmation of post", this.id);
           this.waitForConfirmation().then((postExists) => {
             if (!postExists) {
               let error = new Error("Post " + this.id + " does not exist!");
@@ -159,11 +159,11 @@ export default class Post {
               reject(error);
               return;
             }
-            //console.log("post", this.id, "confirmed");
+            // console.log("post", this.id, "confirmed");
             this.parentGroup.loadPost(this.id).then((postStruct) => {
-              //console.log("post", this.id, "loaded", postStruct);
+              // console.log("post", this.id, "loaded", postStruct);
               this.populate(this.postStructToObject(postStruct));
-              //console.log(this);
+              console.log(this);
               this.markHeaderLoaded();
               resolve();
             }).catch((error) => {
