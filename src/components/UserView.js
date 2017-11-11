@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Wallet from '../models/Wallet';
+import cx from 'classnames';
 
 export default class UserView extends Component {
   constructor(props) {
@@ -67,12 +68,15 @@ export default class UserView extends Component {
         <div style={this.styles.tipWrapper}>
           Tip:&nbsp;
           <input type='text' 
-          value={this.state.inputTip}
-          onChange={(e) => this.changeTip(e)}
+            style={this.styles.tipInput}
+            value={this.state.inputTip}
+            onChange={(e) => this.changeTip(e)}
           />
           <input type='submit' 
-          value='send' 
-          onClick={() => this.sendTip()}
+            style={this.styles.tipSend}
+            value='send' 
+            onClick={() => this.sendTip()}
+            className={cx('button')}
           />
         </div>
       );
@@ -84,11 +88,11 @@ export default class UserView extends Component {
         return;
     }
     var address = this.props.user.getAddress();
-    var isPos = true;
     if (amount === NaN) {
       return;
     }
-    this.props.group.sendUserCurrency(address, amount, isPos).then(() => {
+    var isPos = amount >= 0;
+    this.props.group.sendUserCurrency(address, (amount * (isPos ? 1 : -1)), isPos).then(() => {
       console.log("successfully sent currency!");
     }).catch((error) => {
       console.error("failed to send currency:", error);
@@ -192,6 +196,16 @@ export default class UserView extends Component {
       address: {
         fontSize: 'x-small',
       },
+      tipWrapper: {
+        display: 'flex',
+      },
+      tipInput: {
+        width: '50px',
+        flexGrow: '1',
+      },
+      tipSend: {
+        fontSize: 'x-small',
+      }
     }
   };
 

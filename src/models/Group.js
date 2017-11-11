@@ -251,8 +251,8 @@ export default class Group {
     return (CyberneticChat.getPost(id));
   }
 
-  loadUser(address) {
-    return (CyberneticChat.getUser(this.number, address));
+  loadUserProperties(address) {
+    return (CyberneticChat.getUserProperties(this.number, address));
   }
 
   userExists(address) {
@@ -352,23 +352,39 @@ export default class Group {
 
   sendUserCurrency(address, amount, isPos) {
     return new Promise((resolve, reject) => {
-        Wallet.runTransactionAsync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((transactionId) => {
-          Blockchain.waitForPendingTransaction(transactionId).then((txid) => {
-            resolve(true);
+      const walletAddr = Wallet.getAccountAddress();
+      this.userExists(walletAddr).then((result) => {
+        if (result) {
+					this.userExists(address).then((result) => {
+						if (result) {
+							Wallet.runTransactionSync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((txid) => {
+								console.log("successfully sent", amount, "currency to", address, "txid:", txid);
+								resolve(true);
+							}).catch((error) => {
+								if (error.cancel) {
+									console.log("Transaction cancelled by user");
+								} else {
+									console.error("Error while executing transferTokensToUser contract function:", error);
+								}
+								reject(error);
+							});
+            } else {
+              console.log("user", address, "was not in group!");
+              resolve(false);
+            }
           }).catch((error) => {
+            console.error("Error while checking if user", address, "is in group:", error);
             reject(error);
           });
-        }).catch((error) => {
-          if (error.cancel) {
-            console.log("Transaction cancelled by user");
-          } else {
-            console.error("Error while executing transferTokensToUser contract function:", error);
-          }
-          reject(error);
-        });
+        } else {
+          console.log("self user", walletAddr, "was not in group!");
+          resolve(false);
+        }
       }).catch((error) => {
-        console.error("Error with promise.", error);
+        console.error("Error while checking if self user is in group:", error);
+        reject(error);
       });
+		});
   }
 
   registerPostCreatedEventListener(callback) {
