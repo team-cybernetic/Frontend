@@ -3,6 +3,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import CyberneticChat from '../blockchain/CyberneticChat';
 import Wallet from '../models/Wallet';
 import User from '../models/User';
+import UserStore from '../stores/UserStore';
 import xss from 'xss';
 
 class UserProfileView extends Component {
@@ -22,6 +23,13 @@ class UserProfileView extends Component {
 
   loadProfile(address) {
     this.setState({ isLoading: true });
+    const user = UserStore.getUser(address);
+    user.loadProfile().then(() => {
+      this.setState({ isLoading: false });
+    });
+    this.setState({ user });
+    /*
+    console.log("UserProfileView load profile userAddress:", address);
     CyberneticChat.getUserProfile(address).then((profileStruct) => {
       const user = new User(null, User.userProfileStructToObject(profileStruct));
       user.loadProfile().then(() => {
@@ -29,6 +37,7 @@ class UserProfileView extends Component {
       });
       this.setState({ user });
     });
+    */
   }
 
   render() {
