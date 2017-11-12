@@ -2,6 +2,7 @@ import Ipfs from '../utils/Ipfs';
 import BigNumber from 'bignumber.js';
 import GroupStore from '../stores/GroupStore';
 import CyberneticChat from '../blockchain/CyberneticChat';
+import Wallet from '../models/Wallet';
 
 class UserProperties {
   constructor(parentNumber, address) {
@@ -28,7 +29,7 @@ class UserProperties {
         balance
       :
         (
-          this.balance !== undefined ? 
+          this.balance !== undefined ?
             this.balance
           :
             new BigNumber(0)
@@ -166,7 +167,7 @@ class UserProperties {
       }).catch(reject);
     });
   }
-  
+
   getBanned() {
     return (this.banned);
   }
@@ -248,7 +249,7 @@ export default class User {
     }
     return (this.properties[parentNumber]);
   }
- 
+
   isPropertiesLoaded(parentNumber) {
     return (this.properties[parentNumber] && this.properties[parentNumber].loaded);
   }
@@ -279,6 +280,32 @@ export default class User {
 
   getProfileLastUpdateTime() {
     return (this.profileLastUpdateTime);
+  }
+
+  updateProfile(nickname, profile, profileMimeType) {
+    return new Promise((resolve, reject) => {
+      if (profile) {
+        Ipfs.saveContent(profile).then((multiHashString) => {
+          const multiHashArray = Ipfs.extractMultiHash(multiHashString);
+          const [ipfsHashFunction, ipfsHashLength, ipfsHash] = multiHashArray;
+          Wallet.runTransactionSync('setUserProfile', 'update your profile', nickname, profileMimeType, ipfsHashFunction, ipfsHashLength, ipfsHash).then(() => {
+            this.populateProfile({ nickname, profile, profileMimeType, multiHashString, multiHashArray });
+            resolve();
+          }).catch((error) => {
+            reject(error);
+          });
+        }).catch((error) => {
+          reject(error);
+        });
+      } else {
+        Wallet.runTransactionSync('setUserProfile', 'update your profile', nickname, 0, 0, 0, 0).then(() => {
+          this.populateProfile({ nickname, profile: null, profileMimeType: null, multiHashString: null, multiHashArray: null });
+          resolve();
+        }).catch((error) => {
+          reject(error);
+        });
+      }
+    });
   }
 
   static userProfileStructToObject([

@@ -133,23 +133,6 @@ export default class Wallet {
     return (this.runTransaction(false, methodName, description, ...args));
   }
 
-  /*
-  static deployContract(contractTC) {
-    return GasEstimator.estimateContractCreation(contractTC).then((gas) => {
-      console.log("Gas estimator estimates that this contract creation will take", gas, "gas");
-      return new Promise((resolve, reject) => {
-        if (!this.managedWeb3) {
-          TransactionConfirmationModal.show(gas, 'create this group', (gasPrice) => {
-            contractTC.new({ gas, gasPrice }).then(resolve);
-          }, reject);
-        } else {
-          contractTC.new({ gas, gasPrice: this.defaultGasPrice }).then(resolve);
-        }
-      });
-    });
-  }
-  */
-
   static getAccountAddress() {
     return this.web3.eth.defaultAccount;
   }

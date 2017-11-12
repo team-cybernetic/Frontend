@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 import CyberneticChat from '../blockchain/CyberneticChat';
 import Wallet from '../models/Wallet';
-import User from '../models/User';
 import UserStore from '../stores/UserStore';
 import xss from 'xss';
 
@@ -21,23 +20,23 @@ class UserProfileView extends Component {
     }
   }
 
+  componentWillUnmount() {
+    if (this.profileUpdateListenerHandle && this.state.user) {
+      this.state.user.unregisterProfileUpdateListener(this.profileUpdateListenerHandle);
+    }
+  }
+
   loadProfile(address) {
+    if (this.profileUpdateListenerHandle && this.state.user) {
+      this.state.user.unregisterProfileUpdateListener(this.profileUpdateListenerHandle);
+    }
     this.setState({ isLoading: true });
     const user = UserStore.getUser(address);
     user.loadProfile().then(() => {
       this.setState({ isLoading: false });
     });
     this.setState({ user });
-    /*
-    console.log("UserProfileView load profile userAddress:", address);
-    CyberneticChat.getUserProfile(address).then((profileStruct) => {
-      const user = new User(null, User.userProfileStructToObject(profileStruct));
-      user.loadProfile().then(() => {
-        this.setState({ isLoading: false });
-      });
-      this.setState({ user });
-    });
-    */
+    this.profileUpdateListenerHandle = user.registerProfileUpdateListener(() => this.forceUpdate());
   }
 
   render() {
@@ -68,7 +67,10 @@ class UserProfileView extends Component {
     }
     const html = { __html: content };
     return (
-      <span dangerouslySetInnerHTML={html}></span>
+      <div>
+        <div>Nickname: {this.state.user.nickname}</div>
+        <div>Profile: <span dangerouslySetInnerHTML={html}></span></div>
+      </div>
     );
   }
 
