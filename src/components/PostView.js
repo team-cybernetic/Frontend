@@ -29,32 +29,35 @@ export default class PostView extends Component {
       return (
         <div style={this.styles.container} className='card'>
           <div style={this.styles.cardContent}>
-            <div style={this.styles.container2}>
+            <div style={this.styles.postInfo}>
 
-            <div style={this.styles.title}>
-              {this.renderTitle()}
-              {this.renderTimestamp()}
+              <div style={this.styles.title}>
+                {this.renderTitle()}
+                {this.renderTimestamp()}
+              </div>
+
+              <div style={this.styles.votingContainer}>
+                <div style={this.styles.voting}>
+                  {this.renderUpvote()}
+                  {this.renderBalance()}
+                  {this.renderDownvote()}
+                </div>
+
+                <div style={this.styles.votingCountContainer}>
+                  <span style={this.styles.votingCount}>
+                    {this.renderCount()}
+                  </span>
+                </div>
+        
+              </div>
             </div>
 
-            <div style={this.styles.votingContainer}>
-              <div style={this.styles.voting}>
-                {this.renderUpvote()}
-                {this.renderBalance()}
-                {this.renderDownvote()}
-              </div>
-              <div style={this.styles.votingCountContainer}>
-                <span style={this.styles.votingCount}>
-                  {this.renderCount()}
-                </span>
-              </div>
+            <div style={this.styles.body}>
+              {this.renderContent()}
             </div>
-          </div>
-          <div style={this.styles.body}>
-            {this.renderContent()}
           </div>
         </div>
-      </div>
-    );
+      );
     } else {
       return (
         <div style={this.styles.container} className='card'>
@@ -85,20 +88,6 @@ export default class PostView extends Component {
     );
   }
 
-  renderBalance() {
-      return (
-        <span style={this.styles.balance}>
-          {this.props.post.balance.toString()}
-        </span>
-    );
-  }
-
-  renderCount() {
-    if (this.state.countActive) {
-      return (this.state.count >= 0 ? '+' : '') + this.state.count;
-    }
-  }
-
   renderUpvote() {
     return (
 
@@ -111,6 +100,20 @@ export default class PostView extends Component {
         ▲
       </a>
     );
+  }
+
+  renderBalance() {
+      return (
+        <span style={this.styles.balance}>
+          {this.props.post.balance.toString()}
+        </span>
+    );
+  }
+
+  renderCount() {
+    if (this.state.countActive) {
+      return (this.state.count >= 0 ? '+' : '') + this.state.count;
+    }
   }
 
   renderDownvote() {
@@ -276,7 +279,7 @@ export default class PostView extends Component {
           backgroundColor: this.props.selected ? '#fdffea' : 'white',
           border: 0,
         },
-      container2: {
+      postInfo: {
         display: 'flex',
         flexFlow: 'row',
       },
@@ -305,9 +308,9 @@ export default class PostView extends Component {
         flexDirection: 'column',
         width: '90%',
       },
-
       votingContainer: {
         display: 'flex',
+        marginLeft: '4px',
       },
       voting: {
         lineHeight: '20px',
@@ -332,7 +335,7 @@ export default class PostView extends Component {
         fontSize: 'small',
       },
       voteArrow: {
-        backgroundColor: this.props.selected ? '#fdffea' : 'white',
+//        backgroundColor: this.props.selected ? '#fdffea' : 'white',
         border: 'none',
         textAlign: 'center',
         cursor: 'pointer',
