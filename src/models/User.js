@@ -261,6 +261,26 @@ export default class User {
     return (this.address);
   }
 
+  getNickname() {
+    return (this.nickname);
+  }
+
+  getProfileMimeType() {
+    return (this.profileMimeType);
+  }
+
+  getMultiHashString() {
+    return (this.multiHashString);
+  }
+
+  getMultiHashArray() {
+    return (this.multiHashArray);
+  }
+
+  getProfileLastUpdateTime() {
+    return (this.profileLastUpdateTime);
+  }
+
   static userProfileStructToObject([
     nickname,
     profileMimeType,

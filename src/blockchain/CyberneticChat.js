@@ -46,7 +46,7 @@ export default class CyberneticChat {
   }
 
   static watchForEvent(eventName, filter, callback) {
-    this.watchEvent(eventName, filter, {fromBlock: this.web3.eth.blockNumber, toBlock: 'latest'}, callback);
+    this.watchEvent(eventName, filter, {fromBlock: 'latest', toBlock: 'latest'}, callback);
   }
 
   static getPost(id) {

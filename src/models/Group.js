@@ -67,7 +67,8 @@ export default class Group {
 
           const user = UserStore.getUser(addr);
           const userProperties = user.getProperties(this.number);
-          userProperties.loadBalance().then((balance) => {
+          userProperties.load().then(() => {
+            let balance = userProperties.getBalance();
             let newBalance;
             if (increased) {
               newBalance = balance.add(amount);

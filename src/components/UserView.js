@@ -16,7 +16,10 @@ export default class UserView extends Component {
     this.setState({
       userProperties,
     });
-    this.listenerHandle = userProperties.registerUpdateListener((post) => {
+    this.propertiesListenerHandle = userProperties.registerUpdateListener(() => {
+      this.forceUpdate();
+    });
+    this.profileListenerHandle = this.props.user.registerProfileUpdateListener(() => {
       this.forceUpdate();
     });
     userProperties.load().then(() => {
@@ -29,7 +32,8 @@ export default class UserView extends Component {
   }
 
   componentWillUnmount() {
-    this.state.userProperties.unregisterUpdateListener(this.listenerHandle);
+    this.state.userProperties.unregisterUpdateListener(this.propertiesListenerHandle);
+    this.props.user.unregisterProfileUpdateListener(this.profileListenerHandle);
   }
 
   renderAddress() {
@@ -52,6 +56,23 @@ export default class UserView extends Component {
         </span>
       </div>
     );
+  }
+
+  renderNickname() {
+    const nickname = this.props.user.getNickname();
+    if (nickname) {
+      return (
+        <span style={this.styles.nickname}>
+          {nickname}
+        </span>
+      );
+    } else {
+      return (
+        <span style={this.styles.nicknameAnon}>
+          Anonymous
+        </span>
+      );
+    }
   }
 
   renderTip() {
@@ -101,6 +122,7 @@ export default class UserView extends Component {
       return (
         <div style={this.styles.container} className='card'>
           <div style={this.styles.cardContent} className='card-content'>
+            {this.renderNickname()}
             {this.renderAddress()}
             {this.renderBalance()}
             {this.renderTip()}
@@ -196,7 +218,12 @@ export default class UserView extends Component {
       },
       tipSend: {
         fontSize: 'x-small',
-      }
+      },
+      nickname: {
+      },
+      nicknameAnon: {
+        fontStyle: 'italic',
+      },
     }
   };
 
