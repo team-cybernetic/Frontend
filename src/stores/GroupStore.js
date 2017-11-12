@@ -3,7 +3,6 @@ import PathParser from '../utils/PathParser';
 import Blockchain from '../blockchain/Blockchain';
 
 const ROOT_GROUP_NUMBER = 1;
-const ROOT_GROUP_PARENT_NUMBER = 1;
 
 export default class GroupStore {
   static rootInstance = null;
@@ -12,7 +11,7 @@ export default class GroupStore {
   static initialize(web3, rootInstance) {
     this.web3 = web3;
     this.rootInstance = rootInstance;
-    this.treeRoot = new Group(ROOT_GROUP_PARENT_NUMBER, ROOT_GROUP_NUMBER);
+    this.treeRoot = new Group(ROOT_GROUP_NUMBER);
     this.cache = [];
   }
 
@@ -74,19 +73,9 @@ export default class GroupStore {
       console.log("nextStep:", nextStep);
       currentGroup.postExists(nextStep).then((exists) => {
         if (exists) {
-          currentGroup.getNumber().then((parentNum) => {
-            pathWalked.push(nextStep);
-            let nextGroup = this.getGroup(parentNum, nextStep);
-            this.walkTree(pathToWalk, pathWalked, nextGroup).then(resolve).catch(reject);
-          }).catch((error) => {
-            console.error("Error while getting number of group", nextStep, ":", error);
-            reject({
-              group: currentGroup,
-              num: nextStep,
-              partial: true,
-              error,
-            });
-          });
+          pathWalked.push(nextStep);
+          let nextGroup = this.getGroup(nextStep);
+          this.walkTree(pathToWalk, pathWalked, nextGroup).then(resolve).catch(reject);
         } else {
           console.error("post", nextStep, "does not exist in group:", currentGroup);
           reject({
@@ -107,9 +96,9 @@ export default class GroupStore {
     });
   }
 
-  static getGroup(parentNum, num) {
+  static getGroup(num) {
     if (!this.cache[num]) {
-      this.cache[num] = new Group(parentNum, num);
+      this.cache[num] = new Group(num);
     }
     return (this.cache[num]);
   }

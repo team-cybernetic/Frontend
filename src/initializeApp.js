@@ -3,6 +3,7 @@ import getWeb3 from './utils/getWeb3'
 import Ipfs from './utils/Ipfs';
 import Wallet from './models/Wallet';
 import GroupStore from './stores/GroupStore';
+import UserStore from './stores/UserStore';
 import GasEstimator from './utils/GasEstimator';
 import CyberneticChat from './blockchain/CyberneticChat';
 import Blockchain from './blockchain/Blockchain';
@@ -27,6 +28,7 @@ export default function initializeApp() {
         GasEstimator.initialize(web3);
         Blockchain.initialize(web3);
         CyberneticChat.initialize(web3, rootInstance);
+        UserStore.initialize();
         GroupStore.initialize(web3, rootInstance);
         Ipfs.initialize().then(resolve);
       }).catch((error) => {

@@ -22,31 +22,31 @@ class Editor extends Component {
       const userAddress = Wallet.getAccountAddress();
       group.userExists(userAddress).then((exists) => {
         if (exists) {
-          const user = group.getUser(userAddress);
-          user.loadHeader().then(() => {
-            console.log("Editor loaded user header:", user);
+          const userProperties = group.getUserProperties(userAddress);
+          userProperties.load().then(() => {
+            console.log("Editor loaded userProperties header:", userProperties);
             if (this.userListener) {
               this.oldUser.unregisterUpdateListener(this.userListener);
             }
-            this.userListener = user.registerUpdateListener(() => {
-              console.log("Editor got user update:", user);
+            this.userListener = userProperties.registerUpdateListener(() => {
+              console.log("Editor got userProperties update:", userProperties);
               this.setState({
-                localBalance: user.getBalance().toLocaleString(),
+                localBalance: userProperties.getBalance().toLocaleString(),
               });
             });
 
             this.setState({
-              localBalance: user.getBalance().toLocaleString(),
+              localBalance: userProperties.getBalance().toLocaleString(),
             });
           }).catch((error) => {
-            console.error("Editor failed to load balance of self user", userAddress, ":", error);
+            console.error("Editor failed to load balance of self userProperties", userAddress, ":", error);
           });
-          this.oldUser = user;
+          this.oldUser = userProperties;
         } else {
-          console.log("Editor detect that self user", userAddress, "is not in group!");
+          console.log("Editor detect that self userProperties", userAddress, "is not in group!");
         }
       }).catch((error) => {
-        console.error("Editor failed to get status of self user", userAddress, ":", error);
+        console.error("Editor failed to get status of self userProperties", userAddress, ":", error);
       });
     }
   }

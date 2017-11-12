@@ -33,7 +33,7 @@ class ChildrenView extends Component {
         if (!this.listenerHandle) {
           this.listenerHandle = group.registerPostCreationListener((post) => this.addToPosts(post));
         }
-        group.getChildren().then((posts) => {
+        group.loadChildren().then((posts) => {
           this.setState({
             posts: this.reorderPosts(posts)
           });

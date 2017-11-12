@@ -41,11 +41,11 @@ library UserLib {
 
 
   struct User {
-    uint256 parentNum;
-    uint256 balance;
-    uint256 joinTime;
-    int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
     address addr;
+    uint256 parentNum;
+    uint256 joinTime;
+    uint256 balance;
+    int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values
     bool joined;
     bool banned;
     string banReason;

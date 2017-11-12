@@ -233,15 +233,17 @@ contract CyberneticChat {
     uint256 joinTime,
     uint256 balance,
     int256 permissions,
+    bool joined,
     bool banned,
     string banReason
   ) {
-    var user = UserLib.getUser(state, parentNum, userAddress);
+    var user = UserLib.getUserRaw(state, parentNum, userAddress);
     return (
       parentNum,
       user.joinTime,
       user.balance,
       user.permissions,
+      user.joined,
       user.banned,
       user.banReason
     );

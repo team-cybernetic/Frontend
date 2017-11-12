@@ -12,10 +12,14 @@ export default class UserView extends Component {
   }
 
   componentWillMount() {
-    this.listenerHandle = this.props.user.registerUpdateListener((post) => {
+    const userProperties = this.props.user.getProperties(this.props.group.getNumber());
+    this.setState({
+      userProperties,
+    });
+    this.listenerHandle = userProperties.registerUpdateListener((post) => {
       this.forceUpdate();
     });
-    this.props.user.loadHeader().then(() => {
+    userProperties.load().then(() => {
       if (this.props.user.getAddress() === Wallet.getAccountAddress()) {
         this.setState({
           isSelf: true,
@@ -25,7 +29,7 @@ export default class UserView extends Component {
   }
 
   componentWillUnmount() {
-    this.props.user.unregisterUpdateListener(this.listenerHandle);
+    this.state.userProperties.unregisterUpdateListener(this.listenerHandle);
   }
 
   renderAddress() {
@@ -39,25 +43,12 @@ export default class UserView extends Component {
     );
   }
 
-  /*
-  renderNumber() {
-    return (
-      <div style={this.styles.numberWrapper}>
-        User&nbsp;#
-        <span style={this.styles.number}>
-          {this.props.user.getNumber()}
-        </span>
-      </div>
-    );
-  }
-  */
-
   renderBalance() {
     return (
       <div style={this.styles.balanceWrapper}>
         Balance:&nbsp;
         <span style={this.styles.balance}>
-          {this.props.user.getBalance().toLocaleString()}
+          {this.props.group.getUserProperties(this.props.user.getAddress()).getBalance().toLocaleString()}
         </span>
       </div>
     );
@@ -106,7 +97,7 @@ export default class UserView extends Component {
   }
 
   render() {
-    if (this.props.user.isHeaderLoaded()) {
+    if (this.state.userProperties.isLoaded()) {
       return (
         <div style={this.styles.container} className='card'>
           <div style={this.styles.cardContent} className='card-content'>

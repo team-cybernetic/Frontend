@@ -21,7 +21,7 @@ class SideBar extends Component {
   }
 
   updateBalance(group) {
-    group.getTokens().then((tokens) => {
+    group.loadTokens().then((tokens) => {
       console.log("Sidebar got group tokens:", tokens);
       this.setState({
         tokens: tokens.toLocaleString(),
@@ -38,11 +38,13 @@ class SideBar extends Component {
       group.registerTokensChangedListener(() => {
         this.updateBalance(group);
       });
-      group.getUsers().then((users) => {
+      group.loadUsers().then((users) => {
         if (users) {
           users.forEach((user, idx) => {
             console.log("user[" + idx + "]:", user);
-            user.loadHeader().then(() => {
+            //TODO: this blocks until ALL the users are loaded, make it dynamically grow the list?
+            const userProperties = user.getProperties(group.getNumber());
+            userProperties.load().then(() => {
               let userInGroup = some(users, (user) => {
                 let walletAddr = Wallet.getAccountAddress();
                 let userAddr = user.getAddress();
@@ -61,6 +63,8 @@ class SideBar extends Component {
           users,
           userCount: compact(users).length,
         });
+      }).catch((error) => {
+        console.error("Sidebar: error while loading users list for group", group.getNumber(), ":", error);
       });
       this.setState({
         isLoaded,

@@ -1,14 +1,14 @@
 import Ipfs from '../utils/Ipfs';
 import CyberneticChat from '../blockchain/CyberneticChat';
 import Blockchain from '../blockchain/Blockchain';
+import UserStore from '../stores/UserStore';
 import Post from './Post';
 import User from './User';
 import Wallet from '../models/Wallet'
 import moment from 'moment';
 
 export default class Group {
-  constructor(parentNumber, number) {
-    this.parentNumber = parentNumber.toString();
+  constructor(number) {
     this.number = number.toString();
     this.postCache = {};
     this.userCache = [];
@@ -18,6 +18,9 @@ export default class Group {
     this.tokensChangedListeners = [];
 
     this.post = this.getPost(this.number);
+    this.post.loadHeader().then(() => {
+      this.parentNumber = this.post.getParentNumber(); //is this even needed?
+    });
 
     this.registerPostCreatedEventListener((error, result) => {
       if (!error) {
@@ -37,7 +40,7 @@ export default class Group {
         if (parentNumber === this.number) {
           console.log("Group", this.number, "got a user joined notification:", result);
           const addr = result.args.userAddress;
-          const user = this.getUser(addr);
+          const user = UserStore.getUser(addr);
           this.fireUserJoinedListeners(user);
         }
       }
@@ -48,7 +51,7 @@ export default class Group {
         if (parentNumber === this.number) {
           console.log("Group", this.number, "got a user left notification:", result);
           const addr = result.args.userAddress;
-          const user = this.getUser(addr);
+          const user = UserStore.getUser(addr);
           this.fireUserLeftListeners(user);
         }
       }
@@ -62,17 +65,22 @@ export default class Group {
           const amount = result.args.amount;
           const increased = result.args.increased;
 
-          const user = this.getUser(addr);
-          if (increased) {
-            user.populate({
-              balance: user.getBalance().add(amount),
+          const user = UserStore.getUser(addr);
+          const userProperties = user.getProperties(this.number);
+          userProperties.loadBalance().then((balance) => {
+            let newBalance;
+            if (increased) {
+              newBalance = balance.add(amount);
+            } else {
+              newBalance = balance.sub(amount);
+            }
+            userProperties.populate({
+              balance: newBalance,
             });
-          } else {
-            user.populate({
-              balance: user.getBalance().sub(amount),
-            });
-          }
-          console.log("Balance of user is now", user.getBalance());
+            console.log("Balance of user is now", userProperties.getBalance());
+          }).catch((error) => {
+            console.error("Group failed to get balance of user", addr, " while handling balance changed event:", error);
+          });
         }
       }
     });
@@ -214,15 +222,11 @@ export default class Group {
     }
   }
 
-  getUser(address) {
-    if (!this.userCache[address]) {
-      this.userCache[address] = new User(this, {address});
-      this.userCache[address].load();
-    }
-    return (this.userCache[address]);
+  getUserProperties(address) {
+    return (UserStore.getUser(address).getProperties(this.number));
   }
   
-  getBalance() {
+  loadBalance() {
     return new Promise((resolve, reject) => {
       this.post.loadHeader().then(() => {
         resolve(this.post.getBalance());
@@ -230,7 +234,7 @@ export default class Group {
     });
   }
 
-  getTokens() {
+  loadTokens() {
     return new Promise((resolve, reject) => {
       this.post.loadHeader().then(() => {
         resolve(this.post.getTokens());
@@ -239,21 +243,16 @@ export default class Group {
   }
 
   getNumber() {
-    return new Promise((resolve, reject) => {
-      this.post.loadHeader().then(() => {
-        resolve(this.post.getNumber());
-      }).catch(reject);
-    });
+    return (this.number);
   }
 
-  getParentNumber() {
+  loadParentNumber() {
     return new Promise((resolve, reject) => {
       this.post.loadHeader().then(() => {
         resolve(this.post.getParentNumber());
       }).catch(reject);
     });
   }
-
 
   loadPost(id) {
     return (CyberneticChat.getPost(id));
@@ -271,7 +270,7 @@ export default class Group {
     return (CyberneticChat.postExists(num));
   }
 
-  getChildren() {
+  loadChildren() {
     return new Promise((resolve, reject) => {
       CyberneticChat.getChildren(this.number).then((postIds) => {
         resolve(postIds.map((bigInt) => {
@@ -283,15 +282,15 @@ export default class Group {
     });
   }
 
-  getUsers() {
+  loadUsers() {
     return new Promise((resolve, reject) => {
       console.log("Group", this.number, "getting user ids");
       CyberneticChat.getUsers(this.number).then((userAddresses) => {
         console.log("Group", this.number, "got user addresses:", userAddresses);
         let res = [];
         userAddresses.forEach((addr) => {
-          if (Blockchain.isAddressValid(addr)) { //TODO
-            res.push(this.getUser(addr));
+          if (Blockchain.isAddressValid(addr)) {
+            res.push(UserStore.getUser(addr));
           }
         });
         console.log("Group", this.number, "got users:", res);
