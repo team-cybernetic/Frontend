@@ -218,7 +218,7 @@ export default class Group {
         return (this.postCache[txid]);
       } else {
         //nothing
-        return (null);
+        return (this.post);
       }
     }
   }

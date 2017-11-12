@@ -159,7 +159,7 @@ export default class Wallet {
   }
 
   static getCurrentEthBalance() {
-    return this.web3.fromWei(this.balance, 'ether');
+    return !!this.balance ? this.web3.fromWei(this.balance, 'ether') : new BigNumber(0);
   }
 
   static weiToEther(wei) {

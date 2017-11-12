@@ -14,7 +14,6 @@ export default class PostView extends Component {
   }
 
   componentWillMount() {
-    console.log("props post:", this.props.post);
     this.listenerHandle = this.props.post.registerUpdateListener((post) => {
       this.forceUpdate();
     });
@@ -184,11 +183,9 @@ export default class PostView extends Component {
   renderTimestamp() {
     let m = moment(this.props.post.creationTime, 'X');
     return (
-      <span style={this.styles.timestamp}>
-        <span style={this.styles.date}>
-          Posted&nbsp;
-          {m.calendar()} by <Link to={`/user/${this.props.post.creator}`}>{this.props.post.creator}</Link>
-        </span>
+      <span style={this.styles.date}>
+        Posted&nbsp;
+        {m.calendar()} by <Link to={`/user/${this.props.post.creator}`}>{this.props.post.creator}</Link>
       </span>
     );
   }

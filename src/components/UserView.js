@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Wallet from '../models/Wallet';
 import cx from 'classnames';
+import moment from 'moment';
+import { Link } from 'react-router-dom';
 
 export default class UserView extends Component {
   constructor(props) {
@@ -36,12 +38,21 @@ export default class UserView extends Component {
     this.props.user.unregisterProfileUpdateListener(this.profileListenerHandle);
   }
 
+  renderJoinTime() {
+    let m = moment(this.state.userProperties.getJoinTime(), 'X');
+    return (
+      <span style={this.styles.joinTime}>
+        Member since&nbsp;{m.fromNow()}
+      </span>
+    );
+  }
+
   renderAddress() {
     return (
       <div style={this.styles.addressWrapper}>
         Address:&nbsp;
         <span style={this.styles.address}>
-          {this.props.user.getAddress()}
+          <Link to={`/user/${this.props.user.getAddress()}`}>{this.props.user.getAddress()}</Link>
         </span>
       </div>
     );
@@ -243,6 +254,7 @@ export default class UserView extends Component {
             <div style={this.styles.userInfo}>
               <div style={this.styles.header}>
                 {this.renderNickname()}
+                {this.renderJoinTime()}
                 {this.renderAddress()}
               </div>
               <div style={this.styles.votingContainer}>
@@ -388,6 +400,9 @@ export default class UserView extends Component {
         display: 'flex',
         flexDirection: 'column',
         width: '90%',
+      },
+      joinTime: {
+        fontSize: 'x-small',
       },
     }
   };

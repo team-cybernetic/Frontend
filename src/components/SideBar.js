@@ -85,18 +85,19 @@ class SideBar extends Component {
 
   renderPost() {
     if (this.props.isLoaded) {
+      let post;
       if (this.props.pathState.isGroup) {
-        console.log("sidebar render group TODO");
+        post = this.state.group.getPost();
       } else if (this.state.post) {
-        let post = this.state.post;
-        return (
-          <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} parent={this.props.pathState.parent} />
-        );
+        post = this.state.post;
       } else {
         return (
           <p style={styles.groupDesc}>Loading post...</p>
         );
       }
+      return (
+        <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} parent={this.props.pathState.parent} />
+      );
     } else {
       return (
         <p style={styles.groupDesc}>Loading...</p>
