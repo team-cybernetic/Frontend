@@ -44,11 +44,8 @@ export default class GroupStore {
           console.log("Failed on:", error.num);
           console.log("pathToWalk:", pathToWalk);
           console.log("parsedPath:", parsedPath);
-          let partial = "";
-          if (parsedPath.absolute) {
-            partial = parsedPath.separator;
-            pathWalked.shift(); //drop the root group
-          }
+          let partial = parsedPath.separator;
+          pathWalked.shift(); //drop the root group
           for (var i = 0; i < pathWalked.length; i++) {
             partial = partial + parsedPath.titleArray[i];
           }

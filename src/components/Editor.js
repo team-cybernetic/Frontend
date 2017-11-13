@@ -22,34 +22,29 @@ class Editor extends Component {
   getBalances(isLoaded, group) {
     if (isLoaded && !this.isUserProfile()) {
       const userAddress = Wallet.getAccountAddress();
-      group.userExists(userAddress).then((exists) => {
-        if (exists) {
-          const userProperties = group.getUserProperties(userAddress);
-          userProperties.load().then(() => {
-            console.log("Editor loaded userProperties header:", userProperties);
-            if (this.userListener) {
-              this.oldUser.unregisterUpdateListener(this.userListener);
-            }
-            this.userListener = userProperties.registerUpdateListener(() => {
-              console.log("Editor got userProperties update:", userProperties);
-              this.setState({
-                localBalance: userProperties.getBalance().toLocaleString(),
-              });
-            });
-
-            this.setState({
-              localBalance: userProperties.getBalance().toLocaleString(),
-            });
-          }).catch((error) => {
-            console.error("Editor failed to load balance of self userProperties", userAddress, ":", error);
-          });
-          this.oldUser = userProperties;
-        } else {
-          console.log("Editor detect that self userProperties", userAddress, "is not in group!");
-        }
-      }).catch((error) => {
-        console.error("Editor failed to get status of self userProperties", userAddress, ":", error);
+      const userProperties = group.getUserProperties(userAddress);
+      if (this.userListener) {
+        this.oldUser.unregisterUpdateListener(this.userListener);
+      }
+      this.userListener = userProperties.registerUpdateListener(() => {
+        console.log("Editor got userProperties update:", userProperties);
+        this.setState({
+          localBalance: userProperties.getBalance().toLocaleString(),
+          inGroup: userProperties.getJoined(),
+        });
       });
+
+      userProperties.load().then(() => {
+        console.log("Editor loaded userProperties header:", userProperties);
+
+        this.setState({
+          localBalance: userProperties.getBalance().toLocaleString(),
+          inGroup: userProperties.getJoined(),
+        });
+      }).catch((error) => {
+        console.error("Editor failed to load balance of self userProperties", userAddress, ":", error);
+      });
+      this.oldUser = userProperties;
     }
   }
 
@@ -78,15 +73,40 @@ class Editor extends Component {
     this.setState({ user: UserStore.getUser(address) });
   }
 
+  renderLocalBalance() {
+    if (this.isUserProfile() || !this.state.inGroup) {
+      return '';
+    }
+    return (
+      <p style={styles.earningsText}>
+        Local:
+        <span className='is-pulled-right'>
+          {this.getLocalBalance()}
+        </span>
+      </p>
+    );
+  }
+
+  renderBalances() {
+    return (
+      <div style={styles.earnings}>
+        <p>Balances</p>
+        <p style={styles.earningsText}>
+          Global:
+          <span className='is-pulled-right'>
+            {this.getGlobalBalance()}
+          </span>
+        </p>
+        {this.renderLocalBalance()}
+      </div>
+    );
+  }
+
   render() {
     return (
       <div style={styles.container0}>
         <div style={styles.container}>
-          <div style={styles.earnings}>
-            <p>Balances</p>
-            <p style={styles.earningsText}>Global: <span className='is-pulled-right'>{this.getGlobalBalance()}</span></p>
-            {!this.isUserProfile() && <p style={styles.earningsText}>Local: <span className='is-pulled-right'>{this.getLocalBalance()}</span></p>}
-          </div>
+          {this.renderBalances()}
           <textarea
             style={styles.textArea}
             className='textarea'

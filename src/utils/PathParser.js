@@ -30,6 +30,7 @@ export default class PathParser {
     } else {
       type = Type.POST;
       let groupMatch = PATH.exec(path);
+      console.log(groupMatch);
       let groupPath = groupMatch[1];
       let post = groupMatch[3];
 

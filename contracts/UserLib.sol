@@ -175,12 +175,12 @@ library UserLib {
         permissions: -1 //TODO: ruleset, permissions for new users
       });
 
-      p.userAddressesMap[msg.sender] = p.userAddresses.length;
       p.userAddresses.push(msg.sender);
+      p.userAddressesMap[msg.sender] = p.userAddresses.length;
     } else { //user has been in the group before, just restore the profile
       p.users[msg.sender].joined = true;
       //p.users[msg.sender].parentNum = parentNum;
-      p.userAddresses[p.userAddressesMap[msg.sender]] = msg.sender;
+      p.userAddresses[p.userAddressesMap[msg.sender] - 1] = msg.sender;
     }
 
     UserJoined(parentNum, msg.sender);
@@ -188,9 +188,11 @@ library UserLib {
 
   function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) internal {
     var p = PostLib.getPost(state, parentNum);
-    p.users[userAddress].joined = false;
-    p.userAddresses[p.userAddressesMap[userAddress]] = address(0x0);
-    UserLeft(parentNum, userAddress);
+    if (p.userAddressesMap[msg.sender] != 0) { //user has been in the group before
+      p.users[userAddress].joined = false;
+      p.userAddresses[p.userAddressesMap[userAddress] - 1] = address(0x0);
+      UserLeft(parentNum, userAddress);
+    }
   }
 
   function leave(StateLib.State storage state, uint256 parentNum) internal { 

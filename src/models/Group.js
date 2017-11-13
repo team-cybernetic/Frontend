@@ -41,6 +41,7 @@ export default class Group {
           console.log("Group", this.number, "got a user joined notification:", result.args);
           const addr = result.args.userAddress;
           const user = UserStore.getUser(addr);
+          user.getProperties(this.number).reload();
           this.fireUserJoinedListeners(user);
         }
       }
@@ -52,6 +53,7 @@ export default class Group {
           console.log("Group", this.number, "got a user left notification:", result.args);
           const addr = result.args.userAddress;
           const user = UserStore.getUser(addr);
+          user.getProperties(this.number).reload();
           this.fireUserLeftListeners(user);
         }
       }
@@ -449,8 +451,6 @@ export default class Group {
   }
 
   registerUserBalanceChangedListener(callback) {
-    console.log("Registering a userbalancechangedlistener in group", this.number);
-    console.trace();
     return (CyberneticChat.registerUserBalanceChangedListener(callback));
   }
 

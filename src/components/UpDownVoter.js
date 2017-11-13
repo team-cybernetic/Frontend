@@ -125,15 +125,17 @@ export default class UpDownVoter extends Component {
   render() {
     return (
       <div style={styles.votingContainer}>
-        <div style={styles.voting}>
-          {this.renderUpvote()}
-          {this.renderBalance()}
-          {this.renderDownvote()}
-        </div>
-        <div style={styles.votingCountContainer}>
-          <span style={styles.votingCount}>
-            {this.renderCount()}
-          </span>
+        <div style={styles.votingContainer2}>
+          <div style={styles.voting}>
+            {this.renderUpvote()}
+            {this.renderBalance()}
+            {this.renderDownvote()}
+          </div>
+          <div style={styles.votingCountContainer}>
+            <span style={styles.votingCount}>
+              {this.renderCount()}
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -150,6 +152,9 @@ const styles = {
   votingContainer: {
     display: 'flex',
     marginLeft: '4px',
+  },
+  votingContainer2: {
+    display: 'flex',
   },
   voting: {
 //    lineHeight: '20px',

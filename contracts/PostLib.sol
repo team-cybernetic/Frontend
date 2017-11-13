@@ -33,7 +33,7 @@ library PostLib {
     address[] userAddresses;
     mapping (address => uint256) userAddressesMap; //maps a user address to the corresponding index in userAddresses, for deleting users
     uint256[] children;
-    mapping (uint256 => uint256) childrenMap; //given the child post number, get the index at which it is stored in the children array
+    mapping (uint256 => uint256) childrenMap; //maps a child post number to the index +1 at which it is stored in the children array
   }
 
   function getPostRaw(StateLib.State storage state, uint256 num) constant internal returns (Post storage) {
@@ -69,9 +69,11 @@ library PostLib {
     bool userPermissionsFlagsMode,
     int256 permissions
   ) private returns (Post) {
-    var parent = getPostRaw(state, parentNum);
-    parent.childrenMap[number] = parent.children.length;
-    parent.children.push(number);
+    if (state.main.initialized) {
+      var parent = getPostRaw(state, parentNum);
+      parent.childrenMap[number] = parent.children.length + 1;
+      parent.children.push(number);
+    }
     state.main.posts[number] = Post({
       contents: contents,
       number: number,
@@ -83,8 +85,10 @@ library PostLib {
       userAddresses: state.postLib.userAddressesBacking[number],
       children: state.postLib.childrenBacking[number]
     });
+//    state.main.posts[number].userAddressesMap[contents.creator] = 1; //everything is set to 0 by default
+//    state.main.posts[number].userAddresses.push(0); //the 0th user is null (users start at 1)
     if (!state.main.initialized) {
-      state.main.posts[number].childrenMap[number] = parent.children.length;
+      state.main.posts[number].childrenMap[number] = 1; //length is 0, explicit call not needed
       state.main.posts[number].children.push(0);
     }
     return (state.main.posts[number]);

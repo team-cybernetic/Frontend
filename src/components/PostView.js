@@ -28,7 +28,7 @@ export default class PostView extends Component {
     if (this.props.post.isHeaderLoaded()) {
       return (
         <div style={this.styles.container} className='card'>
-          <div style={this.styles.cardContent}>
+          <div style={this.styles.cardContent} className='card-content'>
             <div style={this.styles.postInfo}>
               <div style={this.styles.title}>
                 {this.renderTitle()}
@@ -146,80 +146,6 @@ export default class PostView extends Component {
     });
   }
 
-
-  vote(amount) {
-    const isPos = amount >= 0;
-    amount = Math.abs(amount);
-    if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
-        return;
-    }
-    this.props.group.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
-      console.log("successfully " + (isPos ? "up" : "down") + "voted post #" + this.props.post.id + " by " + amount + "!");
-    }).catch((error) => {
-      console.error("failed to send currency:", error);
-    });
-  }
-
-  changeCount(amount) {
-    if (this.state.countActive) {
-      console.log("counting active, changing count to", this.state.count + amount);
-      this.setState({
-        count: this.state.count + amount,
-      });
-      setTimeout(() => {
-        this.changeCount(amount);
-      }, 500);
-    }
-  }
-
-  upvoteMouseDown() {
-    //mouse down, reset count and begin counting up
-    this.state.count = 0;
-    this.state.countActive = true;
-    this.changeCount(1);
-  }
-
-  upvoteMouseUp() {
-    //mouse up over the element, send the tip
-    this.state.countActive = false;
-    this.vote(this.state.count);
-    this.setState({
-      count: 0,
-    });
-  }
-
-  upvoteMouseOut() {
-    //mouse out, stop counting, reset counter (cancelled)
-    this.setState({
-      count: 0,
-      countActive: false,
-    });
-  }
-
-  downvoteMouseDown() {
-    //mouse down, reset count and begin counting up
-    this.state.count = 0;
-    this.state.countActive = true;
-    this.changeCount(-1);
-  }
-
-  downvoteMouseUp() {
-    //mouse up over the element, send the tip
-    this.state.countActive = false;
-    this.vote(this.state.count);
-    this.setState({
-      count: 0,
-    });
-  }
-
-  downvoteMouseOut() {
-    //mouse out, stop counting, reset counter (cancelled)
-    this.setState({
-      count: 0,
-      countActive: false,
-    });
-  }
-
   get styles() {
     return {
       container:
@@ -254,8 +180,8 @@ export default class PostView extends Component {
         display: 'flex',
         flexDirection: 'column',
         overflowWrap: 'break-word',
+        maxHeight: '500px',
         padding: '1rem',
-
       },
       title: {
         display: 'flex',

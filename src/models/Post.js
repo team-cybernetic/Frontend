@@ -65,6 +65,10 @@ export default class Post {
     return (this.isConfirmed() && this.isHeaderLoaded() && this.isContentLoaded());
   }
 
+  getParentGroup() {
+    return (this.parentGroup);
+  }
+
   /**
    * Get the balance this post owns in its parent group
    */

@@ -96,6 +96,7 @@ export default class Wallet {
         //TODO: pre-call transaction to see if it will even succeeed
         GasEstimator.estimate(methodName, ...args).then((gas) => {
           if (!this.managedWeb3 && description) {
+            console.log("Gas estimator estimates that this transaction will require", gas, "gas");
             TransactionConfirmationModal.show(gas, description, (gasPrice) => {
               resolve({ gas, gasPrice });
             }, reject);
@@ -104,7 +105,7 @@ export default class Wallet {
           }
         }).catch((error) => {
           //reject(error);
-          resolve({ gas: 4000000, gasPrice: 1 });
+          resolve({ gas: 4000000, gasPrice: 1 }); //TODO: remove this
         });
       }).then(({gas, gasPrice}) => {
         const options = { gas, gasPrice, from: this.getAccountAddress() };

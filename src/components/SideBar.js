@@ -29,43 +29,66 @@ class SideBar extends Component {
     });
   }
 
+  updateUsers(group) {
+    group.loadUsers().then((users) => {
+      let userInGroup = false;
+      if (users) {
+        console.log("updateUsers promise");
+        const walletAddr = Wallet.getAccountAddress();
+        for (let user of users) {
+          const userAddress = user.getAddress();
+          console.log("user[" + userAddress + "]:", user);
+          if (userAddress === walletAddr) {
+            userInGroup = true;
+            break;
+          }
+        }
+      } else {
+        console.log("no users!");
+        users = [];
+      }
+      this.setState({
+        users,
+        userCount: compact(users).length,
+        userInGroup,
+      });
+    }).catch((error) => {
+      console.error("Sidebar: error while loading users list for group", group.getNumber(), ":", error);
+    });
+
+  }
+
   setContent(isLoaded, group, post, pathState) {
     if (isLoaded) {
       if (this.props.isLoaded) {
         return; //went from loaded -> loaded, no update
       }
+
       this.updateBalance(group);
-      group.registerTokensChangedListener(() => {
+
+      if (this.tokensListener) {
+        group.unregisterTokensChangedListener(this.tokensListener);
+      }
+      this.tokensListener = group.registerTokensChangedListener(() => {
         this.updateBalance(group);
       });
-      group.loadUsers().then((users) => {
-        if (users) {
-          users.forEach((user, idx) => {
-            console.log("user[" + idx + "]:", user);
-            //TODO: this blocks until ALL the users are loaded, make it dynamically grow the list?
-            const userProperties = user.getProperties(group.getNumber());
-            userProperties.load().then(() => {
-              let userInGroup = some(users, (user) => {
-                let walletAddr = Wallet.getAccountAddress();
-                let userAddr = user.getAddress();
-                return (walletAddr === userAddr);
-              });
-              this.setState({
-                userInGroup: this.userInGroup || userInGroup,
-              });
-            });
-          });
-        } else {
-          console.log("no users!");
-          users = [];
-        }
-        this.setState({
-          users,
-          userCount: compact(users).length,
-        });
-      }).catch((error) => {
-        console.error("Sidebar: error while loading users list for group", group.getNumber(), ":", error);
+
+      this.updateUsers(group);
+
+      if (this.userJoinListener) {
+        group.unregisterTokensChangedListener(this.userJoinListener);
+      }
+      this.userJoinListener = group.registerUserJoinedListener(() => {
+        this.updateUsers(group);
       });
+
+      if (this.userLeaveListener) {
+        group.unregisterTokensChangedListener(this.userLeaveListener);
+      }
+      this.userLeaveListener = group.registerUserLeftListener(() => {
+        this.updateUsers(group);
+      });
+
       this.setState({
         isLoaded,
         group,
@@ -96,7 +119,7 @@ class SideBar extends Component {
         );
       }
       return (
-        <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} parent={this.props.pathState.parent} />
+        <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} group={post.getParentGroup()} parent={this.props.pathState.parent} />
       );
     } else {
       return (
@@ -160,7 +183,7 @@ class SideBar extends Component {
   }
 
   renderJoinButton() {
-    if (!this.state.isLoaded) {
+    if (!this.state.isLoaded || this.state.userInGroup === undefined) {
       return ('');
     }
     if (!this.state.userInGroup) {
