@@ -63,7 +63,7 @@ export default class PostView extends Component {
 
     if (post && post.id) {
       const prefix = parent || '/';
-      return prefix + post.id + '-' + encodeURIComponent(post.title.replace(' ', '-')) + '';
+      return prefix + post.id + '-' + encodeURIComponent(post.title.replace(/ /g, '-')) + '';
     }
     return '';
   }
