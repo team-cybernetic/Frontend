@@ -45,6 +45,29 @@ library CurrencyLib {
     //var parent = PostLib.getPost(state, parentNum);
     //doing the getUser calls here lets them do their requires() for validation
 
+    uint256 senderBalance = sender.balance;
+    if (increase) {
+      amount = (senderBalance > amount ? amount : senderBalance);
+    } else {
+      uint256 receiverBalance = receiver.balance;
+      if (senderBalance >= amount) { //have enough to complete
+        if (receiverBalance >= amount) { //can take full blow
+          //Scenario: ideal
+        } else { //can't take the full blow
+          //Scenario: smashed
+          amount = receiverBalance;
+        }
+      } else { //don't have enough to complete
+        if (receiverBalance >= senderBalance) { //can take all sender has got
+          //Scenario: poor boy
+          amount = senderBalance;
+        } else { //can't even take what sender has got
+          //Scenario: poor smasher
+          amount = receiverBalance;
+        }
+      }
+    }
+
     awardTokensToUser(parent, sender, amount, false);
     awardTokensToUser(parent, receiver, amount, increase);
     //TODO: ruleset taxes, not 1:1 deduction?
@@ -62,6 +85,7 @@ library CurrencyLib {
     if (amount == 0) {
       return;
     }
+
 //    uint256 parentNum = parent.number;
 //    uint256 postNum = receiver.number;
     require(PostLib.isChild(state, parent.number, receiver.number));
@@ -69,7 +93,28 @@ library CurrencyLib {
     var sender = UserLib.getUser(state, parent.number, msg.sender);
 //    var receiver = PostLib.getPost(state, postNum);
     //var parent = PostLib.getPost(state, parentNum);
-
+    uint256 senderBalance = sender.balance;
+    if (increase) {
+      amount = (senderBalance > amount ? amount : senderBalance);
+    } else {
+      uint256 receiverBalance = receiver.balance;
+      if (senderBalance >= amount) { //have enough to complete
+        if (receiverBalance >= amount) { //can take full blow
+          //Scenario: ideal
+        } else { //can't take the full blow
+          //Scenario: smashed
+          amount = receiverBalance;
+        }
+      } else { //don't have enough to complete
+        if (receiverBalance >= senderBalance) { //can take all sender has got
+          //Scenario: poor boy
+          amount = senderBalance;
+        } else { //can't even take what sender has got
+          //Scenario: poor smasher
+          amount = receiverBalance;
+        }
+      }
+    }
     awardTokensToUser(parent, sender, amount, false);
     awardTokensToPost(parent, receiver, amount, increase);
     //TODO: ruleset taxes, not 1:1 deduction?

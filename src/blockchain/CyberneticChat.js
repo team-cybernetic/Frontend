@@ -1,3 +1,5 @@
+import Blockchain from './Blockchain';
+
 const EVENT_POST_CREATED = 'PostCreated';
 const EVENT_USER_JOINED = 'UserJoined';
 const EVENT_USER_LEFT = 'UserLeft';
@@ -11,29 +13,43 @@ export default class CyberneticChat {
   static initialize(web3, contractInstance) {
     this.web3 = web3;
     this.contractInstance = contractInstance;
-    this.watchForEvent(EVENT_POST_CREATED, {}, (error, response) => {
-      console.log("EVENT: Post created! response:", response);
-      this.fireEventListener(EVENT_POST_CREATED, error, response);
-    });
-    this.watchForEvent(EVENT_USER_JOINED, {}, (error, response) => {
-      console.log("EVENT: User joined! response:", response);
-      this.fireEventListener(EVENT_USER_JOINED, error, response);
-    });
-    this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
-      console.log("EVENT: User left! response:", response);
-      this.fireEventListener(EVENT_USER_LEFT, error, response);
-    });
-    this.watchForEvent(EVENT_USER_BALANCE_CHANGED, {}, (error, response) => {
-      console.log("EVENT: User balance changed! response:", response);
-      this.fireEventListener(EVENT_USER_BALANCE_CHANGED, error, response);
-    });
-    this.watchForEvent(EVENT_POST_BALANCE_CHANGED, {}, (error, response) => {
-      console.log("EVENT: Post balance changed! response:", response);
-      this.fireEventListener(EVENT_POST_BALANCE_CHANGED, error, response);
-    });
-    this.watchForEvent(EVENT_POST_TOKENS_CHANGED, {}, (error, response) => {
-      console.log("EVENT: Post tokens changed! response:", response);
-      this.fireEventListener(EVENT_POST_TOKENS_CHANGED, error, response);
+    this.web3.eth.getBlockNumber((error, currentBlock) => {
+      console.log("CyberneticChat instance started up on block", currentBlock);
+      this.startupBlock = currentBlock;
+      this.nextBlockListener = Blockchain.registerLatestBlockListener((error, blockid) => {
+        console.log("nextblock:", blockid);
+        this.web3.eth.getBlock(blockid, false, (error, result) => {
+          console.log("nextblock actual: ", result);
+          if (!error && result.number === (currentBlock + 1)) {
+            Blockchain.unregisterLatestBlockListener(this.nextBlockListener);
+            this.watchForEvent(EVENT_POST_CREATED, {}, (error, response) => {
+              console.log("EVENT: Post created! response:", response);
+              this.fireEventListener(EVENT_POST_CREATED, error, response);
+            });
+            this.watchForEvent(EVENT_USER_JOINED, {}, (error, response) => {
+              console.log("EVENT: User joined! response:", response);
+              this.fireEventListener(EVENT_USER_JOINED, error, response);
+            });
+            this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
+              console.log("EVENT: User left! response:", response);
+              this.fireEventListener(EVENT_USER_LEFT, error, response);
+            });
+            this.watchForEvent(EVENT_USER_BALANCE_CHANGED, {}, (error, response) => {
+              console.log("EVENT: User balance changed! response:", response);
+              this.fireEventListener(EVENT_USER_BALANCE_CHANGED, error, response);
+            });
+            this.watchForEvent(EVENT_POST_BALANCE_CHANGED, {}, (error, response) => {
+              console.log("EVENT: Post balance changed! response:", response);
+              this.fireEventListener(EVENT_POST_BALANCE_CHANGED, error, response);
+            });
+            this.watchForEvent(EVENT_POST_TOKENS_CHANGED, {}, (error, response) => {
+              console.log("EVENT: Post tokens changed! response:", response);
+              this.fireEventListener(EVENT_POST_TOKENS_CHANGED, error, response);
+            });
+
+          }
+        });
+      });
     });
   }
 

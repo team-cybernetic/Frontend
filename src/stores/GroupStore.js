@@ -11,8 +11,8 @@ export default class GroupStore {
   static initialize(web3, rootInstance) {
     this.web3 = web3;
     this.rootInstance = rootInstance;
-    this.treeRoot = new Group(ROOT_GROUP_NUMBER);
     this.cache = [];
+    this.treeRoot = this.getGroup(ROOT_GROUP_NUMBER);
   }
 
   /**
@@ -97,6 +97,8 @@ export default class GroupStore {
   }
 
   static getGroup(num) {
+    console.log("getting group:", num);
+    console.log("getting groupstr:", num.toString());
     if (!this.cache[num]) {
       this.cache[num] = new Group(num);
     }

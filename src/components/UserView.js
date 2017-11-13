@@ -3,6 +3,7 @@ import Wallet from '../models/Wallet';
 import cx from 'classnames';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import UpDownVoter from './UpDownVoter';
 
 export default class UserView extends Component {
   constructor(props) {
@@ -86,165 +87,13 @@ export default class UserView extends Component {
     }
   }
 
-  renderTip() {
-    return (
-        <div style={this.styles.tipWrapper}>
-          Tip:&nbsp;
-          <input type='text' 
-            style={this.styles.tipInput}
-            value={this.state.inputTip}
-            onChange={(e) => this.changeTip(e)}
-          />
-          <input type='submit' 
-            style={this.styles.tipSend}
-            value='send' 
-            onClick={() => this.sendTip()}
-            className={cx('button')}
-          />
-        </div>
-      );
-  }
-
-  renderUpvote() {
-    return (
-
-      <a 
-        style={this.styles.voteArrow}
-        onMouseDown={() => this.upvoteMouseDown()}
-        onMouseUp={() => this.upvoteMouseUp()}
-        onMouseOut={() => this.upvoteMouseOut()}
-      >
-        ▲
-      </a>
-    );
-  }
-
-  renderBalance() {
-      return (
-        <span style={this.styles.balance}>
-          {this.state.userProperties.getBalance().toString()}
-        </span>
-    );
-  }
-
-  renderCount() {
-    if (this.state.countActive) {
-      return (this.state.count >= 0 ? '+' : '') + this.state.count;
-    }
-  }
-
-  renderDownvote() {
-    return (
-      <a
-        style={this.styles.voteArrow}
-        onMouseDown={() => this.downvoteMouseDown()}
-        onMouseUp={() => this.downvoteMouseUp()}
-        onMouseOut={() => this.downvoteMouseOut()}
-      >
-        ▼
-      </a>
-    );
-  }
-
-  sendTip() {
-    var amount = parseInt(this.state.inputTip);
-    if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
-        return;
-    }
-    var address = this.props.user.getAddress();
-    if (amount === NaN) {
-      return;
-    }
-    var isPos = amount >= 0;
-    this.props.group.sendUserCurrency(address, (amount * (isPos ? 1 : -1)), isPos).then(() => {
-      console.log("successfully sent currency!");
-    }).catch((error) => {
-      console.error("failed to send currency:", error);
-    });
-  }
-
-  changeTip(event) {
-    this.setState({
-      inputTip: event.target.value,
-    });
-  }
-
-  vote(amount) {
-    const isPos = amount >= 0;
-    amount = Math.abs(amount);
-    if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
-        return;
-    }
+  sendTip(amount, isPos) {
     this.props.group.sendUserCurrency(this.props.user.getAddress(), amount, isPos).then(() => {
-      console.log("successfully " + (isPos ? "up" : "down") + "tipped user #" + this.props.user.getAddress() + " by " + amount + "!");
+      console.log("successfully " + (isPos ? "up" : "down") + "tipped user " + this.props.user.getAddress() + " by " + amount + "!");
     }).catch((error) => {
       console.error("failed to send currency:", error);
     });
   }
-
-  changeCount(amount) {
-    if (this.state.countActive) {
-      console.log("counting active, changing count to", this.state.count + amount);
-      this.setState({
-        count: this.state.count + amount,
-      });
-      setTimeout(() => {
-        this.changeCount(amount);
-      }, 500);
-    }
-  }
-
-
-
-  upvoteMouseDown() {
-    //mouse down, reset count and begin counting up
-    this.state.count = 0;
-    this.state.countActive = true;
-    this.changeCount(1);
-  }
-
-  upvoteMouseUp() {
-    //mouse up over the element, send the tip
-    this.state.countActive = false;
-    this.vote(this.state.count);
-    this.setState({
-      count: 0,
-    });
-  }
-
-  upvoteMouseOut() {
-    //mouse out, stop counting, reset counter (cancelled)
-    this.setState({
-      count: 0,
-      countActive: false,
-    });
-  }
-
-  downvoteMouseDown() {
-    //mouse down, reset count and begin counting up
-    this.state.count = 0;
-    this.state.countActive = true;
-    this.changeCount(-1);
-  }
-
-  downvoteMouseUp() {
-    //mouse up over the element, send the tip
-    this.state.countActive = false;
-    this.vote(this.state.count);
-    this.setState({
-      count: 0,
-    });
-  }
-
-  downvoteMouseOut() {
-    //mouse out, stop counting, reset counter (cancelled)
-    this.setState({
-      count: 0,
-      countActive: false,
-    });
-  }
-
-
 
   render() {
     if (this.state.userProperties.isLoaded()) {
@@ -257,18 +106,10 @@ export default class UserView extends Component {
                 {this.renderJoinTime()}
                 {this.renderAddress()}
               </div>
-              <div style={this.styles.votingContainer}>
-                <div style={this.styles.voting}>
-                  {this.renderUpvote()}
-                  {this.renderBalance()}
-                  {this.renderDownvote()}
-                </div>
-                <div style={this.styles.votingCountContainer}>
-                  <span style={this.styles.votingCount}>
-                    {this.renderCount()}
-                  </span>
-                </div>
-              </div>
+              <UpDownVoter
+                getBalance={() => this.state.userProperties.getBalance() }
+                send={this.sendTip.bind(this)}
+              />
             </div>
           </div>
         </div>
@@ -340,6 +181,7 @@ export default class UserView extends Component {
       },
       balance: {
         fontSize: 'small',
+        textAlign: 'center',
       },
       multiHash: {
         fontSize: 'small',
@@ -367,30 +209,6 @@ export default class UserView extends Component {
       },
       nicknameAnon: {
         fontStyle: 'italic',
-      },
-      voteArrow: {
-//        backgroundColor: this.props.selected ? '#fdffea' : 'white',
-        border: 'none',
-        textAlign: 'center',
-        cursor: 'pointer',
-      },
-      votingContainer: {
-        display: 'flex',
-        marginLeft: '4px',
-      },
-      voting: {
-        lineHeight: '20px',
-        float: 'right',
-        display: 'flex',
-        flexDirection: 'column',
-      },
-      votingCountContainer: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      votingCount: {
-        fontSize: 'small',
       },
       userInfo: {
         display: 'flex',

@@ -3,6 +3,7 @@ import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import Blockchain from '../blockchain/Blockchain';
+import UpDownVoter from './UpDownVoter';
 
 export default class PostView extends Component {
   constructor(props) {
@@ -29,28 +30,16 @@ export default class PostView extends Component {
         <div style={this.styles.container} className='card'>
           <div style={this.styles.cardContent}>
             <div style={this.styles.postInfo}>
-
               <div style={this.styles.title}>
                 {this.renderTitle()}
                 {this.renderTimestamp()}
               </div>
 
-              <div style={this.styles.votingContainer}>
-                <div style={this.styles.voting}>
-                  {this.renderUpvote()}
-                  {this.renderBalance()}
-                  {this.renderDownvote()}
-                </div>
-
-                <div style={this.styles.votingCountContainer}>
-                  <span style={this.styles.votingCount}>
-                    {this.renderCount()}
-                  </span>
-                </div>
-        
-              </div>
+              <UpDownVoter
+                getBalance={() => this.props.post.balance.toString() }
+                send={this.sendTip.bind(this)}
+              />
             </div>
-
             <div style={this.styles.body}>
               {this.renderContent()}
             </div>
@@ -84,47 +73,6 @@ export default class PostView extends Component {
       <div>
         <Link to={this.getTargetPath()}>{this.renderId()}</Link>&nbsp;--&nbsp;<Link to={this.getTargetPath() + '/'}>{this.props.post.title}</Link>
       </div>
-    );
-  }
-
-  renderUpvote() {
-    return (
-
-      <a 
-        style={this.styles.voteArrow}
-        onMouseDown={() => this.upvoteMouseDown()}
-        onMouseUp={() => this.upvoteMouseUp()}
-        onMouseOut={() => this.upvoteMouseOut()}
-      >
-        ▲
-      </a>
-    );
-  }
-
-  renderBalance() {
-      return (
-        <span style={this.styles.balance}>
-          {this.props.post.balance.toString()}
-        </span>
-    );
-  }
-
-  renderCount() {
-    if (this.state.countActive) {
-      return (this.state.count >= 0 ? '+' : '') + this.state.count;
-    }
-  }
-
-  renderDownvote() {
-    return (
-      <a
-        style={this.styles.voteArrow}
-        onMouseDown={() => this.downvoteMouseDown()}
-        onMouseUp={() => this.downvoteMouseUp()}
-        onMouseOut={() => this.downvoteMouseOut()}
-      >
-        ▼
-      </a>
     );
   }
 
@@ -189,6 +137,15 @@ export default class PostView extends Component {
       </span>
     );
   }
+
+  sendTip(amount, isPos) {
+    this.props.group.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
+      console.log("successfully " + (isPos ? "up" : "down") + "voted post #" + this.props.post.id + " by " + amount + "!");
+    }).catch((error) => {
+      console.error("failed to send currency:", error);
+    });
+  }
+
 
   vote(amount) {
     const isPos = amount >= 0;

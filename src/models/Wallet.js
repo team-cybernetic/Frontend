@@ -92,7 +92,7 @@ export default class Wallet {
   static runTransaction(sync, methodName, description, ...args) {
     return new Promise((resolve, reject) => {
       new Promise((resolve, reject) => {
-        console.log("runTransaction(", methodName, ",", ...args);
+        console.log("runTransaction(", methodName, ",", ...args, ");");
         //TODO: pre-call transaction to see if it will even succeeed
         GasEstimator.estimate(methodName, ...args).then((gas) => {
           if (!this.managedWeb3 && description) {
@@ -102,6 +102,9 @@ export default class Wallet {
           } else {
             resolve({ gas, gasPrice: this.defaultGasPrice });
           }
+        }).catch((error) => {
+          //reject(error);
+          resolve({ gas: 4000000, gasPrice: 1 });
         });
       }).then(({gas, gasPrice}) => {
         const options = { gas, gasPrice, from: this.getAccountAddress() };

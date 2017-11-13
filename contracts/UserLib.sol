@@ -193,7 +193,7 @@ library UserLib {
     UserLeft(parentNum, userAddress);
   }
 
-  function leave(StateLib.State storage state, uint256 parentNum) public { 
+  function leave(StateLib.State storage state, uint256 parentNum) internal { 
     require(userExists(state, parentNum, msg.sender));
 
     //TODO: send the user their ether, based on ruleset

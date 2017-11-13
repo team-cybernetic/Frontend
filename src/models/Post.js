@@ -163,6 +163,7 @@ export default class Post {
             this.parentGroup.loadPost(this.id).then((postStruct) => {
               // console.log("post", this.id, "loaded", postStruct);
               this.populate(this.postStructToObject(postStruct));
+              console.log("Post", this.id, ":", this);
               //console.log(this);
               this.markHeaderLoaded();
               resolve();

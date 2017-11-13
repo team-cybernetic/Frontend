@@ -26,7 +26,7 @@ export default class Group {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
-          console.log("Group", this.number, "got a new post notification:", result);
+          console.log("Group", this.number, "got a new post notification:", result.args);
           const postNumber = result.args.postNumber.toString();
           const userAddress = result.args.userAddress;
           const post = this.getPost(postNumber, result.transactionHash);
@@ -38,7 +38,7 @@ export default class Group {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
-          console.log("Group", this.number, "got a user joined notification:", result);
+          console.log("Group", this.number, "got a user joined notification:", result.args);
           const addr = result.args.userAddress;
           const user = UserStore.getUser(addr);
           this.fireUserJoinedListeners(user);
@@ -49,7 +49,7 @@ export default class Group {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
-          console.log("Group", this.number, "got a user left notification:", result);
+          console.log("Group", this.number, "got a user left notification:", result.args);
           const addr = result.args.userAddress;
           const user = UserStore.getUser(addr);
           this.fireUserLeftListeners(user);
@@ -60,7 +60,7 @@ export default class Group {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
-          console.log("Group", this.number, "got a user balance change notification:", result);
+          console.log("Group", this.number, "got a user balance change notification:", result.args);
           const addr = result.args.userAddress;
           const amount = result.args.amount;
           const increased = result.args.increased;
@@ -78,7 +78,7 @@ export default class Group {
             userProperties.populate({
               balance: newBalance,
             });
-            console.log("Balance of user is now", userProperties.getBalance());
+            console.log("Balance of user is now", userProperties.getBalance().toString());
           }).catch((error) => {
             console.error("Group failed to get balance of user", addr, " while handling balance changed event:", error);
           });
@@ -92,7 +92,7 @@ export default class Group {
         const parentNumber = result.args.parentNumber.toString();
         const postNumber = result.args.postNumber.toString();
         if (parentNumber === this.number) {
-          console.log("Group", this.number, "got a balance change notification:", result);
+          console.log("Group", this.number, "got a balance change notification:", result.args);
           const amount = result.args.amount;
           const increased = result.args.increased;
 
@@ -106,7 +106,7 @@ export default class Group {
               balance: post.getBalance().sub(amount),
             });
           }
-          console.log("Balance of post is now", post.getBalance());
+          console.log("Balance of post is now", post.getBalance().toString());
         }
       }
     });
@@ -116,7 +116,7 @@ export default class Group {
       if (!error) {
         const postNumber = result.args.postNumber.toString();
         if (postNumber === this.number) {
-          console.log("Group", this.number, "got a tokens change notification:", result);
+          console.log("Group", this.number, "got a tokens change notification:", result.args);
           const amount = result.args.amount;
           const increased = result.args.increased;
 
@@ -129,7 +129,7 @@ export default class Group {
               tokens: this.post.getTokens().sub(amount),
             });
           }
-          console.log("Tokens of group is now", this.post.getTokens());
+          console.log("Tokens of group is now", this.post.getTokens().toString());
           this.fireTokensChangedListeners(this.post.getTokens());
         }
       }
@@ -274,9 +274,13 @@ export default class Group {
   loadChildren() {
     return new Promise((resolve, reject) => {
       CyberneticChat.getChildren(this.number).then((postIds) => {
-        resolve(postIds.map((bigInt) => {
-          return (this.getPost(bigInt.toString()));
-        }));
+        let result = [];
+        postIds.forEach((id) => {
+          if (!id.equals(0)) {
+            result.push(this.getPost(id));
+          }
+        });
+        resolve(result);
       }).catch((error) => {
         reject(error);
       });
@@ -445,6 +449,8 @@ export default class Group {
   }
 
   registerUserBalanceChangedListener(callback) {
+    console.log("Registering a userbalancechangedlistener in group", this.number);
+    console.trace();
     return (CyberneticChat.registerUserBalanceChangedListener(callback));
   }
 

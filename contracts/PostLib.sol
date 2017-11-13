@@ -69,22 +69,25 @@ library PostLib {
     bool userPermissionsFlagsMode,
     int256 permissions
   ) private returns (Post) {
-    if (state.main.initialized) {
-      var parent = getPostRaw(state, parentNum);
-      parent.childrenMap[number] = parent.children.length;
-      parent.children.push(number);
-    }
-    return (state.main.posts[number] = Post({
+    var parent = getPostRaw(state, parentNum);
+    parent.childrenMap[number] = parent.children.length;
+    parent.children.push(number);
+    state.main.posts[number] = Post({
       contents: contents,
       number: number,
       parentNum: parentNum,
       balance: balance,
-      tokens: tokens, //TODO: ruleset
+      tokens: tokens,
       permissions: permissions,
       userPermissionsFlagsMode: userPermissionsFlagsMode,
       userAddresses: state.postLib.userAddressesBacking[number],
-      children: state.postLib.childrenBacking[number] //TODO: test if this really works
-    }));
+      children: state.postLib.childrenBacking[number]
+    });
+    if (!state.main.initialized) {
+      state.main.posts[number].childrenMap[number] = parent.children.length;
+      state.main.posts[number].children.push(0);
+    }
+    return (state.main.posts[number]);
   }
 
   function createPostChecks(
