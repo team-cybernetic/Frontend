@@ -1,6 +1,6 @@
 import CyberneticChat from '../blockchain/CyberneticChat';
 
-const GAS_MULTIPLIER = 2.5; //this ensures the calculated gas amount will actually work
+const GAS_MULTIPLIER = 2.0; //this ensures the calculated gas amount will actually work
 
 export default class GasEstimator {
   static web3 = null;
@@ -13,28 +13,7 @@ export default class GasEstimator {
     return new Promise((resolve, reject) => {
       CyberneticChat.getContractInstance()[methodName].estimateGas(...args).then((gas) => {
         resolve(Math.ceil(gas * GAS_MULTIPLIER));
-      }).catch((error) => {
-        reject(error);
-      });
+      }).catch(reject);
     });
   }
-
-  /*
-  static estimateContractCreation() {
-    return new Promise((resolve, reject) => {
-      let args = Array.prototype.slice.call(arguments);
-      const TC = args.shift();
-      const Contract = this.web3.eth.contract(TC.abi);
-      args.push({ data: TC.linked_binary });
-      const data = Contract.new.getData.apply(Contract, args);
-      this.web3.eth.estimateGas({ data }, (error, result) => {
-        if (!error) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-    });
-  }
-  */
 }

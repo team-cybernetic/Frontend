@@ -186,7 +186,7 @@ library UserLib {
     UserJoined(parentNum, msg.sender);
   }
 
-  function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) internal {
+  function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) public {
     var p = PostLib.getPost(state, parentNum);
     if (p.userAddressesMap[msg.sender] != 0) { //user has been in the group before
       p.users[userAddress].joined = false;
@@ -195,7 +195,7 @@ library UserLib {
     }
   }
 
-  function leave(StateLib.State storage state, uint256 parentNum) internal { 
+  function leave(StateLib.State storage state, uint256 parentNum) public { 
     require(userExists(state, parentNum, msg.sender));
 
     //TODO: send the user their ether, based on ruleset
