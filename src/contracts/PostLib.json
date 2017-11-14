@@ -7629,11 +7629,11 @@
         }
       },
       "links": {
-        "UserLib": "0x6319c102706dd685c5398df3432bc08160d439b3",
-        "ContentLib": "0x9e98ac027d4b20f83c39d0464796c930ad3a6bca",
-        "PermissionLib": "0xd14b1a65239382f8a41d4986081ab4cf690bd525"
+        "UserLib": "0x3f4a305ef460e63e319e62b586dd0ac75985df0f",
+        "ContentLib": "0x8ceb7d16b3782823ac076928cc15a83b26e203cd",
+        "PermissionLib": "0x3d3331375408a9ce7dff47886768c1eba8a175f8"
       },
-      "address": "0x8e246eb4deb22bf5f827d9fdd59cb487b8dd0b89"
+      "address": "0xba8816ed6b91f0da31a25f81d22c6eb612c16c6c"
     },
     "1510676859141": {
       "events": {
@@ -7845,5 +7845,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-14T16:27:49.020Z"
+  "updatedAt": "2017-11-14T16:46:31.701Z"
 }

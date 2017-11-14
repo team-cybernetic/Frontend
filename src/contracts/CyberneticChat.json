@@ -8720,11 +8720,11 @@
         }
       },
       "links": {
-        "UserLib": "0x6319c102706dd685c5398df3432bc08160d439b3",
-        "PostLib": "0x8e246eb4deb22bf5f827d9fdd59cb487b8dd0b89",
-        "CurrencyLib": "0xad45683b3cac45161230076e2c2cf7c7cdcc6dba"
+        "UserLib": "0x3f4a305ef460e63e319e62b586dd0ac75985df0f",
+        "PostLib": "0xba8816ed6b91f0da31a25f81d22c6eb612c16c6c",
+        "CurrencyLib": "0x7a10f4ee0be1fc2f7370172d9337536284b276b4"
       },
-      "address": "0x6d20274ea7bad9551dd0ad6cab223717bd96a888"
+      "address": "0x04417cb90f933db22afd65a03f6170f7c0d2e252"
     },
     "1510676859141": {
       "events": {
@@ -9012,5 +9012,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-14T16:27:49.053Z"
+  "updatedAt": "2017-11-14T16:46:31.690Z"
 }
