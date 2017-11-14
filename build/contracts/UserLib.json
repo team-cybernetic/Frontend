@@ -8134,12 +8134,197 @@
         }
       },
       "links": {
-        "PermissionLib": "0xd14b1a65239382f8a41d4986081ab4cf690bd525",
-        "ContentLib": "0x9e98ac027d4b20f83c39d0464796c930ad3a6bca"
+        "PermissionLib": "0x3d3331375408a9ce7dff47886768c1eba8a175f8",
+        "ContentLib": "0x8ceb7d16b3782823ac076928cc15a83b26e203cd"
       },
-      "address": "0x6319c102706dd685c5398df3432bc08160d439b3"
+      "address": "0x3f4a305ef460e63e319e62b586dd0ac75985df0f"
+    },
+    "1510676859141": {
+      "events": {
+        "0x33c90698e3ceaafedcd2a825eb0eff6ffda9746751913fe9997cc40c2822980c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserJoinDenied",
+          "type": "event"
+        },
+        "0xd423976f4855ebe49c0df63012daef410fc4ab8e9ac9cb816d71a5b7783f5b61": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "PostCreationDenied",
+          "type": "event"
+        },
+        "0x6a5f716eff9d9b77c04378575633c0f6784ea8d1a0b7cc011d723b4022decd57": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserJoined",
+          "type": "event"
+        },
+        "0x29b8faa3fcd3114fc2e3197ee983011779d847dd9f2eb40a1b68ee205e981447": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserLeft",
+          "type": "event"
+        },
+        "0x0bfc0fdd0ffeea0e521135d18175afe397d80a6a4e800fb548c6ed82a633a062": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "kickedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "kickingUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserKicked",
+          "type": "event"
+        },
+        "0xfe553b2e063ab936b88de3b4a73bfe46017e9b2d227ecbcefde730e18e29e94e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "bannedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "banningUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserBanned",
+          "type": "event"
+        },
+        "0xd750f80b9aae0ab3f217b9461dd61457f94d54cb41c3b441099662dd6370aede": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "mutedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "mutingUserAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserMuted",
+          "type": "event"
+        },
+        "0x953f76616f89ce265d9b8b6b8bc303e885d6c3653e1ae4b3e0dc396953af7ab1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "nickname",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "UserProfileChanged",
+          "type": "event"
+        }
+      },
+      "links": {
+        "PermissionLib": "0x8f7aed6c391710cf66ff5aaeca71635683d4a8c8",
+        "ContentLib": "0x420bd59b3a39134d216d491a695f5d5fdb202c0c"
+      },
+      "address": "0x13f34b9af0fda8fe6cd42ba12c6f72ce9e72ffb6"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-14T05:25:53.044Z"
+  "updatedAt": "2017-11-14T16:46:31.713Z"
 }

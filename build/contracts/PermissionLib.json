@@ -2950,9 +2950,59 @@
         }
       },
       "links": {},
-      "address": "0xd14b1a65239382f8a41d4986081ab4cf690bd525"
+      "address": "0x3d3331375408a9ce7dff47886768c1eba8a175f8"
+    },
+    "1510676859141": {
+      "events": {
+        "0x33c90698e3ceaafedcd2a825eb0eff6ffda9746751913fe9997cc40c2822980c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserJoinDenied",
+          "type": "event"
+        },
+        "0xd423976f4855ebe49c0df63012daef410fc4ab8e9ac9cb816d71a5b7783f5b61": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "PostCreationDenied",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x8f7aed6c391710cf66ff5aaeca71635683d4a8c8"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-14T05:25:53.057Z"
+  "updatedAt": "2017-11-14T16:46:31.718Z"
 }

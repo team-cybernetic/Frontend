@@ -1,5 +1,6 @@
 import Ipfs from '../utils/Ipfs';
 import BigNumber from 'bignumber.js';
+import UserStore from '../stores/UserStore';
 
 export default class Post {
   constructor(parentGroup, post) {
@@ -89,6 +90,14 @@ export default class Post {
 
   getParentNumber() {
     return (this.parentNumber);
+  }
+
+  getCreatorAddress() {
+    return (this.creator);
+  }
+
+  getCreator() {
+    return (UserStore.getUser(this.creator));
   }
 
   //Loading methods so we can fetch the stuff we don't have. Asynchronous.

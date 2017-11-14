@@ -18,10 +18,22 @@ export default class PostView extends Component {
     this.listenerHandle = this.props.post.registerUpdateListener((post) => {
       this.forceUpdate();
     });
+    this.props.post.loadHeader().then(() => {
+      const creator = this.props.post.getCreator();
+      this.creatorListenerHandle = creator.registerProfileUpdateListener(() => {
+        this.forceUpdate();
+      });
+      this.setState({
+        creator,
+      });
+    }).catch((error) => {
+      console.error("Error while loading header of post to get creator:", error);
+    });
   }
 
   componentWillUnmount() {
     this.props.post.unregisterUpdateListener(this.listenerHandle);
+    this.state.creator.unregisterProfileUpdateListener(this.creatorListenerHandle);
   }
 
   render() {
@@ -76,17 +88,6 @@ export default class PostView extends Component {
     );
   }
 
-  renderCreator() {
-    return (
-      <span style={this.styles.creator}>
-        Creator:&nbsp;
-        <span style={this.styles.creatorHash}>
-          {this.props.post.creator}
-        </span>
-      </span>
-    );
-  }
-
   renderId() {
     if (this.props.post.id) {
       return (
@@ -128,12 +129,28 @@ export default class PostView extends Component {
     }
   }
 
+  renderCreator() {
+    let username = '';
+    if (this.state.creator) {
+      username = this.state.creator.getNickname();
+      if (!username) {
+        username = "Anonymous";
+      }
+    }
+    return (
+      <Link to={`/user/${this.props.post.creator}`}>
+        {username} ({this.props.post.creator})
+      </Link>
+    );
+  }
+
+
   renderTimestamp() {
     let m = moment(this.props.post.creationTime, 'X');
     return (
       <span style={this.styles.date}>
         Posted&nbsp;
-        {m.calendar()} by <Link to={`/user/${this.props.post.creator}`}>{this.props.post.creator}</Link>
+        {m.calendar()} by {this.renderCreator()}
       </span>
     );
   }

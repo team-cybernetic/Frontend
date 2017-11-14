@@ -8725,8 +8725,292 @@
         "CurrencyLib": "0xad45683b3cac45161230076e2c2cf7c7cdcc6dba"
       },
       "address": "0x6d20274ea7bad9551dd0ad6cab223717bd96a888"
+    },
+    "1510676859141": {
+      "events": {
+        "0x33c90698e3ceaafedcd2a825eb0eff6ffda9746751913fe9997cc40c2822980c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserJoinDenied",
+          "type": "event"
+        },
+        "0xd423976f4855ebe49c0df63012daef410fc4ab8e9ac9cb816d71a5b7783f5b61": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "PostCreationDenied",
+          "type": "event"
+        },
+        "0x6a5f716eff9d9b77c04378575633c0f6784ea8d1a0b7cc011d723b4022decd57": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserJoined",
+          "type": "event"
+        },
+        "0x29b8faa3fcd3114fc2e3197ee983011779d847dd9f2eb40a1b68ee205e981447": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserLeft",
+          "type": "event"
+        },
+        "0x0bfc0fdd0ffeea0e521135d18175afe397d80a6a4e800fb548c6ed82a633a062": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "kickedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "kickingUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserKicked",
+          "type": "event"
+        },
+        "0xfe553b2e063ab936b88de3b4a73bfe46017e9b2d227ecbcefde730e18e29e94e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "bannedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "banningUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserBanned",
+          "type": "event"
+        },
+        "0xd750f80b9aae0ab3f217b9461dd61457f94d54cb41c3b441099662dd6370aede": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "mutedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "mutingUserAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserMuted",
+          "type": "event"
+        },
+        "0x953f76616f89ce265d9b8b6b8bc303e885d6c3653e1ae4b3e0dc396953af7ab1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "nickname",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "UserProfileChanged",
+          "type": "event"
+        },
+        "0x479ec612f400c16ffe0e29ab35fd2726d09436492c66bd0b0b39fdff5817d01c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "PostCreated",
+          "type": "event"
+        },
+        "0x2e059c295c455531568b11c53cf3b686d0da4b0f817fa7b31f2b40e7182ca3f5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "increased",
+              "type": "bool"
+            }
+          ],
+          "name": "UserBalanceChanged",
+          "type": "event"
+        },
+        "0xa49556adbe4cf7bc6dd68f4130fdc93b03cb75bf223c9959608a34b0210568f5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "increased",
+              "type": "bool"
+            }
+          ],
+          "name": "PostBalanceChanged",
+          "type": "event"
+        },
+        "0x9a715461e57fab920501d1b45d275cd77d7ef897cf2553053a36680151d7078d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "postNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "increased",
+              "type": "bool"
+            }
+          ],
+          "name": "PostTokensChanged",
+          "type": "event"
+        }
+      },
+      "links": {
+        "UserLib": "0x13f34b9af0fda8fe6cd42ba12c6f72ce9e72ffb6",
+        "PostLib": "0xd112f1c748ad3b89e4b140d952c96060d5bf18d9",
+        "CurrencyLib": "0x0a791388c941b49d425a8c68e56eb94d02b00721"
+      },
+      "address": "0x1206140cef14a858e7c146f80805d26950f1673f"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-14T05:25:53.019Z"
+  "updatedAt": "2017-11-14T16:27:49.053Z"
 }

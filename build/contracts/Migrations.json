@@ -819,9 +819,14 @@
     "1509747848196": {
       "events": {},
       "links": {},
-      "address": "0xa3d67267d54e77ee25ce1e88a87f4a6485f01362"
+      "address": "0xfeda6ced6738853046e3da7535bad784b7157e82"
+    },
+    "1510676859141": {
+      "events": {},
+      "links": {},
+      "address": "0x0e3dcccb166e77373495ac93ddc6264b037d901e"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-14T05:25:53.059Z"
+  "updatedAt": "2017-11-14T16:46:31.716Z"
 }
