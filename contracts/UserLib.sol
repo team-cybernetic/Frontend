@@ -39,6 +39,14 @@ library UserLib {
     address indexed mutingUserAddress
   );
 
+  event UserProfileChanged(
+    address indexed userAddress,
+    string nickname,
+    uint256 timestamp
+  );
+
+
+
 
   struct User {
     address addr;
@@ -143,6 +151,7 @@ library UserLib {
       creator: userAddress,
       creationTime: updateTime
     });
+    UserProfileChanged(userAddress, nickname, updateTime);
   }
 
   function getUsers(StateLib.State storage state, uint256 parentNum) constant internal returns (address[]) {
@@ -186,7 +195,7 @@ library UserLib {
     UserJoined(parentNum, msg.sender);
   }
 
-  function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) public {
+  function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) internal {
     var p = PostLib.getPost(state, parentNum);
     if (p.userAddressesMap[msg.sender] != 0) { //user has been in the group before
       p.users[userAddress].joined = false;
@@ -195,7 +204,8 @@ library UserLib {
     }
   }
 
-  function leave(StateLib.State storage state, uint256 parentNum) public { 
+  //apparently this function MUST be internal, otherwise joined=false in removeUser throws invalild opcode??
+  function leave(StateLib.State storage state, uint256 parentNum) internal { 
     require(userExists(state, parentNum, msg.sender));
 
     //TODO: send the user their ether, based on ruleset

@@ -25,5 +25,5 @@ module.exports = function(deployer) {
   deployer.link(ContentLib, CyberneticChat);
   deployer.link(CurrencyLib, CyberneticChat);
 
-  deployer.deploy(CyberneticChat, "title", "text/plain", 0, 0, "", 0);
+  deployer.deploy(CyberneticChat, "Cybernetic Chat Root", "text/plain", 18, 32, "0x671a2d8d519c51f1c33d5c05318f1f7bdbda8abd6d9cce2492d09bdebbe04551", 0);
 };

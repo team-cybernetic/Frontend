@@ -94,7 +94,7 @@ class Editor extends Component {
         <p style={styles.earningsText}>
           Global:
           <span className='is-pulled-right'>
-            {this.getGlobalBalance()}
+            {this.getGlobalBalance()} ETH
           </span>
         </p>
         {this.renderLocalBalance()}

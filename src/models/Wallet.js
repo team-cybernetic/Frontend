@@ -26,7 +26,7 @@ export default class Wallet {
       this.defaultGasPrice = price * 1;
     });
     this.web3.eth.getAccounts((error, accounts) => {
-      this.web3.eth.defaultAccount = accounts[0];
+      this.web3.eth.defaultAccount = accounts[2];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
         this.balance = balance;
         this.fireBalanceUpdateListeners(-1, balance);

@@ -3,6 +3,7 @@ import Blockchain from './Blockchain';
 const EVENT_POST_CREATED = 'PostCreated';
 const EVENT_USER_JOINED = 'UserJoined';
 const EVENT_USER_LEFT = 'UserLeft';
+const EVENT_USER_PROFILE_CHANGED = 'UserProfileChanged';
 const EVENT_USER_BALANCE_CHANGED = 'UserBalanceChanged';
 const EVENT_POST_BALANCE_CHANGED = 'PostBalanceChanged';
 const EVENT_POST_TOKENS_CHANGED = 'PostTokensChanged';
@@ -33,6 +34,10 @@ export default class CyberneticChat {
             this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
               console.log("EVENT: User left! response:", response);
               this.fireEventListener(EVENT_USER_LEFT, error, response);
+            });
+            this.watchForEvent(EVENT_USER_PROFILE_CHANGED, {}, (error, response) => {
+              console.log("EVENT: User profile changed! response:", response);
+              this.fireEventListener(EVENT_USER_PROFILE_CHANGED, error, response);
             });
             this.watchForEvent(EVENT_USER_BALANCE_CHANGED, {}, (error, response) => {
               console.log("EVENT: User balance changed! response:", response);
@@ -121,6 +126,10 @@ export default class CyberneticChat {
 
   static registerUserLeftEventListener(callback) {
     return (this.registerEventListener(EVENT_USER_LEFT, callback));
+  }
+
+  static registerUserProfileChangedListener(callback) {
+    return (this.registerEventListener(EVENT_USER_PROFILE_CHANGED, callback));
   }
 
   static registerUserBalanceChangedListener(callback) {

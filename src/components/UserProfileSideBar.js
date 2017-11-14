@@ -16,8 +16,17 @@ class UserProfileSidebar extends Component {
     this.loadProfile(this.userAddress());
   }
 
+  componentWillUnmount() {
+    if (this.updateListener) {
+      this.state.user.unregisterProfileUpdateListener(this.updateListener);
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.userAddress() !== nextProps.pathState.userAddress) {
+      if (this.updateListener) {
+        this.state.user.unregisterProfileUpdateListener(this.updateListener);
+      }
       this.loadProfile(nextProps.pathState.userAddress);
     }
   }
@@ -27,6 +36,12 @@ class UserProfileSidebar extends Component {
     const user = UserStore.getUser(address);
     user.loadProfile().then(() => {
       this.setState({ isLoading: false });
+    });
+    if (this.updateListener) {
+      this.state.user.unregisterProfileUpdateListener(this.updateListener);
+    }
+    this.updateListener = user.registerProfileUpdateListener(() => {
+      this.forceUpdate();
     });
     this.setState({ user });
   }
@@ -46,7 +61,7 @@ class UserProfileSidebar extends Component {
   renderProfileLastUpdateTime() {
     const profileLastUpdateTime = this.state.user.getProfileLastUpdateTime();
     let m = moment(profileLastUpdateTime, 'X');
-    console.log("Profile last updated:", profileLastUpdateTime);
+    console.log("Profile last updated:", profileLastUpdateTime.toString());
     if (!!profileLastUpdateTime && profileLastUpdateTime.toString() !== '0') { //it's a BigNumber
       return (
         <span style={styles.profileLastUpdateTime}>

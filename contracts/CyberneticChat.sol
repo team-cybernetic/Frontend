@@ -38,6 +38,11 @@ contract CyberneticChat {
     bool increased
   );
 
+  event UserProfileChanged(
+    address indexed userAddress,
+    string nickname,
+    uint256 timestamp
+  );
 
   event UserJoined(
     uint256 indexed parentNumber,

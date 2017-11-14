@@ -106,9 +106,7 @@ class UserProperties {
   }
 
   reload() {
-    if (this.loaded) {
-      this.loaded = false;
-    }
+    this.loaded = false;
     return (this.load());
   }
 
@@ -214,12 +212,24 @@ export default class User {
     this.profileLoadListeners = [];
     this.headerLoadListeners = [];
     this.updateListeners = [];
-    //TODO: profileUpdateListeners
-    //TODO: propertiesUpdateListeners
     this.confirming = false;
     this.headerLoading = false;
     this.profileLoading = false;
     this.properties = [];
+
+    this.registerUserProfileChangedListener((error, result) => {
+      if (!error) {
+        const userAddress = result.args.userAddress;
+        if (userAddress === this.address) {
+          console.log("User", this.address, "got a user profile change notification:", result.args);
+          this.reload().then(() => {
+            console.log("User", this.address, "profile updated!");
+          }).catch((error) => {
+            console.error("User", this.address, "profile update failed:", error);
+          });
+        }
+      }
+    });
   }
 
   populateProfile({
@@ -289,7 +299,10 @@ export default class User {
           const multiHashArray = Ipfs.extractMultiHash(multiHashString);
           const [ipfsHashFunction, ipfsHashLength, ipfsHash] = multiHashArray;
           Wallet.runTransactionSync('setUserProfile', 'update your profile', nickname, profileMimeType, ipfsHashFunction, ipfsHashLength, ipfsHash).then(() => {
+            /*
             this.populateProfile({ nickname, profile, profileMimeType, multiHashString, multiHashArray });
+            */
+            this.reloadProfile();
             resolve();
           }).catch((error) => {
             reject(error);
@@ -416,10 +429,18 @@ export default class User {
   }
 
   reloadProfile() {
-    if (this.profileLoaded) {
-      this.profileLoaded = false;
-    }
+    this.profileLoaded = false;
     return (this.loadProfile());
+  }
+
+  reload() {
+    this.profileLoaded = false;
+    this.headerLoaded = false;
+    return (this.loadProfile());
+  }
+
+  registerUserProfileChangedListener(callback) {
+    return (CyberneticChat.registerUserProfileChangedListener(callback));
   }
 
   registerProfileUpdateListener(callback) {
