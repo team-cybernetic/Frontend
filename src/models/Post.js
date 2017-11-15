@@ -1,10 +1,12 @@
 import Ipfs from '../utils/Ipfs';
 import BigNumber from 'bignumber.js';
 import UserStore from '../stores/UserStore';
+import CyberneticChat from '../blockchain/CyberneticChat';
+import GroupStore from '../stores/GroupStore';
 
 export default class Post {
-  constructor(parentGroup, post) {
-    this.parentGroup = parentGroup;
+  constructor(group, post) {
+    this.group = group;
     this.contentLoadListeners = [];
     this.headerLoadListeners = [];
     this.confirmationListeners = [];
@@ -66,8 +68,8 @@ export default class Post {
     return (this.isConfirmed() && this.isHeaderLoaded() && this.isContentLoaded());
   }
 
-  getParentGroup() {
-    return (this.parentGroup);
+  getGroup() {
+    return (this.group);
   }
 
   /**
@@ -90,6 +92,10 @@ export default class Post {
 
   getParentNumber() {
     return (this.parentNumber);
+  }
+
+  getParentGroup() {
+    return (GroupStore.getGroup(this.parentNumber));
   }
 
   getCreatorAddress() {
@@ -173,7 +179,7 @@ export default class Post {
               return;
             }
             // console.log("post", this.id, "confirmed");
-            this.parentGroup.loadPost(this.id).then((postStruct) => {
+            CyberneticChat.getPost(this.id).then((postStruct) => {
               // console.log("post", this.id, "loaded", postStruct);
               this.populate(this.postStructToObject(postStruct));
               console.log("Post", this.id, ":", this);
@@ -272,7 +278,7 @@ export default class Post {
         } else {
           this.confirming = true;
           if (!!this.id) {
-            this.parentGroup.postExists(this.id).then((result) => {
+            CyberneticChat.postExists(this.id).then((result) => {
               this.markConfirmed(result);
               resolve(result);
             }).catch((error) => {
@@ -280,19 +286,19 @@ export default class Post {
               reject(error);
             });
           } else {
-            var eventListenerHandle = this.parentGroup.registerPostCreatedListener((error, response) => {
+            var eventListenerHandle = CyberneticChat.registerPostCreatedEventListener((error, response) => {
               if (!error) {
                 if (response.transactionHash === this.transactionId) {
                   this.populate({
                     id: response.args.postNumber.toString(),
                   });
                   this.markConfirmed();
-                  this.parentGroup.unregisterEventListener(eventListenerHandle);
+                  CyberneticChat.unregisterEventListener(eventListenerHandle);
                   resolve(true);
                 }
               } else {
                 this.markConfirmedFailure(error);
-                this.parentGroup.unregisterEventListener(eventListenerHandle);
+                CyberneticChat.unregisterEventListener(eventListenerHandle);
                 reject(error);
               }
             });

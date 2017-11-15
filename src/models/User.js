@@ -440,7 +440,7 @@ export default class User {
   }
 
   registerUserProfileChangedListener(callback) {
-    return (CyberneticChat.registerUserProfileChangedListener(callback));
+    return (CyberneticChat.registerUserProfileChangedEventListener(callback));
   }
 
   registerProfileUpdateListener(callback) {

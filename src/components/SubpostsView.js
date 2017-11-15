@@ -3,7 +3,7 @@ import PostView from './PostView';
 import { some } from 'lodash';
 import { Scrollbars } from 'react-custom-scrollbars';
 
-class ChildrenView extends Component {
+export default class SubpostsView extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -22,7 +22,7 @@ class ChildrenView extends Component {
 
   componentWillUnmount() {
     if (this.listenerHandle) {
-      this.props.group.unregisterPostCreationListener(this.listenerHandle);
+      this.props.group.unregisterPostCreatedListener(this.listenerHandle);
       this.listenerHandle = null;
     }
   }
@@ -31,9 +31,9 @@ class ChildrenView extends Component {
     if (isLoaded) {
       if (!this.props.isLoaded) {
         if (!this.listenerHandle) {
-          this.listenerHandle = group.registerPostCreationListener((post) => this.addToPosts(post));
+          this.listenerHandle = group.registerPostCreatedListener((post) => this.addToPosts(post));
         }
-        group.loadChildren().then((posts) => {
+        group.loadSubposts().then((posts) => {
           this.setState({
             posts: this.reorderPosts(posts)
           });
@@ -147,5 +147,3 @@ const styles = {
     textAlign: 'center',
   },
 };
-
-export default ChildrenView;

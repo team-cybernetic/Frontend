@@ -79,6 +79,7 @@ class SideBar extends Component {
         group.unregisterTokensChangedListener(this.userJoinListener);
       }
       this.userJoinListener = group.registerUserJoinedListener(() => {
+        console.log("Sidebar got UserJoined event");
         this.updateUsers(group);
       });
 
@@ -86,8 +87,10 @@ class SideBar extends Component {
         group.unregisterTokensChangedListener(this.userLeaveListener);
       }
       this.userLeaveListener = group.registerUserLeftListener(() => {
+        console.log("Sidebar got UserLeft event");
         this.updateUsers(group);
       });
+      console.log("Sidebar registered userLeaveListener", this.userLeaveListener);
 
       this.setState({
         isLoaded,
@@ -119,7 +122,7 @@ class SideBar extends Component {
         );
       }
       return (
-        <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} group={post.getParentGroup()} parent={this.props.pathState.parent} />
+        <PostView key={post.id ? post.id : post.transactionId} sidebar={true} post={post} group={post.getGroup()} parent={this.props.pathState.parent} />
       );
     } else {
       return (

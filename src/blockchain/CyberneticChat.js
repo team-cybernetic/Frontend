@@ -44,8 +44,8 @@ export default class CyberneticChat {
         });
       });
     });
-    EVENTS.forEach((eventName) => {
-      CyberneticChat['register' + eventName + 'Listener'] = (callback) => {
+    EVENTS.forEach((eventName) => { //populate all events
+      CyberneticChat['register' + eventName + 'EventListener'] = (callback) => {
         return (this.registerEventListener(eventName, callback));
       };
     });
@@ -67,8 +67,8 @@ export default class CyberneticChat {
     return (this.contractInstance.getPost.call(id));
   }
 
-  static getChildren(parentNumber) {
-    return (this.contractInstance.getChildren.call(parentNumber));
+  static getSubposts(parentNumber) {
+    return (this.contractInstance.getSubposts.call(parentNumber));
   }
 
   static getUsers(parentNumber) {

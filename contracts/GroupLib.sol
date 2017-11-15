@@ -120,7 +120,7 @@ library GroupLib {
       group.userAddresses[group.userAddressesMap[msg.sender] - 1] = msg.sender;
     }
 
-    UserJoined(group.parentNum, msg.sender);
+    UserJoined(group.number, msg.sender);
   }
 
   function removeUser(StateLib.State storage state, Group storage group, address userAddress) internal {
@@ -128,7 +128,7 @@ library GroupLib {
       return;
     group.users[userAddress].joined = false;
     group.userAddresses[group.userAddressesMap[userAddress] - 1] = address(0x0);
-    UserLeft(group.parentNum, userAddress);
+    UserLeft(group.number, userAddress);
   }
 
   //apparently this function MUST be internal, otherwise joined=false in removeUser throws invalild opcode??

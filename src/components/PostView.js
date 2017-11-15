@@ -16,6 +16,7 @@ export default class PostView extends Component {
 
   componentWillMount() {
     this.listenerHandle = this.props.post.registerUpdateListener((post) => {
+      console.log("PostView updated, post:", this.props.post);
       this.forceUpdate();
     });
     this.props.post.loadHeader().then(() => {
@@ -23,7 +24,9 @@ export default class PostView extends Component {
       this.creatorListenerHandle = creator.registerProfileUpdateListener(() => {
         this.forceUpdate();
       });
+      const parentGroup = this.props.post.getParentGroup();
       this.setState({
+        parentGroup,
         creator,
       });
     }).catch((error) => {
@@ -156,7 +159,7 @@ export default class PostView extends Component {
   }
 
   sendTip(amount, isPos) {
-    this.props.group.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
+    this.state.parentGroup.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
       console.log("successfully " + (isPos ? "up" : "down") + "voted post #" + this.props.post.id + " by " + amount + "!");
     }).catch((error) => {
       console.error("failed to send currency:", error);

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import registerServiceWorker from './registerServiceWorker';
 import initializeApp from './initializeApp';
 import NavigationBar from './components/NavigationBar';
-import ChildrenView from './components/ChildrenView';
+import SubpostsView from './components/SubpostsView';
 import SideBar from './components/SideBar';
 import Editor from './components/Editor';
 import GroupStore from './stores/GroupStore';
@@ -163,7 +163,7 @@ class App extends Component {
       );
     } else {
       return (
-        <ChildrenView key={`children-${sharedState.pathState.cleanGroupPath}`} {...sharedState} />
+        <SubpostsView key={`children-${sharedState.pathState.cleanGroupPath}`} {...sharedState} />
       );
     }
   }

@@ -63,7 +63,7 @@ library UserLib {
     (checksPassed, updateTime) = ContentLib.contentCheck(content);
   }
 
-  function setProfile(StateLib.State storage state, ContentLib.Content content) public returns (
+  function setProfile(StateLib.State storage state, ContentLib.Content memory content) internal returns (
     bool checksPassed
   ) {
     (checksPassed, content.creationTime) = setProfileChecks(content);

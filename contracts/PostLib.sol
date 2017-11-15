@@ -83,9 +83,9 @@ library PostLib {
   function createPost(
     StateLib.State storage state,
     uint256 parentNum,
-    ContentLib.Content content,
+    ContentLib.Content memory content,
     bool userPermissionsFlagsMode
-  ) public returns (
+  ) internal returns (
     uint256 newNum
   ) {
 

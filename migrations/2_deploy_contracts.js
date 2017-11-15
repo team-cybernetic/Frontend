@@ -4,11 +4,19 @@ var UserLib = artifacts.require("./UserLib.sol");
 var ContentLib = artifacts.require("./ContentLib.sol");
 var CurrencyLib = artifacts.require("./CurrencyLib.sol");
 var PermissionLib = artifacts.require("./PermissionLib.sol");
+var GroupLib = artifacts.require("./GroupLib.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(ContentLib);
-  deployer.deploy(CurrencyLib);
+
   deployer.deploy(PermissionLib);
+
+  deployer.link(PermissionLib, GroupLib);
+  deployer.deploy(GroupLib);
+
+  deployer.link(GroupLib, CurrencyLib);
+  deployer.deploy(CurrencyLib);
+
 
   deployer.link(PermissionLib, UserLib);
   deployer.link(ContentLib, UserLib);
@@ -25,6 +33,7 @@ module.exports = function(deployer) {
   deployer.link(ContentLib, CyberneticChat);
   deployer.link(CurrencyLib, CyberneticChat);
   deployer.link(PermissionLib, CyberneticChat);
+  deployer.link(GroupLib, CyberneticChat);
 
   deployer.deploy(CyberneticChat, "Cybernetic Chat Root", "text/plain", 18, 32, "0x671a2d8d519c51f1c33d5c05318f1f7bdbda8abd6d9cce2492d09bdebbe04551", 0);
 };

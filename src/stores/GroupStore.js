@@ -1,6 +1,8 @@
 import Group from '../models/Group'
 import PathParser from '../utils/PathParser';
 import Blockchain from '../blockchain/Blockchain';
+import CyberneticChat from '../blockchain/CyberneticChat';
+import PostStore from './PostStore';
 
 const ROOT_GROUP_NUMBER = 1;
 
@@ -33,7 +35,7 @@ export default class GroupStore {
         console.log("Successfully walked tree:", result);
         console.log("path walked", pathWalked);
         if (!parsedPath.isGroup) {
-          result.post = result.group.getPost(parsedPath.postNum);
+          result.post = PostStore.getPost(parsedPath.postNum);
         }
         resolve(result);
       }).catch((error) => {
@@ -68,7 +70,7 @@ export default class GroupStore {
       }
       var nextStep = pathToWalk.shift();
       console.log("nextStep:", nextStep);
-      currentGroup.postExists(nextStep).then((exists) => {
+      CyberneticChat.postExists(nextStep).then((exists) => {
         if (exists) {
           pathWalked.push(nextStep);
           let nextGroup = this.getGroup(nextStep);

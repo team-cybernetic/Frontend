@@ -2,6 +2,7 @@ import Ipfs from '../utils/Ipfs';
 import CyberneticChat from '../blockchain/CyberneticChat';
 import Blockchain from '../blockchain/Blockchain';
 import UserStore from '../stores/UserStore';
+import PostStore from '../stores/PostStore';
 import Post from './Post';
 import User from './User';
 import Wallet from '../models/Wallet'
@@ -17,24 +18,24 @@ export default class Group {
     this.userLeftListeners = [];
     this.tokensChangedListeners = [];
 
-    this.post = this.getPost(this.number);
+    this.post = PostStore.getPost(this.number);
     this.post.loadHeader().then(() => {
       this.parentNumber = this.post.getParentNumber(); //is this even needed?
     });
 
-    this.registerPostCreatedListener((error, result) => {
+    this.registerPostCreatedEventListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
           console.log("Group", this.number, "got a new post notification:", result.args);
           const postNumber = result.args.postNumber.toString();
           const userAddress = result.args.userAddress;
-          const post = this.getPost(postNumber, result.transactionHash);
-          this.firePostCreationListeners(post);
+          const post = PostStore.getPost(postNumber, result.transactionHash);
+          this.firePostCreatedListeners(post);
         }
       }
     });
-    this.registerUserJoinedListener((error, result) => {
+    this.registerUserJoinedEventListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
@@ -46,9 +47,10 @@ export default class Group {
         }
       }
     });
-    this.registerUserLeftListener((error, result) => {
+    this.registerUserLeftEventListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
+        console.log("Group", this.number, "UserLeft event:", result.args);
         if (parentNumber === this.number) {
           console.log("Group", this.number, "got a user left notification:", result.args);
           const addr = result.args.userAddress;
@@ -58,7 +60,7 @@ export default class Group {
         }
       }
     });
-    this.registerUserBalanceChangedListener((error, result) => {
+    this.registerUserBalanceChangedEventListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
@@ -88,7 +90,7 @@ export default class Group {
       }
     });
 
-    this.registerPostBalanceChangedListener((error, result) => {
+    this.registerPostBalanceChangedEventListener((error, result) => {
       //the post got some money from one of its peers
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
@@ -98,7 +100,7 @@ export default class Group {
           const amount = result.args.amount;
           const increased = result.args.increased;
 
-          const post = this.getPost(postNumber);
+          const post = PostStore.getPost(postNumber);
           if (increased) {
             post.populate({
               balance: post.getBalance().add(amount),
@@ -113,7 +115,7 @@ export default class Group {
       }
     });
 
-    this.registerPostTokensChangedListener((error, result) => {
+    this.registerPostTokensChangedEventListener((error, result) => {
       //the number of tokens issued to the children of this post has changed
       if (!error) {
         const postNumber = result.args.postNumber.toString();
@@ -145,7 +147,7 @@ export default class Group {
         const creationTime = moment().unix();
         Wallet.runTransactionAsync('createPost', 'create this post', this.number, title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, userPermissionsFlagsMode).then((transactionId) => {
           Blockchain.waitForPendingTransaction(transactionId).then((txid) => {
-            const post = this.getPost(undefined, txid);
+            const post = PostStore.getPost(undefined, txid);
             const userAddress = Wallet.getAccountAddress();
             post.populate({
               parentNumber: this.number,
@@ -158,7 +160,7 @@ export default class Group {
               creationTime,
               transactionId: txid,
             });
-            this.firePostCreationListeners(post);
+            this.firePostCreatedListeners(post);
             resolve(post);
           }).catch((error) => {
             reject(error);
@@ -176,53 +178,6 @@ export default class Group {
         reject(error);
       });
     });
-  }
-
-  getPost(id, txid) {
-    if (id) {
-      if (typeof(id) !== 'string') {
-        id = id.toString();
-      }
-      if (txid) {
-        //id and txid
-        if (!this.postCache[id]) {
-          if (this.postCache[txid]) {
-            this.postCache[id] = this.postCache[txid];
-            delete (this.postCache[txid]);
-          } else {
-            this.postCache[id] = new Post(this, { id, transactionId: txid });
-            this.postCache[id].load();
-            this.postCache[id].waitForConfirmation().catch((error) => {
-              delete (this.postCache[id]);
-            });
-          }
-        }
-        return (this.postCache[id]);
-      } else {
-        //id only
-        if (!this.postCache[id]) {
-          this.postCache[id] = new Post(this, { id });
-          this.postCache[id].load().catch((error) => {
-            delete (this.postCache[id]);
-          });
-        }
-        return (this.postCache[id]);
-      }
-    } else {
-      if (txid) {
-        //txid only
-        if (!this.postCache[txid]) {
-          this.postCache[txid] = new Post(this, { transactionId: txid });
-          this.postCache[txid].load().catch((error) => {
-            delete (this.postCache[txid]);
-          });
-        }
-        return (this.postCache[txid]);
-      } else {
-        //nothing
-        return (this.post);
-      }
-    }
   }
 
   getUserProperties(address) {
@@ -257,10 +212,6 @@ export default class Group {
     });
   }
 
-  loadPost(id) {
-    return (CyberneticChat.getPost(id));
-  }
-
   loadUserProperties(address) {
     return (CyberneticChat.getUserProperties(this.number, address));
   }
@@ -269,17 +220,17 @@ export default class Group {
     return (CyberneticChat.userExists(this.number, address));
   }
 
-  postExists(num) {
-    return (CyberneticChat.postExists(num));
+  getPost() {
+    return (this.post);
   }
 
-  loadChildren() {
+  loadSubposts() {
     return new Promise((resolve, reject) => {
-      CyberneticChat.getChildren(this.number).then((postIds) => {
+      CyberneticChat.getSubposts(this.number).then((postIds) => {
         let result = [];
         postIds.forEach((id) => {
           if (!id.equals(0)) {
-            result.push(this.getPost(id));
+            result.push(PostStore.getPost(id));
           }
         });
         resolve(result);
@@ -366,36 +317,41 @@ export default class Group {
 
   sendUserCurrency(address, amount, isPos) {
     return new Promise((resolve, reject) => {
-      const walletAddr = Wallet.getAccountAddress();
-      this.userExists(walletAddr).then((result) => {
-        if (result) {
-          this.userExists(address).then((result) => {
-            if (result) {
-              Wallet.runTransactionSync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((txid) => {
-                console.log("successfully sent", amount, "currency to", address, "txid:", txid);
-                resolve(true);
-              }).catch((error) => {
-                if (error.cancel) {
-                  console.log("Transaction cancelled by user");
-                } else {
-                  console.error("Error while executing transferTokensToUser contract function:", error);
-                }
-                reject(error);
-              });
-            } else {
-              console.log("user", address, "was not in group!");
-              resolve(false);
-            }
-          }).catch((error) => {
-            console.error("Error while checking if user", address, "is in group:", error);
-            reject(error);
-          });
-        } else {
-          console.log("self user", walletAddr, "was not in group!");
-          resolve(false);
-        }
+      this.post.loadHeader().then(() => {
+        const walletAddr = Wallet.getAccountAddress();
+        this.userExists(walletAddr).then((result) => {
+          if (result) {
+            this.userExists(address).then((result) => {
+              if (result) {
+                Wallet.runTransactionSync('transferTokensToUser', 'send currency', this.number, address, amount, isPos).then((txid) => {
+                  console.log("successfully sent", amount, "currency to", address, "txid:", txid);
+                  resolve(true);
+                }).catch((error) => {
+                  if (error.cancel) {
+                    console.log("Transaction cancelled by user");
+                  } else {
+                    console.error("Error while executing transferTokensToUser contract function:", error);
+                  }
+                  reject(error);
+                });
+              } else {
+                console.log("user", address, "was not in group!");
+                resolve(false);
+              }
+            }).catch((error) => {
+              console.error("Error while checking if user", address, "is in group:", error);
+              reject(error);
+            });
+          } else {
+            console.log("self user", walletAddr, "was not in group!");
+            resolve(false);
+          }
+        }).catch((error) => {
+          console.error("Error while checking if self user is in group:", error);
+          reject(error);
+        });
       }).catch((error) => {
-        console.error("Error while checking if self user is in group:", error);
+        console.error("Error while sending currency to user", address, ": group failed to load self post:", this.post, ":", error);
         reject(error);
       });
     });
@@ -403,82 +359,87 @@ export default class Group {
 
   sendPostCurrency(postNumber, amount, isPos) {
     return new Promise((resolve, reject) => {
-      const walletAddr = Wallet.getAccountAddress();
-      this.userExists(walletAddr).then((result) => {
-        if (result) {
-          this.postExists(postNumber).then((result) => {
-            if (result) {
-              Wallet.runTransactionSync('transferTokensToPost', 'send currency to post #' + postNumber, this.number, postNumber, amount, isPos).then((txid) => {
-                console.log("successfully sent", amount, "currency to post #", postNumber, ", txid:", txid);
-                resolve(true);
-              }).catch((error) => {
-                if (error.cancel) {
-                  console.log("Transaction cancelled by user");
-                } else {
-                  console.error("Error while executing transferTokensToUser contract function:", error);
-                }
-                reject(error);
-              });
-            } else {
-              console.log("post", postNumber, "does not exist!");
-              resolve(false);
-            }
-          }).catch((error) => {
-            console.error("Error while checking if post", postNumber, "exists:", error);
-            reject(error);
-          });
-        } else {
-          console.log("self user", walletAddr, "was not in group!");
-          resolve(false);
-        }
+      this.post.loadHeader().then(() => {
+        const walletAddr = Wallet.getAccountAddress();
+        this.userExists(walletAddr).then((result) => {
+          if (result) {
+            CyberneticChat.postExists(postNumber).then((result) => {
+              if (result) {
+                Wallet.runTransactionSync('transferTokensToPost', 'send currency to post #' + postNumber, this.number, postNumber, amount, isPos).then((txid) => {
+                  console.log("successfully sent", amount, "currency to post #", postNumber, ", txid:", txid);
+                  resolve(true);
+                }).catch((error) => {
+                  if (error.cancel) {
+                    console.log("Transaction cancelled by user");
+                  } else {
+                    console.error("Error while executing transferTokensToUser contract function:", error);
+                  }
+                  reject(error);
+                });
+              } else {
+                console.log("post", postNumber, "does not exist!");
+                resolve(false);
+              }
+            }).catch((error) => {
+              console.error("Error while checking if post", postNumber, "exists:", error);
+              reject(error);
+            });
+          } else {
+            console.log("self user", walletAddr, "was not in group!");
+            resolve(false);
+          }
+        }).catch((error) => {
+          console.error("Error while checking if self user is in group:", error);
+          reject(error);
+        });
       }).catch((error) => {
-        console.error("Error while checking if self user is in group:", error);
+        console.error("Error while sending currency to post", postNumber, ": group failed to load self post:", this.post, ":", error);
         reject(error);
       });
     });
   }
 
-  registerPostCreatedListener(callback) {
-    return (CyberneticChat.registerPostCreatedListener(callback));
+  registerPostCreatedEventListener(callback) {
+    return (CyberneticChat.registerPostCreatedEventListener(callback));
   }
 
-  registerUserJoinedListener(callback) {
-    return (CyberneticChat.registerUserJoinedListener(callback));
+  registerUserJoinedEventListener(callback) {
+    return (CyberneticChat.registerUserJoinedEventListener(callback));
   }
 
-  registerUserLeftListener(callback) {
-    return (CyberneticChat.registerUserLeftListener(callback));
+  registerUserLeftEventListener(callback) {
+    return (CyberneticChat.registerUserLeftEventListener(callback));
   }
 
-  registerUserBalanceChangedListener(callback) {
-    return (CyberneticChat.registerUserBalanceChangedListener(callback));
+  registerUserBalanceChangedEventListener(callback) {
+    return (CyberneticChat.registerUserBalanceChangedEventListener(callback));
   }
 
-  registerPostBalanceChangedListener(callback) {
-    return (CyberneticChat.registerPostBalanceChangedListener(callback));
+  registerPostBalanceChangedEventListener(callback) {
+    return (CyberneticChat.registerPostBalanceChangedEventListener(callback));
   }
 
-  registerPostTokensChangedListener(callback) {
-    return (CyberneticChat.registerPostTokensChangedListener(callback));
+  registerPostTokensChangedEventListener(callback) {
+    return (CyberneticChat.registerPostTokensChangedEventListener(callback));
   }
+
 
   registerEventListener(eventName, callback) {
     return (CyberneticChat.registerEventListener(eventName, callback));
   }
 
-
   unregisterEventListener(handle) {
     return (CyberneticChat.unregisterEventListener(handle));
   }
 
-  registerPostCreationListener(callback) {
+  registerPostCreatedListener(callback) {
     this.postCreatedListeners.push(callback);
     return ({
       num: this.postCreatedListeners.length,
     });
   }
 
-  unregisterPostCreationListener(handle) {
+  unregisterPostCreatedListener(handle) {
     if (handle) {
       let {num} = handle;
       if (this.postCreatedListeners) {
@@ -487,7 +448,7 @@ export default class Group {
     }
   }
 
-  firePostCreationListeners(post) {
+  firePostCreatedListeners(post) {
     this.postCreatedListeners.forEach((listener, idx) => {
       listener(post);
     });
