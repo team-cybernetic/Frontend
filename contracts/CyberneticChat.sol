@@ -6,6 +6,7 @@ import "./PostLib.sol";
 import "./UserLib.sol";
 import "./PermissionLib.sol";
 import "./StateLib.sol";
+import "./GroupLib.sol";
 
 contract CyberneticChat {
 
@@ -102,12 +103,17 @@ contract CyberneticChat {
     PostLib.createPost(
       state,
       1, //it will be post number 1, with parent number 1
-      title,
-      mimeType,
-      ipfsHashFunction,
-      ipfsHashLength,
-      ipfsHash,
-      creationTime,
+      ContentLib.Content({
+        title: title,
+        mimeType: mimeType,
+        multihash: ContentLib.IpfsMultihash({
+          hashFunction: ipfsHashFunction,
+          hashLength: ipfsHashLength,
+          hash: ipfsHash
+        }),
+        creator: msg.sender,
+        creationTime: creationTime
+      }),
       true //flags mode
     );
     state.main.initialized = true;
@@ -143,13 +149,13 @@ contract CyberneticChat {
       post.contents.creator,
       post.contents.creationTime,
       post.balance,
-      post.tokens,
+      post.group.tokens,
       post.permissions
     );
   }
 
-  function getChildren(uint256 num) constant public returns (uint256[]) {
-    return (PostLib.getChildren(state, num));
+  function getSubposts(uint256 num) constant public returns (uint256[]) {
+    return (GroupLib.getSubposts(state, GroupLib.getGroup(state, num)));
   }
 
   function createPost(
@@ -167,31 +173,36 @@ contract CyberneticChat {
     return (PostLib.createPost(
       state,
       parentNum,
-      title,
-      mimeType,
-      ipfsHashFunction,
-      ipfsHashLength,
-      ipfsHash,
-      creationTime,
+      ContentLib.Content({
+        title: title,
+        mimeType: mimeType,
+        multihash: ContentLib.IpfsMultihash({
+          hashFunction: ipfsHashFunction,
+          hashLength: ipfsHashLength,
+          hash: ipfsHash
+        }),
+        creator: msg.sender,
+        creationTime: creationTime
+      }),
       userPermissionsFlagsMode
     ));
   }
 
   function userExists(uint256 parentNum, address addr) constant public returns (bool) {
-    return (UserLib.userExists(state, parentNum, addr));
+    return (GroupLib.userExists(state, GroupLib.getGroup(state, parentNum), addr));
   }
 
   function joinGroup(uint256 parentNum) public returns (bool) {
     //TODO: payable
-    UserLib.join(state, parentNum);
+    GroupLib.joinGroup(state, GroupLib.getGroup(state, parentNum));
   }
 
   function leaveGroup(uint256 parentNum) public returns (bool) { 
-    UserLib.leave(state, parentNum);
+    GroupLib.leaveGroup(state, GroupLib.getGroup(state, parentNum));
   }
 
   function getUsers(uint256 parentNum) constant public returns (address[]) {
-    return (UserLib.getUsers(state, parentNum));
+    return (GroupLib.getUsers(state, GroupLib.getGroup(state, parentNum)));
   }
 
   function userProfileExists(address userAddress) constant public returns (bool) {
@@ -223,17 +234,21 @@ contract CyberneticChat {
     uint8 ipfsHashFunction,
     uint8 ipfsHashLength,
     bytes ipfsHash
-  ) public {
-    UserLib.setProfile(
+  ) public returns (bool) {
+    return (UserLib.setProfile(
       state,
-      msg.sender,
-      nickname,
-      profileMimeType,
-      ipfsHashFunction,
-      ipfsHashLength,
-      ipfsHash,
-      block.timestamp
-    );
+      ContentLib.Content({
+        title: nickname,
+        mimeType: profileMimeType,
+        multihash: ContentLib.IpfsMultihash({
+          hashFunction: ipfsHashFunction,
+          hashLength: ipfsHashLength,
+          hash: ipfsHash
+        }),
+        creator: msg.sender,
+        creationTime: block.timestamp
+      })
+    ));
   }
 
   function getUserProperties(uint256 parentNum, address userAddress) constant public returns (
@@ -245,7 +260,7 @@ contract CyberneticChat {
     bool banned,
     string banReason
   ) {
-    var user = UserLib.getUserRaw(state, parentNum, userAddress);
+    var user = GroupLib.getUserPropertiesRaw(state, GroupLib.getGroup(state, parentNum), userAddress);
     return (
       parentNum,
       user.joinTime,
@@ -258,11 +273,11 @@ contract CyberneticChat {
   }
 
   function transferTokensToUser(uint256 parentNum, address userAddress, uint256 amount, bool increase) public {
-    CurrencyLib.transferTokensToUser(state, PostLib.getPost(state, parentNum), userAddress, amount, increase);
+    CurrencyLib.transferTokensToUser(state, GroupLib.getGroup(state, parentNum), userAddress, amount, increase);
   }
 
   function transferTokensToPost(uint256 parentNum, uint256 num, uint256 amount, bool increase) public {
-    CurrencyLib.transferTokensToPost(state, PostLib.getPost(state, parentNum), PostLib.getPost(state, num), amount, increase);
+    CurrencyLib.transferTokensToPost(state, GroupLib.getGroup(state, parentNum), PostLib.getPost(state, num), amount, increase);
   }
 }
 

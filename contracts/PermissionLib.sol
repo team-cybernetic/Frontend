@@ -3,6 +3,7 @@ pragma solidity ^0.4.11;
 import "./UserLib.sol";
 import "./PostLib.sol";
 import "./StateLib.sol";
+import "./GroupLib.sol";
 
 library PermissionLib {
 
@@ -49,20 +50,19 @@ library PermissionLib {
     Group_permissions_edit    //user wants to edit the assignable permissions of the group
   }
 
-  function isPermitted(StateLib.State storage state, uint256 parentNum, int256 permissions, Action action) constant public returns (bool) {
-    var p = PostLib.getPost(state, parentNum);
-    if (!p.userPermissionsFlagsMode) {
-      permissions = p.userPermissions[permissions]; //user.permissions just maps to some flags
+  function isPermitted(StateLib.State storage state, GroupLib.Group storage group, int256 permissions, Action action) constant public returns (bool) {
+    if (!group.userPermissionsFlagsMode) {
+      permissions = group.userPermissions[permissions]; //user.permissions just maps to some flags
     }
     require(uint256(action) < 256);
     return ((uint256(permissions) & (uint256(1) << uint256(action))) != 0);
   }
 
-  function userJoin(StateLib.State storage state, uint256 parentNum, address userAddress) public returns (bool) {
-    var u = UserLib.getUserRaw(state, parentNum, userAddress);
+  function userJoin(StateLib.State storage state, GroupLib.Group storage group, address userAddress) public returns (bool) {
+    var u = GroupLib.getUserPropertiesRaw(state, group, userAddress);
     if (u.banned) {
       UserJoinDenied(
-        parentNum,
+        group.parentNum,
         userAddress,
         (bytes(u.banReason).length != 0) ?
           u.banReason
@@ -74,10 +74,10 @@ library PermissionLib {
     return (true);
   }
 
-  function createPost(StateLib.State storage state, uint256 parentNum, address userAddress) public returns (bool) {
-    var u = UserLib.getUser(state, parentNum, userAddress);
-    if (!isPermitted(state, parentNum, u.permissions, Action.Post_create)) {
-      PostCreationDenied(parentNum, userAddress, "User is muted");
+  function createPost(StateLib.State storage state, GroupLib.Group storage group, address userAddress) public returns (bool) {
+    var u = GroupLib.getUserProperties(state, group, userAddress);
+    if (!isPermitted(state, group, u.permissions, Action.Post_create)) {
+      PostCreationDenied(group.parentNum, userAddress, "User is not allowed to post");
       return (false);
     }
     return (true);

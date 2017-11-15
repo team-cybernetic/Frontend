@@ -25,39 +25,31 @@ library ContentLib {
     uint256 creationTime;
   }
 
-  function contentCheck(
-//    StateLib.State storage state,
-    string title,
-    string mimeType,
-    uint8 ipfsHashFunction,
-    uint8 ipfsHashLength,
-    bytes ipfsHash,
-    uint256 creationTime
-  ) public view returns (
+  function contentCheck(Content content) internal view returns (
     bool checkPassed,
-    uint256 _creationTime
+    uint256 creationTime
   ) {
 
     //        require(ipfsHashLength != 0); //permit content-less posts TODO: ruleset
     checkPassed = false;
-    _creationTime = 0;
+    creationTime = 0;
 
-    if (bytes(title).length > 2048) //arbitrary, but pretty close to the gas limit to store 64, 32 byte string segments at 5000 gas per segment
+    if (bytes(content.title).length > 2048) //arbitrary, but pretty close to the gas limit to store 64, 32 byte string segments at 5000 gas per segment
       return;
 
-    if (ipfsHashLength != ipfsHash.length)
+    if (content.multihash.hashLength != content.multihash.hash.length)
       return;
 
     //check if ipfs hash length matches expected size for hash function (function 0x12 should always be 0x20 bytes long) TODO: find out the other (multihash, size) tuples
-    if (ipfsHashLength != 0) {
-      if (ipfsHashFunction == 0x12) {
-        require(ipfsHashLength == 0x20);
+    if (content.multihash.hashLength != 0) {
+      if (content.multihash.hashFunction == 0x12) {
+        require(content.multihash.hashLength == 0x20);
       }
     }
 
-    uint256 ctLen = bytes(mimeType).length;
+    uint256 ctLen = bytes(content.mimeType).length;
 
-    if (ipfsHashLength > 0) { //if there's no content, don't bother checking if there's a content type given
+    if (content.multihash.hashLength > 0) { //if there's no content, don't bother checking if there's a content type given
       if (ctLen == 0)
         return;
     }
@@ -66,10 +58,10 @@ library ContentLib {
     if (ctLen > 255)
       return;
 
-    if (creationTime > block.timestamp || creationTime <= (block.timestamp - 1 hours)) { //TODO: moving average across all posts in the last hour?
-      _creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
+    if (content.creationTime > block.timestamp || content.creationTime <= (block.timestamp - 1 hours)) { //TODO: moving average across all posts in the last hour?
+      creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block
     } else {
-      _creationTime = creationTime;
+      creationTime = content.creationTime;
     }
     checkPassed = true;
   }

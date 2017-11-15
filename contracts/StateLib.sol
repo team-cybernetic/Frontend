@@ -5,6 +5,7 @@ import "./UserLib.sol";
 import "./PostLib.sol";
 import "./CurrencyLib.sol";
 import "./PermissionLib.sol";
+import "./GroupLib.sol";
 
 library StateLib {
 
@@ -20,5 +21,6 @@ library StateLib {
     UserLib.State userLib;
     PermissionLib.State permissionLib;
     CurrencyLib.State currencyLib;
+    GroupLib.State groupLib;
   }
 }
