@@ -1,6 +1,6 @@
 import CyberneticChat from '../blockchain/CyberneticChat';
 
-const GAS_MULTIPLIER = 2.0; //this ensures the calculated gas amount will actually work
+const GAS_MULTIPLIER = 2.5; //this ensures the calculated gas amount will actually work
 
 export default class GasEstimator {
   static web3 = null;

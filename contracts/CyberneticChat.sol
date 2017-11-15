@@ -38,6 +38,7 @@ contract CyberneticChat {
     bool increased
   );
 
+
   event UserProfileChanged(
     address indexed userAddress,
     string nickname,
@@ -160,7 +161,9 @@ contract CyberneticChat {
     bytes ipfsHash,
     uint256 creationTime,
     bool userPermissionsFlagsMode
-  ) public returns (uint256 newPostNum) {
+  ) public returns (
+    uint256 newPostNum
+  ) {
     return (PostLib.createPost(
       state,
       parentNum,

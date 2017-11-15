@@ -60,7 +60,7 @@ library UserLib {
   }
 
   struct State {
-    uint256 count;
+//    uint256 count;
 //    mapping (uint256 => mapping (address => User)) byAddress; //maps ethereum address (public key) to user objects
 //    mapping (uint256 => address[]) addresses;
   }
@@ -98,15 +98,19 @@ library UserLib {
     bytes ipfsHash,
     uint256 updateTime
   ) private view returns (
+    bool checksPassed,
     uint256 _updateTime
   ) {
+
+    checksPassed = false;
+    _updateTime = 0;
 
     require(userAddress != 0x0);
     //TODO: check nickname length via global ruleset
     //TODO: UTF-8 length != bytes().length
-    require(bytes(nickname).length <= 64);
+    if (bytes(nickname).length > 64)
+      return;
 
-    bool checksPassed;
     (checksPassed, _updateTime) = ContentLib.contentCheck(
 //      state,
       nickname,
@@ -116,7 +120,6 @@ library UserLib {
       ipfsHash,
       updateTime
     );
-    require(checksPassed);
   }
 
   function setProfile(
@@ -128,8 +131,10 @@ library UserLib {
     uint8 ipfsHashLength,
     bytes ipfsHash,
     uint256 updateTime
-  ) public {
-    (updateTime) = setProfileChecks(
+  ) public returns (
+    bool checksPassed
+  ) {
+    (checksPassed, updateTime) = setProfileChecks(
 //      state,
       userAddress,
       nickname,
@@ -139,6 +144,9 @@ library UserLib {
       ipfsHash,
       updateTime
     );
+
+    if (!checksPassed)
+      return;
 
     state.main.userProfiles[userAddress] = ContentLib.Content({
       title: nickname,
@@ -155,24 +163,24 @@ library UserLib {
   }
 
   function getUsers(StateLib.State storage state, uint256 parentNum) constant internal returns (address[]) {
-    var p = PostLib.getPost(state, parentNum);
-    return (p.userAddresses);
+    return (PostLib.getPost(state, parentNum).userAddresses);
   }
 
   function join(StateLib.State storage state, uint256 parentNum) public {
-    require(!userExists(state, parentNum, msg.sender));
+    if (userExists(state, parentNum, msg.sender)) {
+      return;
+    }
 
     if (state.main.initialized) {
-      if (!PermissionLib.userJoin(state, parentNum, msg.sender)) {
-        //UserJoinDenied event emitted by permissionlib
+      if (!PermissionLib.userJoin(state, parentNum, msg.sender))
         return;
-      }
+        //UserJoinDenied event emitted by permissionlib
     }
 
     var p = PostLib.getPost(state, parentNum);
 
     if (p.userAddressesMap[msg.sender] == 0) { //user has never been in the group before
-      state.userLib.count++;
+//      state.userLib.count++;
       p.users[msg.sender] = User({
         parentNum: parentNum,
         addr: msg.sender,
@@ -186,9 +194,8 @@ library UserLib {
 
       p.userAddresses.push(msg.sender);
       p.userAddressesMap[msg.sender] = p.userAddresses.length;
-    } else { //user has been in the group before, just restore the profile
+    } else { //user has been in the group before, just restore the user
       p.users[msg.sender].joined = true;
-      //p.users[msg.sender].parentNum = parentNum;
       p.userAddresses[p.userAddressesMap[msg.sender] - 1] = msg.sender;
     }
 
@@ -197,16 +204,18 @@ library UserLib {
 
   function removeUser(StateLib.State storage state, uint256 parentNum, address userAddress) internal {
     var p = PostLib.getPost(state, parentNum);
-    if (p.userAddressesMap[msg.sender] != 0) { //user has been in the group before
-      p.users[userAddress].joined = false;
-      p.userAddresses[p.userAddressesMap[userAddress] - 1] = address(0x0);
-      UserLeft(parentNum, userAddress);
-    }
+    if (p.userAddressesMap[msg.sender] == 0) //user has never been in the group before
+      return;
+    p.users[userAddress].joined = false;
+    p.userAddresses[p.userAddressesMap[userAddress] - 1] = address(0x0);
+    UserLeft(parentNum, userAddress);
   }
 
   //apparently this function MUST be internal, otherwise joined=false in removeUser throws invalild opcode??
   function leave(StateLib.State storage state, uint256 parentNum) internal { 
-    require(userExists(state, parentNum, msg.sender));
+    if (!userExists(state, parentNum, msg.sender)) {
+      return;
+    }
 
     //TODO: send the user their ether, based on ruleset
     removeUser(state, parentNum, msg.sender);

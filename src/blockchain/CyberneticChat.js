@@ -1,12 +1,23 @@
 import Blockchain from './Blockchain';
 
-const EVENT_POST_CREATED = 'PostCreated';
-const EVENT_USER_JOINED = 'UserJoined';
-const EVENT_USER_LEFT = 'UserLeft';
-const EVENT_USER_PROFILE_CHANGED = 'UserProfileChanged';
-const EVENT_USER_BALANCE_CHANGED = 'UserBalanceChanged';
-const EVENT_POST_BALANCE_CHANGED = 'PostBalanceChanged';
-const EVENT_POST_TOKENS_CHANGED = 'PostTokensChanged';
+const EVENTS = [
+  'PostCreated',
+  'PostLocked',
+  'PostUnlocked',
+  'PostBalanceChanged',
+  'PostTokensChanged',
+
+  'UserProfileChanged',
+  'UserJoined',
+  'UserLeft',
+  'UserKicked',
+  'UserBanned',
+  'UserMuted',
+  'UserBalanceChanged',
+
+  'UserJoinDenied',
+  'PostCreationDenied',
+];
 
 export default class CyberneticChat {
   static eventListeners = [[]];
@@ -23,38 +34,20 @@ export default class CyberneticChat {
           console.log("nextblock actual: ", result);
           if (!error && result.number === (currentBlock + 1)) {
             Blockchain.unregisterLatestBlockListener(this.nextBlockListener);
-            this.watchForEvent(EVENT_POST_CREATED, {}, (error, response) => {
-              console.log("EVENT: Post created! response:", response);
-              this.fireEventListener(EVENT_POST_CREATED, error, response);
+            EVENTS.forEach((eventName) => {
+              this.watchForEvent(eventName, {}, (error, response) => {
+                console.log("EVENT: ", eventName, "! response:", response, "args:", response.args);
+                this.fireEventListener(eventName, error, response);
+              });
             });
-            this.watchForEvent(EVENT_USER_JOINED, {}, (error, response) => {
-              console.log("EVENT: User joined! response:", response);
-              this.fireEventListener(EVENT_USER_JOINED, error, response);
-            });
-            this.watchForEvent(EVENT_USER_LEFT, {}, (error, response) => {
-              console.log("EVENT: User left! response:", response);
-              this.fireEventListener(EVENT_USER_LEFT, error, response);
-            });
-            this.watchForEvent(EVENT_USER_PROFILE_CHANGED, {}, (error, response) => {
-              console.log("EVENT: User profile changed! response:", response);
-              this.fireEventListener(EVENT_USER_PROFILE_CHANGED, error, response);
-            });
-            this.watchForEvent(EVENT_USER_BALANCE_CHANGED, {}, (error, response) => {
-              console.log("EVENT: User balance changed! response:", response);
-              this.fireEventListener(EVENT_USER_BALANCE_CHANGED, error, response);
-            });
-            this.watchForEvent(EVENT_POST_BALANCE_CHANGED, {}, (error, response) => {
-              console.log("EVENT: Post balance changed! response:", response);
-              this.fireEventListener(EVENT_POST_BALANCE_CHANGED, error, response);
-            });
-            this.watchForEvent(EVENT_POST_TOKENS_CHANGED, {}, (error, response) => {
-              console.log("EVENT: Post tokens changed! response:", response);
-              this.fireEventListener(EVENT_POST_TOKENS_CHANGED, error, response);
-            });
-
           }
         });
       });
+    });
+    EVENTS.forEach((eventName) => {
+      CyberneticChat['register' + eventName + 'Listener'] = (callback) => {
+        return (this.registerEventListener(eventName, callback));
+      };
     });
   }
 
@@ -114,34 +107,6 @@ export default class CyberneticChat {
       eventName,
       num: this.eventListeners[eventName].length,
     });
-  }
-
-  static registerPostCreatedEventListener(callback) {
-    return (this.registerEventListener(EVENT_POST_CREATED, callback));
-  }
-
-  static registerUserJoinedEventListener(callback) {
-    return (this.registerEventListener(EVENT_USER_JOINED, callback));
-  }
-
-  static registerUserLeftEventListener(callback) {
-    return (this.registerEventListener(EVENT_USER_LEFT, callback));
-  }
-
-  static registerUserProfileChangedListener(callback) {
-    return (this.registerEventListener(EVENT_USER_PROFILE_CHANGED, callback));
-  }
-
-  static registerUserBalanceChangedListener(callback) {
-    return (this.registerEventListener(EVENT_USER_BALANCE_CHANGED, callback));
-  }
-
-  static registerPostBalanceChangedListener(callback) {
-    return (this.registerEventListener(EVENT_POST_BALANCE_CHANGED, callback));
-  }
-
-  static registerPostTokensChangedListener(callback) {
-    return (this.registerEventListener(EVENT_POST_TOKENS_CHANGED, callback));
   }
 
   static fireEventListener(eventName, error, response) {

@@ -22,7 +22,7 @@ export default class Group {
       this.parentNumber = this.post.getParentNumber(); //is this even needed?
     });
 
-    this.registerPostCreatedEventListener((error, result) => {
+    this.registerPostCreatedListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
@@ -34,7 +34,7 @@ export default class Group {
         }
       }
     });
-    this.registerUserJoinedEventListener((error, result) => {
+    this.registerUserJoinedListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
@@ -46,7 +46,7 @@ export default class Group {
         }
       }
     });
-    this.registerUserLeftEventListener((error, result) => {
+    this.registerUserLeftListener((error, result) => {
       if (!error) {
         const parentNumber = result.args.parentNumber.toString();
         if (parentNumber === this.number) {
@@ -438,16 +438,16 @@ export default class Group {
     });
   }
 
-  registerPostCreatedEventListener(callback) {
-    return (CyberneticChat.registerPostCreatedEventListener(callback));
+  registerPostCreatedListener(callback) {
+    return (CyberneticChat.registerPostCreatedListener(callback));
   }
 
-  registerUserJoinedEventListener(callback) {
-    return (CyberneticChat.registerUserJoinedEventListener(callback));
+  registerUserJoinedListener(callback) {
+    return (CyberneticChat.registerUserJoinedListener(callback));
   }
 
-  registerUserLeftEventListener(callback) {
-    return (CyberneticChat.registerUserLeftEventListener(callback));
+  registerUserLeftListener(callback) {
+    return (CyberneticChat.registerUserLeftListener(callback));
   }
 
   registerUserBalanceChangedListener(callback) {

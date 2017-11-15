@@ -104,20 +104,26 @@ library PostLib {
     bytes ipfsHash,
     uint256 creationTime
   ) private returns (
+    bool checksPassed,
     uint256 _creationTime
   ) {
+    checksPassed = false;
+    _creationTime = 0;
     if (state.main.initialized) { //if the contract hasn't been fully deployed yet (I.E. it's being deployed right now, in this call), the original creator won't even have permissions to create the first post, so just skip these checks
-      require(PermissionLib.createPost(state, parentNum, msg.sender));
-      require(postExists(state, parentNum));
+      if (!postExists(state, parentNum))
+        return;
+      //TODO: ruleset? creating a post (could) auto-join to group
+      if (!PermissionLib.createPost(state, parentNum, msg.sender))
+        return;
     }
 
     //require(!PermissionLib.postLocked(parentNum)); //TODO: self.byNumber[parentNum].locked ??
 
     //TODO: check title length via group's ruleset
     //TODO: UTF-8 length != bytes().length
-    require(bytes(title).length <= 255);
+    if (bytes(title).length > 255)
+      return;
 
-    bool checksPassed;
     (checksPassed, _creationTime) = ContentLib.contentCheck(
 //      state,
       title,
@@ -127,7 +133,6 @@ library PostLib {
       ipfsHash,
       creationTime
     );
-    require(checksPassed);
   }
 
   function createPost(
@@ -140,9 +145,14 @@ library PostLib {
     bytes ipfsHash,
     uint256 creationTime,
     bool userPermissionsFlagsMode
-  ) public returns (uint256) {
+  ) public returns (
+    uint256 newNum
+  ) {
 
-    (creationTime) = createPostChecks(
+    newNum = 0;
+    bool checksPassed;
+
+    (checksPassed, creationTime) = createPostChecks(
       state,
       parentNum,
       title,
@@ -152,11 +162,11 @@ library PostLib {
       ipfsHash,
       creationTime
     );
+    if (!checksPassed)
+      return;
 
 
-    state.postLib.count++;
-
-    uint256 newNum = state.postLib.count;
+    newNum = ++state.postLib.count;
 
     addPost(
       state,
@@ -196,7 +206,5 @@ library PostLib {
 
 
     PostCreated(parentNum, newNum, msg.sender);
-
-    return (newNum);
   }
 }

@@ -26,7 +26,7 @@ export default class Wallet {
       this.defaultGasPrice = price * 1;
     });
     this.web3.eth.getAccounts((error, accounts) => {
-      this.web3.eth.defaultAccount = accounts[1];
+      this.web3.eth.defaultAccount = accounts[0];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
         this.balance = balance;
         this.fireBalanceUpdateListeners(-1, balance);
@@ -65,7 +65,9 @@ export default class Wallet {
       }).catch((error) => {
         this.etherToUsdConversionFailures++;
         if (this.etherToUsdConversionFailures < this.etherToUsdConversionMaxFailures) {
-          this.fetchEthUsdPrice().then(resolve).catch(reject);
+          setTimeout(() => {
+            this.fetchEthUsdPrice().then(resolve).catch(reject);
+          }, 3000);
         } else {
           reject(error);
         }
@@ -81,7 +83,9 @@ export default class Wallet {
       }).catch((error) => {
         this.etherConfirmationSpeedsFailures++;
         if (this.etherConfirmationSpeedsFailures < this.etherConfirmationSpeedsMaxFailures) {
-          this.fetchEthConfirmationSpeeds().then(resolve).catch(reject);
+          setTimeout(() => {
+            this.fetchEthConfirmationSpeeds().then(resolve).catch(reject);
+          }, 3000);
         } else {
           reject(error);
         }
@@ -104,8 +108,8 @@ export default class Wallet {
             resolve({ gas, gasPrice: this.defaultGasPrice });
           }
         }).catch((error) => {
-          //reject(error);
-          resolve({ gas: 4000000, gasPrice: 1 }); //TODO: remove this
+          reject(error);
+          //resolve({ gas: 4000000, gasPrice: 1 }); //TODO: remove this
         });
       }).then(({gas, gasPrice}) => {
         const options = { gas, gasPrice, from: this.getAccountAddress() };

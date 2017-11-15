@@ -9,6 +9,9 @@
 # production build
 /production
 
+#temporary build files
+/build
+
 # misc
 .DS_Store
 .env.local
