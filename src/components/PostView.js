@@ -51,7 +51,14 @@ export default class PostView extends Component {
               </div>
 
               <UpDownVoter
-                getBalance={() => this.props.post.balance.toString() }
+                getBalance={() => {
+                  return (
+                    this.props.sidebar ?
+                      this.props.post.getTokens().toString()
+                    :
+                      this.props.post.getBalance().toString()
+                  );
+                }}
                 send={this.sendTip.bind(this)}
               />
             </div>
@@ -159,8 +166,13 @@ export default class PostView extends Component {
   }
 
   sendTip(amount, isPos) {
-    this.state.parentGroup.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
-      console.log("successfully " + (isPos ? "up" : "down") + "voted post #" + this.props.post.id + " by " + amount + "!");
+    let targetGroup = this.state.parentGroup;
+    if (this.props.sidebar) {
+      targetGroup = this.props.group;
+    }
+    console.log("Target group to send currency to:", targetGroup);
+    targetGroup.sendPostCurrency(this.props.post.id, amount, isPos).then(() => {
+      console.log("successfully " + (isPos ? "up" : "down") + "voted post #" + this.props.post.id + " in group " + targetGroup.getNumber() + " by " + amount + "!");
     }).catch((error) => {
       console.error("failed to send currency:", error);
     });

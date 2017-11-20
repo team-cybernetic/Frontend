@@ -5,8 +5,7 @@ import CyberneticChat from '../blockchain/CyberneticChat';
 import GroupStore from '../stores/GroupStore';
 
 export default class Post {
-  constructor(group, post) {
-    this.group = group;
+  constructor(post) {
     this.contentLoadListeners = [];
     this.headerLoadListeners = [];
     this.confirmationListeners = [];
@@ -69,7 +68,7 @@ export default class Post {
   }
 
   getGroup() {
-    return (this.group);
+    return (GroupStore.getGroup(this.id));
   }
 
   /**

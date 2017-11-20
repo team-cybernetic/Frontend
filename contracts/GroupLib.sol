@@ -35,6 +35,17 @@ library GroupLib {
     address indexed mutingUserAddress
   );
 
+  event Debug(
+    uint256 indexed major,
+    uint256 indexed minor,
+    uint256 indexed micro,
+    string message,
+    uint256 dat1,
+    uint256 dat2
+  );
+
+
+
   struct State {
     mapping (uint256 => address[]) userAddressesBacking;
     mapping (uint256 => uint256[]) subpostsBacking;
@@ -88,7 +99,7 @@ library GroupLib {
     return (group.userAddresses);
   }
 
-  function joinGroup(StateLib.State storage state, Group storage group) public {
+  function joinGroup(StateLib.State storage state, Group storage group) internal {
     if (userExists(state, group, msg.sender)) {
       return;
     }
@@ -102,7 +113,7 @@ library GroupLib {
     if (group.userAddressesMap[msg.sender] == 0) { //user has never been in the group before
       group.userCount++;
       group.users[msg.sender] = UserLib.User({
-        parentNum: group.parentNum,
+        parentNum: group.number,
         number: group.userCount,
         addr: msg.sender,
         balance: 0, //TODO: ruleset

@@ -26,7 +26,7 @@ export default class Wallet {
       this.defaultGasPrice = price * 1;
     });
     this.web3.eth.getAccounts((error, accounts) => {
-      this.web3.eth.defaultAccount = accounts[1];
+      this.web3.eth.defaultAccount = accounts[2];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
         this.balance = balance;
         this.fireBalanceUpdateListeners(-1, balance);
@@ -100,7 +100,6 @@ export default class Wallet {
         //TODO: pre-call transaction to see if it will even succeeed
         GasEstimator.estimate(methodName, ...args).then((gas) => {
           if (!this.managedWeb3 && description) {
-            console.log("Gas estimator estimates that this transaction will require", gas, "gas");
             TransactionConfirmationModal.show(gas, description, (gasPrice) => {
               resolve({ gas, gasPrice });
             }, reject);

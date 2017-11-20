@@ -24,8 +24,8 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058202f56d26880d206451d436540a28f21d6f2dc92e0d98c2caff9892761f43a510b0029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058202f56d26880d206451d436540a28f21d6f2dc92e0d98c2caff9892761f43a510b0029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a7230582096b5adb8e125f7efb821633ed90cba17198df91fd89984ddf7ef77c156e0e8230029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a7230582096b5adb8e125f7efb821633ed90cba17198df91fd89984ddf7ef77c156e0e8230029",
   "sourceMap": "161:2055:8:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "161:2055:8:-;;;;;",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./ContentLib.sol\";\nimport \"./CurrencyLib.sol\";\nimport \"./PostLib.sol\";\nimport \"./PermissionLib.sol\";\nimport \"./StateLib.sol\";\n\nlibrary UserLib {\n\n  using UserLib for State;\n  using PostLib for PostLib.State;\n  using CurrencyLib for CurrencyLib.State;\n  using PermissionLib for PermissionLib.State;\n\n  event UserProfileChanged(\n    address indexed userAddress,\n    string nickname,\n    uint256 timestamp\n  );\n\n  struct User {\n    address addr;\n    uint256 number;\n    uint256 parentNum;\n    uint256 joinTime;\n    uint256 balance;\n    int256 permissions; //permission level of user, permit negatives for banned/muted/etc type users, also use largest type to permit flags instead of linear values\n    bool joined;\n    bool banned;\n    string banReason;\n  }\n\n  struct State {\n//    uint256 count;\n//    mapping (uint256 => mapping (address => User)) byAddress; //maps ethereum address (public key) to user objects\n//    mapping (uint256 => address[]) addresses;\n  }\n\n  function getUserProfile(StateLib.State storage state, address userAddress) constant internal returns (ContentLib.Content) {\n    return (state.main.userProfiles[userAddress]);\n  }\n\n  function userProfileExists(StateLib.State storage state, address userAddress) constant internal returns (bool) {\n    var profile = getUserProfile(state, userAddress);\n    return (profile.creationTime != 0);\n  }\n\n  function setProfileChecks(ContentLib.Content content) private view returns (\n    bool checksPassed,\n    uint256 updateTime\n  ) {\n\n    checksPassed = false;\n    updateTime = 0;\n\n    require(content.creator != 0x0);\n    //TODO: check nickname length via global ruleset\n    //TODO: UTF-8 length != bytes().length\n    if (bytes(content.title).length > 64)\n      return;\n\n    (checksPassed, updateTime) = ContentLib.contentCheck(content);\n  }\n\n  function setProfile(StateLib.State storage state, ContentLib.Content memory content) internal returns (\n    bool checksPassed\n  ) {\n    (checksPassed, content.creationTime) = setProfileChecks(content);\n\n    if (!checksPassed)\n      return;\n\n    state.main.userProfiles[content.creator] = content;\n    UserProfileChanged(content.creator, content.title, content.creationTime);\n  }\n}\n",
@@ -35,7 +35,7 @@
       "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/UserLib.sol",
       "exportedSymbols": {
         "UserLib": [
-          2602
+          2758
         ]
       }
     },
@@ -49,7 +49,7 @@
             ".11"
           ]
         },
-        "id": 2431,
+        "id": 2587,
         "name": "PragmaDirective",
         "src": "0:24:8"
       },
@@ -58,73 +58,73 @@
           "SourceUnit": 137,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/ContentLib.sol",
           "file": "./ContentLib.sol",
-          "scope": 2603,
+          "scope": 2759,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2432,
+        "id": 2588,
         "name": "ImportDirective",
         "src": "26:26:8"
       },
       {
         "attributes": {
-          "SourceUnit": 645,
+          "SourceUnit": 711,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/CurrencyLib.sol",
           "file": "./CurrencyLib.sol",
-          "scope": 2603,
+          "scope": 2759,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2433,
+        "id": 2589,
         "name": "ImportDirective",
         "src": "53:27:8"
       },
       {
         "attributes": {
-          "SourceUnit": 2397,
+          "SourceUnit": 2553,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/PostLib.sol",
           "file": "./PostLib.sol",
-          "scope": 2603,
+          "scope": 2759,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2434,
+        "id": 2590,
         "name": "ImportDirective",
         "src": "81:23:8"
       },
       {
         "attributes": {
-          "SourceUnit": 2109,
+          "SourceUnit": 2265,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/PermissionLib.sol",
           "file": "./PermissionLib.sol",
-          "scope": 2603,
+          "scope": 2759,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2435,
+        "id": 2591,
         "name": "ImportDirective",
         "src": "105:29:8"
       },
       {
         "attributes": {
-          "SourceUnit": 2430,
+          "SourceUnit": 2586,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/StateLib.sol",
           "file": "./StateLib.sol",
-          "scope": 2603,
+          "scope": 2759,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 2436,
+        "id": 2592,
         "name": "ImportDirective",
         "src": "135:24:8"
       },
@@ -140,10 +140,10 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            2602
+            2758
           ],
           "name": "UserLib",
-          "scope": 2603
+          "scope": 2759
         },
         "children": [
           {
@@ -152,10 +152,10 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "UserLib",
-                  "referencedDeclaration": 2602,
+                  "referencedDeclaration": 2758,
                   "type": "library UserLib"
                 },
-                "id": 2437,
+                "id": 2593,
                 "name": "UserDefinedTypeName",
                 "src": "188:7:8"
               },
@@ -163,15 +163,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "State",
-                  "referencedDeclaration": 2476,
+                  "referencedDeclaration": 2632,
                   "type": "struct UserLib.State storage pointer"
                 },
-                "id": 2438,
+                "id": 2594,
                 "name": "UserDefinedTypeName",
                 "src": "200:5:8"
               }
             ],
-            "id": 2439,
+            "id": 2595,
             "name": "UsingForDirective",
             "src": "182:24:8"
           },
@@ -181,10 +181,10 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "PostLib",
-                  "referencedDeclaration": 2396,
+                  "referencedDeclaration": 2552,
                   "type": "library PostLib"
                 },
-                "id": 2440,
+                "id": 2596,
                 "name": "UserDefinedTypeName",
                 "src": "215:7:8"
               },
@@ -192,15 +192,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "PostLib.State",
-                  "referencedDeclaration": 2127,
+                  "referencedDeclaration": 2283,
                   "type": "struct PostLib.State storage pointer"
                 },
-                "id": 2441,
+                "id": 2597,
                 "name": "UserDefinedTypeName",
                 "src": "227:13:8"
               }
             ],
-            "id": 2442,
+            "id": 2598,
             "name": "UsingForDirective",
             "src": "209:32:8"
           },
@@ -210,10 +210,10 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "CurrencyLib",
-                  "referencedDeclaration": 644,
+                  "referencedDeclaration": 710,
                   "type": "library CurrencyLib"
                 },
-                "id": 2443,
+                "id": 2599,
                 "name": "UserDefinedTypeName",
                 "src": "250:11:8"
               },
@@ -224,12 +224,12 @@
                   "referencedDeclaration": 143,
                   "type": "struct CurrencyLib.State storage pointer"
                 },
-                "id": 2444,
+                "id": 2600,
                 "name": "UserDefinedTypeName",
                 "src": "266:17:8"
               }
             ],
-            "id": 2445,
+            "id": 2601,
             "name": "UsingForDirective",
             "src": "244:40:8"
           },
@@ -239,10 +239,10 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "PermissionLib",
-                  "referencedDeclaration": 2108,
+                  "referencedDeclaration": 2264,
                   "type": "library PermissionLib"
                 },
-                "id": 2446,
+                "id": 2602,
                 "name": "UserDefinedTypeName",
                 "src": "293:13:8"
               },
@@ -250,15 +250,15 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "PermissionLib.State",
-                  "referencedDeclaration": 1921,
+                  "referencedDeclaration": 2077,
                   "type": "struct PermissionLib.State storage pointer"
                 },
-                "id": 2447,
+                "id": 2603,
                 "name": "UserDefinedTypeName",
                 "src": "311:19:8"
               }
             ],
-            "id": 2448,
+            "id": 2604,
             "name": "UsingForDirective",
             "src": "287:44:8"
           },
@@ -275,7 +275,7 @@
                       "constant": false,
                       "indexed": true,
                       "name": "userAddress",
-                      "scope": 2456,
+                      "scope": 2612,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -288,12 +288,12 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 2449,
+                        "id": 2605,
                         "name": "ElementaryTypeName",
                         "src": "365:7:8"
                       }
                     ],
-                    "id": 2450,
+                    "id": 2606,
                     "name": "VariableDeclaration",
                     "src": "365:27:8"
                   },
@@ -302,7 +302,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "nickname",
-                      "scope": 2456,
+                      "scope": 2612,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -315,12 +315,12 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 2451,
+                        "id": 2607,
                         "name": "ElementaryTypeName",
                         "src": "398:6:8"
                       }
                     ],
-                    "id": 2452,
+                    "id": 2608,
                     "name": "VariableDeclaration",
                     "src": "398:15:8"
                   },
@@ -329,7 +329,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "timestamp",
-                      "scope": 2456,
+                      "scope": 2612,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -342,22 +342,22 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2453,
+                        "id": 2609,
                         "name": "ElementaryTypeName",
                         "src": "419:7:8"
                       }
                     ],
-                    "id": 2454,
+                    "id": 2610,
                     "name": "VariableDeclaration",
                     "src": "419:17:8"
                   }
                 ],
-                "id": 2455,
+                "id": 2611,
                 "name": "ParameterList",
                 "src": "359:81:8"
               }
             ],
-            "id": 2456,
+            "id": 2612,
             "name": "EventDefinition",
             "src": "335:106:8"
           },
@@ -365,7 +365,7 @@
             "attributes": {
               "canonicalName": "UserLib.User",
               "name": "User",
-              "scope": 2602,
+              "scope": 2758,
               "visibility": "public"
             },
             "children": [
@@ -373,7 +373,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "addr",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "address",
@@ -386,12 +386,12 @@
                       "name": "address",
                       "type": "address"
                     },
-                    "id": 2457,
+                    "id": 2613,
                     "name": "ElementaryTypeName",
                     "src": "463:7:8"
                   }
                 ],
-                "id": 2458,
+                "id": 2614,
                 "name": "VariableDeclaration",
                 "src": "463:12:8"
               },
@@ -399,7 +399,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "number",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "uint256",
@@ -412,12 +412,12 @@
                       "name": "uint256",
                       "type": "uint256"
                     },
-                    "id": 2459,
+                    "id": 2615,
                     "name": "ElementaryTypeName",
                     "src": "481:7:8"
                   }
                 ],
-                "id": 2460,
+                "id": 2616,
                 "name": "VariableDeclaration",
                 "src": "481:14:8"
               },
@@ -425,7 +425,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "parentNum",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "uint256",
@@ -438,12 +438,12 @@
                       "name": "uint256",
                       "type": "uint256"
                     },
-                    "id": 2461,
+                    "id": 2617,
                     "name": "ElementaryTypeName",
                     "src": "501:7:8"
                   }
                 ],
-                "id": 2462,
+                "id": 2618,
                 "name": "VariableDeclaration",
                 "src": "501:17:8"
               },
@@ -451,7 +451,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "joinTime",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "uint256",
@@ -464,12 +464,12 @@
                       "name": "uint256",
                       "type": "uint256"
                     },
-                    "id": 2463,
+                    "id": 2619,
                     "name": "ElementaryTypeName",
                     "src": "524:7:8"
                   }
                 ],
-                "id": 2464,
+                "id": 2620,
                 "name": "VariableDeclaration",
                 "src": "524:16:8"
               },
@@ -477,7 +477,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "balance",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "uint256",
@@ -490,12 +490,12 @@
                       "name": "uint256",
                       "type": "uint256"
                     },
-                    "id": 2465,
+                    "id": 2621,
                     "name": "ElementaryTypeName",
                     "src": "546:7:8"
                   }
                 ],
-                "id": 2466,
+                "id": 2622,
                 "name": "VariableDeclaration",
                 "src": "546:15:8"
               },
@@ -503,7 +503,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "permissions",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "int256",
@@ -516,12 +516,12 @@
                       "name": "int256",
                       "type": "int256"
                     },
-                    "id": 2467,
+                    "id": 2623,
                     "name": "ElementaryTypeName",
                     "src": "567:6:8"
                   }
                 ],
-                "id": 2468,
+                "id": 2624,
                 "name": "VariableDeclaration",
                 "src": "567:18:8"
               },
@@ -529,7 +529,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "joined",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "bool",
@@ -542,12 +542,12 @@
                       "name": "bool",
                       "type": "bool"
                     },
-                    "id": 2469,
+                    "id": 2625,
                     "name": "ElementaryTypeName",
                     "src": "732:4:8"
                   }
                 ],
-                "id": 2470,
+                "id": 2626,
                 "name": "VariableDeclaration",
                 "src": "732:11:8"
               },
@@ -555,7 +555,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "banned",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "bool",
@@ -568,12 +568,12 @@
                       "name": "bool",
                       "type": "bool"
                     },
-                    "id": 2471,
+                    "id": 2627,
                     "name": "ElementaryTypeName",
                     "src": "749:4:8"
                   }
                 ],
-                "id": 2472,
+                "id": 2628,
                 "name": "VariableDeclaration",
                 "src": "749:11:8"
               },
@@ -581,7 +581,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "banReason",
-                  "scope": 2475,
+                  "scope": 2631,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "string storage pointer",
@@ -594,17 +594,17 @@
                       "name": "string",
                       "type": "string storage pointer"
                     },
-                    "id": 2473,
+                    "id": 2629,
                     "name": "ElementaryTypeName",
                     "src": "766:6:8"
                   }
                 ],
-                "id": 2474,
+                "id": 2630,
                 "name": "VariableDeclaration",
                 "src": "766:16:8"
               }
             ],
-            "id": 2475,
+            "id": 2631,
             "name": "StructDefinition",
             "src": "445:342:8"
           },
@@ -615,10 +615,10 @@
                 null
               ],
               "name": "State",
-              "scope": 2602,
+              "scope": 2758,
               "visibility": "public"
             },
-            "id": 2476,
+            "id": 2632,
             "name": "StructDefinition",
             "src": "791:204:8"
           },
@@ -632,7 +632,7 @@
               ],
               "name": "getUserProfile",
               "payable": false,
-              "scope": 2602,
+              "scope": 2758,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -644,7 +644,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "state",
-                      "scope": 2493,
+                      "scope": 2649,
                       "stateVariable": false,
                       "storageLocation": "storage",
                       "type": "struct StateLib.State storage pointer",
@@ -656,15 +656,15 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "StateLib.State",
-                          "referencedDeclaration": 2428,
+                          "referencedDeclaration": 2584,
                           "type": "struct StateLib.State storage pointer"
                         },
-                        "id": 2477,
+                        "id": 2633,
                         "name": "UserDefinedTypeName",
                         "src": "1023:14:8"
                       }
                     ],
-                    "id": 2478,
+                    "id": 2634,
                     "name": "VariableDeclaration",
                     "src": "1023:28:8"
                   },
@@ -672,7 +672,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "userAddress",
-                      "scope": 2493,
+                      "scope": 2649,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -685,17 +685,17 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 2479,
+                        "id": 2635,
                         "name": "ElementaryTypeName",
                         "src": "1053:7:8"
                       }
                     ],
-                    "id": 2480,
+                    "id": 2636,
                     "name": "VariableDeclaration",
                     "src": "1053:19:8"
                   }
                 ],
-                "id": 2481,
+                "id": 2637,
                 "name": "ParameterList",
                 "src": "1022:51:8"
               },
@@ -705,7 +705,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "",
-                      "scope": 2493,
+                      "scope": 2649,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "struct ContentLib.Content memory",
@@ -720,17 +720,17 @@
                           "referencedDeclaration": 20,
                           "type": "struct ContentLib.Content storage pointer"
                         },
-                        "id": 2482,
+                        "id": 2638,
                         "name": "UserDefinedTypeName",
                         "src": "1101:18:8"
                       }
                     ],
-                    "id": 2483,
+                    "id": 2639,
                     "name": "VariableDeclaration",
                     "src": "1101:18:8"
                   }
                 ],
-                "id": 2484,
+                "id": 2640,
                 "name": "ParameterList",
                 "src": "1100:20:8"
               },
@@ -738,7 +738,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "functionReturnParameters": 2484
+                      "functionReturnParameters": 2640
                     },
                     "children": [
                       {
@@ -770,7 +770,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "userProfiles",
-                                  "referencedDeclaration": 2412,
+                                  "referencedDeclaration": 2568,
                                   "type": "mapping(address => struct ContentLib.Content storage ref)"
                                 },
                                 "children": [
@@ -782,7 +782,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "main",
-                                      "referencedDeclaration": 2417,
+                                      "referencedDeclaration": 2573,
                                       "type": "struct StateLib.Main storage ref"
                                     },
                                     "children": [
@@ -792,21 +792,21 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2478,
+                                          "referencedDeclaration": 2634,
                                           "type": "struct StateLib.State storage pointer",
                                           "value": "state"
                                         },
-                                        "id": 2485,
+                                        "id": 2641,
                                         "name": "Identifier",
                                         "src": "1135:5:8"
                                       }
                                     ],
-                                    "id": 2486,
+                                    "id": 2642,
                                     "name": "MemberAccess",
                                     "src": "1135:10:8"
                                   }
                                 ],
-                                "id": 2487,
+                                "id": 2643,
                                 "name": "MemberAccess",
                                 "src": "1135:23:8"
                               },
@@ -816,36 +816,36 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2480,
+                                  "referencedDeclaration": 2636,
                                   "type": "address",
                                   "value": "userAddress"
                                 },
-                                "id": 2488,
+                                "id": 2644,
                                 "name": "Identifier",
                                 "src": "1159:11:8"
                               }
                             ],
-                            "id": 2489,
+                            "id": 2645,
                             "name": "IndexAccess",
                             "src": "1135:36:8"
                           }
                         ],
-                        "id": 2490,
+                        "id": 2646,
                         "name": "TupleExpression",
                         "src": "1134:38:8"
                       }
                     ],
-                    "id": 2491,
+                    "id": 2647,
                     "name": "Return",
                     "src": "1127:45:8"
                   }
                 ],
-                "id": 2492,
+                "id": 2648,
                 "name": "Block",
                 "src": "1121:56:8"
               }
             ],
-            "id": 2493,
+            "id": 2649,
             "name": "FunctionDefinition",
             "src": "999:178:8"
           },
@@ -859,7 +859,7 @@
               ],
               "name": "userProfileExists",
               "payable": false,
-              "scope": 2602,
+              "scope": 2758,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -871,7 +871,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "state",
-                      "scope": 2515,
+                      "scope": 2671,
                       "stateVariable": false,
                       "storageLocation": "storage",
                       "type": "struct StateLib.State storage pointer",
@@ -883,15 +883,15 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "StateLib.State",
-                          "referencedDeclaration": 2428,
+                          "referencedDeclaration": 2584,
                           "type": "struct StateLib.State storage pointer"
                         },
-                        "id": 2494,
+                        "id": 2650,
                         "name": "UserDefinedTypeName",
                         "src": "1208:14:8"
                       }
                     ],
-                    "id": 2495,
+                    "id": 2651,
                     "name": "VariableDeclaration",
                     "src": "1208:28:8"
                   },
@@ -899,7 +899,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "userAddress",
-                      "scope": 2515,
+                      "scope": 2671,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -912,17 +912,17 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 2496,
+                        "id": 2652,
                         "name": "ElementaryTypeName",
                         "src": "1238:7:8"
                       }
                     ],
-                    "id": 2497,
+                    "id": 2653,
                     "name": "VariableDeclaration",
                     "src": "1238:19:8"
                   }
                 ],
-                "id": 2498,
+                "id": 2654,
                 "name": "ParameterList",
                 "src": "1207:51:8"
               },
@@ -932,7 +932,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "",
-                      "scope": 2515,
+                      "scope": 2671,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -945,17 +945,17 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 2499,
+                        "id": 2655,
                         "name": "ElementaryTypeName",
                         "src": "1286:4:8"
                       }
                     ],
-                    "id": 2500,
+                    "id": 2656,
                     "name": "VariableDeclaration",
                     "src": "1286:4:8"
                   }
                 ],
-                "id": 2501,
+                "id": 2657,
                 "name": "ParameterList",
                 "src": "1285:6:8"
               },
@@ -964,7 +964,7 @@
                   {
                     "attributes": {
                       "assignments": [
-                        2502
+                        2658
                       ]
                     },
                     "children": [
@@ -972,7 +972,7 @@
                         "attributes": {
                           "constant": false,
                           "name": "profile",
-                          "scope": 2515,
+                          "scope": 2671,
                           "stateVariable": false,
                           "storageLocation": "default",
                           "type": "struct ContentLib.Content memory",
@@ -981,7 +981,7 @@
                           "visibility": "internal"
                         },
                         "children": [],
-                        "id": 2502,
+                        "id": 2658,
                         "name": "VariableDeclaration",
                         "src": "1298:11:8"
                       },
@@ -1004,7 +1004,7 @@
                             "attributes": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_struct$_State_$2428_storage_ptr",
+                                  "typeIdentifier": "t_struct$_State_$2584_storage_ptr",
                                   "typeString": "struct StateLib.State storage pointer"
                                 },
                                 {
@@ -1015,11 +1015,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2493,
+                              "referencedDeclaration": 2649,
                               "type": "function (struct StateLib.State storage pointer,address) view returns (struct ContentLib.Content memory)",
                               "value": "getUserProfile"
                             },
-                            "id": 2503,
+                            "id": 2659,
                             "name": "Identifier",
                             "src": "1312:14:8"
                           },
@@ -1029,11 +1029,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2495,
+                              "referencedDeclaration": 2651,
                               "type": "struct StateLib.State storage pointer",
                               "value": "state"
                             },
-                            "id": 2504,
+                            "id": 2660,
                             "name": "Identifier",
                             "src": "1327:5:8"
                           },
@@ -1043,27 +1043,27 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2497,
+                              "referencedDeclaration": 2653,
                               "type": "address",
                               "value": "userAddress"
                             },
-                            "id": 2505,
+                            "id": 2661,
                             "name": "Identifier",
                             "src": "1334:11:8"
                           }
                         ],
-                        "id": 2506,
+                        "id": 2662,
                         "name": "FunctionCall",
                         "src": "1312:34:8"
                       }
                     ],
-                    "id": 2507,
+                    "id": 2663,
                     "name": "VariableDeclarationStatement",
                     "src": "1298:48:8"
                   },
                   {
                     "attributes": {
-                      "functionReturnParameters": 2501
+                      "functionReturnParameters": 2657
                     },
                     "children": [
                       {
@@ -1110,16 +1110,16 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2502,
+                                      "referencedDeclaration": 2658,
                                       "type": "struct ContentLib.Content memory",
                                       "value": "profile"
                                     },
-                                    "id": 2508,
+                                    "id": 2664,
                                     "name": "Identifier",
                                     "src": "1360:7:8"
                                   }
                                 ],
-                                "id": 2509,
+                                "id": 2665,
                                 "name": "MemberAccess",
                                 "src": "1360:20:8"
                               },
@@ -1136,32 +1136,32 @@
                                   "type": "int_const 0",
                                   "value": "0"
                                 },
-                                "id": 2510,
+                                "id": 2666,
                                 "name": "Literal",
                                 "src": "1384:1:8"
                               }
                             ],
-                            "id": 2511,
+                            "id": 2667,
                             "name": "BinaryOperation",
                             "src": "1360:25:8"
                           }
                         ],
-                        "id": 2512,
+                        "id": 2668,
                         "name": "TupleExpression",
                         "src": "1359:27:8"
                       }
                     ],
-                    "id": 2513,
+                    "id": 2669,
                     "name": "Return",
                     "src": "1352:34:8"
                   }
                 ],
-                "id": 2514,
+                "id": 2670,
                 "name": "Block",
                 "src": "1292:99:8"
               }
             ],
-            "id": 2515,
+            "id": 2671,
             "name": "FunctionDefinition",
             "src": "1181:210:8"
           },
@@ -1175,7 +1175,7 @@
               ],
               "name": "setProfileChecks",
               "payable": false,
-              "scope": 2602,
+              "scope": 2758,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "private"
@@ -1187,7 +1187,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "content",
-                      "scope": 2558,
+                      "scope": 2714,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "struct ContentLib.Content memory",
@@ -1202,17 +1202,17 @@
                           "referencedDeclaration": 20,
                           "type": "struct ContentLib.Content storage pointer"
                         },
-                        "id": 2516,
+                        "id": 2672,
                         "name": "UserDefinedTypeName",
                         "src": "1421:18:8"
                       }
                     ],
-                    "id": 2517,
+                    "id": 2673,
                     "name": "VariableDeclaration",
                     "src": "1421:26:8"
                   }
                 ],
-                "id": 2518,
+                "id": 2674,
                 "name": "ParameterList",
                 "src": "1420:28:8"
               },
@@ -1222,7 +1222,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "checksPassed",
-                      "scope": 2558,
+                      "scope": 2714,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -1235,12 +1235,12 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 2519,
+                        "id": 2675,
                         "name": "ElementaryTypeName",
                         "src": "1476:4:8"
                       }
                     ],
-                    "id": 2520,
+                    "id": 2676,
                     "name": "VariableDeclaration",
                     "src": "1476:17:8"
                   },
@@ -1248,7 +1248,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "updateTime",
-                      "scope": 2558,
+                      "scope": 2714,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1261,17 +1261,17 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 2521,
+                        "id": 2677,
                         "name": "ElementaryTypeName",
                         "src": "1499:7:8"
                       }
                     ],
-                    "id": 2522,
+                    "id": 2678,
                     "name": "VariableDeclaration",
                     "src": "1499:18:8"
                   }
                 ],
-                "id": 2523,
+                "id": 2679,
                 "name": "ParameterList",
                 "src": "1470:51:8"
               },
@@ -1296,11 +1296,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2520,
+                              "referencedDeclaration": 2676,
                               "type": "bool",
                               "value": "checksPassed"
                             },
-                            "id": 2524,
+                            "id": 2680,
                             "name": "Identifier",
                             "src": "1529:12:8"
                           },
@@ -1317,17 +1317,17 @@
                               "type": "bool",
                               "value": "false"
                             },
-                            "id": 2525,
+                            "id": 2681,
                             "name": "Literal",
                             "src": "1544:5:8"
                           }
                         ],
-                        "id": 2526,
+                        "id": 2682,
                         "name": "Assignment",
                         "src": "1529:20:8"
                       }
                     ],
-                    "id": 2527,
+                    "id": 2683,
                     "name": "ExpressionStatement",
                     "src": "1529:20:8"
                   },
@@ -1350,11 +1350,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2522,
+                              "referencedDeclaration": 2678,
                               "type": "uint256",
                               "value": "updateTime"
                             },
-                            "id": 2528,
+                            "id": 2684,
                             "name": "Identifier",
                             "src": "1555:10:8"
                           },
@@ -1371,17 +1371,17 @@
                               "type": "int_const 0",
                               "value": "0"
                             },
-                            "id": 2529,
+                            "id": 2685,
                             "name": "Literal",
                             "src": "1568:1:8"
                           }
                         ],
-                        "id": 2530,
+                        "id": 2686,
                         "name": "Assignment",
                         "src": "1555:14:8"
                       }
                     ],
-                    "id": 2531,
+                    "id": 2687,
                     "name": "ExpressionStatement",
                     "src": "1555:14:8"
                   },
@@ -1413,11 +1413,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2617,
+                              "referencedDeclaration": 2773,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
-                            "id": 2532,
+                            "id": 2688,
                             "name": "Identifier",
                             "src": "1576:7:8"
                           },
@@ -1454,16 +1454,16 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2517,
+                                      "referencedDeclaration": 2673,
                                       "type": "struct ContentLib.Content memory",
                                       "value": "content"
                                     },
-                                    "id": 2533,
+                                    "id": 2689,
                                     "name": "Identifier",
                                     "src": "1584:7:8"
                                   }
                                 ],
-                                "id": 2534,
+                                "id": 2690,
                                 "name": "MemberAccess",
                                 "src": "1584:15:8"
                               },
@@ -1480,22 +1480,22 @@
                                   "type": "int_const 0",
                                   "value": "0x0"
                                 },
-                                "id": 2535,
+                                "id": 2691,
                                 "name": "Literal",
                                 "src": "1603:3:8"
                               }
                             ],
-                            "id": 2536,
+                            "id": 2692,
                             "name": "BinaryOperation",
                             "src": "1584:22:8"
                           }
                         ],
-                        "id": 2537,
+                        "id": 2693,
                         "name": "FunctionCall",
                         "src": "1576:31:8"
                       }
                     ],
-                    "id": 2538,
+                    "id": 2694,
                     "name": "ExpressionStatement",
                     "src": "1576:31:8"
                   },
@@ -1561,7 +1561,7 @@
                                       "type": "type(bytes storage pointer)",
                                       "value": "bytes"
                                     },
-                                    "id": 2539,
+                                    "id": 2695,
                                     "name": "ElementaryTypeNameExpression",
                                     "src": "1713:5:8"
                                   },
@@ -1583,26 +1583,26 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2517,
+                                          "referencedDeclaration": 2673,
                                           "type": "struct ContentLib.Content memory",
                                           "value": "content"
                                         },
-                                        "id": 2540,
+                                        "id": 2696,
                                         "name": "Identifier",
                                         "src": "1719:7:8"
                                       }
                                     ],
-                                    "id": 2541,
+                                    "id": 2697,
                                     "name": "MemberAccess",
                                     "src": "1719:13:8"
                                   }
                                 ],
-                                "id": 2542,
+                                "id": 2698,
                                 "name": "FunctionCall",
                                 "src": "1713:20:8"
                               }
                             ],
-                            "id": 2543,
+                            "id": 2699,
                             "name": "MemberAccess",
                             "src": "1713:27:8"
                           },
@@ -1619,26 +1619,26 @@
                               "type": "int_const 64",
                               "value": "64"
                             },
-                            "id": 2544,
+                            "id": 2700,
                             "name": "Literal",
                             "src": "1743:2:8"
                           }
                         ],
-                        "id": 2545,
+                        "id": 2701,
                         "name": "BinaryOperation",
                         "src": "1713:32:8"
                       },
                       {
                         "attributes": {
                           "expression": null,
-                          "functionReturnParameters": 2523
+                          "functionReturnParameters": 2679
                         },
-                        "id": 2546,
+                        "id": 2702,
                         "name": "Return",
                         "src": "1753:7:8"
                       }
                     ],
-                    "id": 2547,
+                    "id": 2703,
                     "name": "IfStatement",
                     "src": "1709:51:8"
                   },
@@ -1672,11 +1672,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2520,
+                                  "referencedDeclaration": 2676,
                                   "type": "bool",
                                   "value": "checksPassed"
                                 },
-                                "id": 2548,
+                                "id": 2704,
                                 "name": "Identifier",
                                 "src": "1767:12:8"
                               },
@@ -1686,16 +1686,16 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2522,
+                                  "referencedDeclaration": 2678,
                                   "type": "uint256",
                                   "value": "updateTime"
                                 },
-                                "id": 2549,
+                                "id": 2705,
                                 "name": "Identifier",
                                 "src": "1781:10:8"
                               }
                             ],
-                            "id": 2550,
+                            "id": 2706,
                             "name": "TupleExpression",
                             "src": "1766:26:8"
                           },
@@ -1741,12 +1741,12 @@
                                       "type": "type(library ContentLib)",
                                       "value": "ContentLib"
                                     },
-                                    "id": 2551,
+                                    "id": 2707,
                                     "name": "Identifier",
                                     "src": "1795:10:8"
                                   }
                                 ],
-                                "id": 2552,
+                                "id": 2708,
                                 "name": "MemberAccess",
                                 "src": "1795:23:8"
                               },
@@ -1756,36 +1756,36 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2517,
+                                  "referencedDeclaration": 2673,
                                   "type": "struct ContentLib.Content memory",
                                   "value": "content"
                                 },
-                                "id": 2553,
+                                "id": 2709,
                                 "name": "Identifier",
                                 "src": "1819:7:8"
                               }
                             ],
-                            "id": 2554,
+                            "id": 2710,
                             "name": "FunctionCall",
                             "src": "1795:32:8"
                           }
                         ],
-                        "id": 2555,
+                        "id": 2711,
                         "name": "Assignment",
                         "src": "1766:61:8"
                       }
                     ],
-                    "id": 2556,
+                    "id": 2712,
                     "name": "ExpressionStatement",
                     "src": "1766:61:8"
                   }
                 ],
-                "id": 2557,
+                "id": 2713,
                 "name": "Block",
                 "src": "1522:310:8"
               }
             ],
-            "id": 2558,
+            "id": 2714,
             "name": "FunctionDefinition",
             "src": "1395:437:8"
           },
@@ -1799,7 +1799,7 @@
               ],
               "name": "setProfile",
               "payable": false,
-              "scope": 2602,
+              "scope": 2758,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "internal"
@@ -1811,7 +1811,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "state",
-                      "scope": 2601,
+                      "scope": 2757,
                       "stateVariable": false,
                       "storageLocation": "storage",
                       "type": "struct StateLib.State storage pointer",
@@ -1823,15 +1823,15 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "StateLib.State",
-                          "referencedDeclaration": 2428,
+                          "referencedDeclaration": 2584,
                           "type": "struct StateLib.State storage pointer"
                         },
-                        "id": 2559,
+                        "id": 2715,
                         "name": "UserDefinedTypeName",
                         "src": "1856:14:8"
                       }
                     ],
-                    "id": 2560,
+                    "id": 2716,
                     "name": "VariableDeclaration",
                     "src": "1856:28:8"
                   },
@@ -1839,7 +1839,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "content",
-                      "scope": 2601,
+                      "scope": 2757,
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "type": "struct ContentLib.Content memory",
@@ -1854,17 +1854,17 @@
                           "referencedDeclaration": 20,
                           "type": "struct ContentLib.Content storage pointer"
                         },
-                        "id": 2561,
+                        "id": 2717,
                         "name": "UserDefinedTypeName",
                         "src": "1886:18:8"
                       }
                     ],
-                    "id": 2562,
+                    "id": 2718,
                     "name": "VariableDeclaration",
                     "src": "1886:33:8"
                   }
                 ],
-                "id": 2563,
+                "id": 2719,
                 "name": "ParameterList",
                 "src": "1855:65:8"
               },
@@ -1874,7 +1874,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "checksPassed",
-                      "scope": 2601,
+                      "scope": 2757,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -1887,17 +1887,17 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 2564,
+                        "id": 2720,
                         "name": "ElementaryTypeName",
                         "src": "1944:4:8"
                       }
                     ],
-                    "id": 2565,
+                    "id": 2721,
                     "name": "VariableDeclaration",
                     "src": "1944:17:8"
                   }
                 ],
-                "id": 2566,
+                "id": 2722,
                 "name": "ParameterList",
                 "src": "1938:27:8"
               },
@@ -1933,11 +1933,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2565,
+                                  "referencedDeclaration": 2721,
                                   "type": "bool",
                                   "value": "checksPassed"
                                 },
-                                "id": 2567,
+                                "id": 2723,
                                 "name": "Identifier",
                                 "src": "1973:12:8"
                               },
@@ -1959,21 +1959,21 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2562,
+                                      "referencedDeclaration": 2718,
                                       "type": "struct ContentLib.Content memory",
                                       "value": "content"
                                     },
-                                    "id": 2568,
+                                    "id": 2724,
                                     "name": "Identifier",
                                     "src": "1987:7:8"
                                   }
                                 ],
-                                "id": 2569,
+                                "id": 2725,
                                 "name": "MemberAccess",
                                 "src": "1987:20:8"
                               }
                             ],
-                            "id": 2570,
+                            "id": 2726,
                             "name": "TupleExpression",
                             "src": "1972:36:8"
                           },
@@ -2003,11 +2003,11 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2558,
+                                  "referencedDeclaration": 2714,
                                   "type": "function (struct ContentLib.Content memory) view returns (bool,uint256)",
                                   "value": "setProfileChecks"
                                 },
-                                "id": 2571,
+                                "id": 2727,
                                 "name": "Identifier",
                                 "src": "2011:16:8"
                               },
@@ -2017,26 +2017,26 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2562,
+                                  "referencedDeclaration": 2718,
                                   "type": "struct ContentLib.Content memory",
                                   "value": "content"
                                 },
-                                "id": 2572,
+                                "id": 2728,
                                 "name": "Identifier",
                                 "src": "2028:7:8"
                               }
                             ],
-                            "id": 2573,
+                            "id": 2729,
                             "name": "FunctionCall",
                             "src": "2011:25:8"
                           }
                         ],
-                        "id": 2574,
+                        "id": 2730,
                         "name": "Assignment",
                         "src": "1972:64:8"
                       }
                     ],
-                    "id": 2575,
+                    "id": 2731,
                     "name": "ExpressionStatement",
                     "src": "1972:64:8"
                   },
@@ -2063,30 +2063,30 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2565,
+                              "referencedDeclaration": 2721,
                               "type": "bool",
                               "value": "checksPassed"
                             },
-                            "id": 2576,
+                            "id": 2732,
                             "name": "Identifier",
                             "src": "2048:12:8"
                           }
                         ],
-                        "id": 2577,
+                        "id": 2733,
                         "name": "UnaryOperation",
                         "src": "2047:13:8"
                       },
                       {
                         "attributes": {
                           "expression": null,
-                          "functionReturnParameters": 2566
+                          "functionReturnParameters": 2722
                         },
-                        "id": 2578,
+                        "id": 2734,
                         "name": "Return",
                         "src": "2068:7:8"
                       }
                     ],
-                    "id": 2579,
+                    "id": 2735,
                     "name": "IfStatement",
                     "src": "2043:32:8"
                   },
@@ -2121,7 +2121,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "userProfiles",
-                                  "referencedDeclaration": 2412,
+                                  "referencedDeclaration": 2568,
                                   "type": "mapping(address => struct ContentLib.Content storage ref)"
                                 },
                                 "children": [
@@ -2133,7 +2133,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "main",
-                                      "referencedDeclaration": 2417,
+                                      "referencedDeclaration": 2573,
                                       "type": "struct StateLib.Main storage ref"
                                     },
                                     "children": [
@@ -2143,21 +2143,21 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2560,
+                                          "referencedDeclaration": 2716,
                                           "type": "struct StateLib.State storage pointer",
                                           "value": "state"
                                         },
-                                        "id": 2580,
+                                        "id": 2736,
                                         "name": "Identifier",
                                         "src": "2081:5:8"
                                       }
                                     ],
-                                    "id": 2585,
+                                    "id": 2741,
                                     "name": "MemberAccess",
                                     "src": "2081:10:8"
                                   }
                                 ],
-                                "id": 2586,
+                                "id": 2742,
                                 "name": "MemberAccess",
                                 "src": "2081:23:8"
                               },
@@ -2179,21 +2179,21 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2562,
+                                      "referencedDeclaration": 2718,
                                       "type": "struct ContentLib.Content memory",
                                       "value": "content"
                                     },
-                                    "id": 2583,
+                                    "id": 2739,
                                     "name": "Identifier",
                                     "src": "2105:7:8"
                                   }
                                 ],
-                                "id": 2584,
+                                "id": 2740,
                                 "name": "MemberAccess",
                                 "src": "2105:15:8"
                               }
                             ],
-                            "id": 2587,
+                            "id": 2743,
                             "name": "IndexAccess",
                             "src": "2081:40:8"
                           },
@@ -2203,21 +2203,21 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2562,
+                              "referencedDeclaration": 2718,
                               "type": "struct ContentLib.Content memory",
                               "value": "content"
                             },
-                            "id": 2588,
+                            "id": 2744,
                             "name": "Identifier",
                             "src": "2124:7:8"
                           }
                         ],
-                        "id": 2589,
+                        "id": 2745,
                         "name": "Assignment",
                         "src": "2081:50:8"
                       }
                     ],
-                    "id": 2590,
+                    "id": 2746,
                     "name": "ExpressionStatement",
                     "src": "2081:50:8"
                   },
@@ -2257,11 +2257,11 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2456,
+                              "referencedDeclaration": 2612,
                               "type": "function (address,string memory,uint256)",
                               "value": "UserProfileChanged"
                             },
-                            "id": 2591,
+                            "id": 2747,
                             "name": "Identifier",
                             "src": "2137:18:8"
                           },
@@ -2283,16 +2283,16 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2562,
+                                  "referencedDeclaration": 2718,
                                   "type": "struct ContentLib.Content memory",
                                   "value": "content"
                                 },
-                                "id": 2592,
+                                "id": 2748,
                                 "name": "Identifier",
                                 "src": "2156:7:8"
                               }
                             ],
-                            "id": 2593,
+                            "id": 2749,
                             "name": "MemberAccess",
                             "src": "2156:15:8"
                           },
@@ -2314,16 +2314,16 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2562,
+                                  "referencedDeclaration": 2718,
                                   "type": "struct ContentLib.Content memory",
                                   "value": "content"
                                 },
-                                "id": 2594,
+                                "id": 2750,
                                 "name": "Identifier",
                                 "src": "2173:7:8"
                               }
                             ],
-                            "id": 2595,
+                            "id": 2751,
                             "name": "MemberAccess",
                             "src": "2173:13:8"
                           },
@@ -2345,46 +2345,46 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2562,
+                                  "referencedDeclaration": 2718,
                                   "type": "struct ContentLib.Content memory",
                                   "value": "content"
                                 },
-                                "id": 2596,
+                                "id": 2752,
                                 "name": "Identifier",
                                 "src": "2188:7:8"
                               }
                             ],
-                            "id": 2597,
+                            "id": 2753,
                             "name": "MemberAccess",
                             "src": "2188:20:8"
                           }
                         ],
-                        "id": 2598,
+                        "id": 2754,
                         "name": "FunctionCall",
                         "src": "2137:72:8"
                       }
                     ],
-                    "id": 2599,
+                    "id": 2755,
                     "name": "ExpressionStatement",
                     "src": "2137:72:8"
                   }
                 ],
-                "id": 2600,
+                "id": 2756,
                 "name": "Block",
                 "src": "1966:248:8"
               }
             ],
-            "id": 2601,
+            "id": 2757,
             "name": "FunctionDefinition",
             "src": "1836:378:8"
           }
         ],
-        "id": 2602,
+        "id": 2758,
         "name": "ContractDefinition",
         "src": "161:2055:8"
       }
     ],
-    "id": 2603,
+    "id": 2759,
     "name": "SourceUnit",
     "src": "0:2217:8"
   },
@@ -2393,12 +2393,32 @@
     "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
   },
   "networks": {
+    "4447": {
+      "events": {},
+      "links": {},
+      "address": "0x25cbab0c13650026c7bcbcce7ef963c303b68cd6"
+    },
+    "1511112854249": {
+      "events": {},
+      "links": {},
+      "address": "0xb6361817754f811484178ebb427c74dfe290b056"
+    },
+    "1511114305929": {
+      "events": {},
+      "links": {},
+      "address": "0x0e2c7c0bc995367e4cdc8d5ef669ae1d26a66b6d"
+    },
+    "1511114467803": {
+      "events": {},
+      "links": {},
+      "address": "0x3369e8ae5b205a413f9fb77208a9a8a9b94c307c"
+    },
     "1509747848196": {
       "events": {},
       "links": {},
-      "address": "0x031b04bfaf66a270d8441727acac2379041e4147"
+      "address": "0x6c1fd3ea4a843946ad14468ad108a30e440074d9"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-15T20:33:50.050Z"
+  "updatedAt": "2017-11-20T15:04:19.232Z"
 }

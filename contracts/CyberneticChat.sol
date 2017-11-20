@@ -91,6 +91,15 @@ contract CyberneticChat {
     string reason
   );
 
+  event Debug(
+    uint256 indexed major,
+    uint256 indexed minor,
+    uint256 indexed micro,
+    string message,
+    uint256 dat1,
+    uint256 dat2
+  );
+
   function CyberneticChat(
     string title,
     string mimeType,
@@ -273,11 +282,27 @@ contract CyberneticChat {
   }
 
   function transferTokensToUser(uint256 parentNum, address userAddress, uint256 amount, bool increase) public {
-    CurrencyLib.transferTokensToUser(state, GroupLib.getGroup(state, parentNum), userAddress, amount, increase);
+    if (amount == 0) {
+      return;
+    }
+    var group = GroupLib.getGroup(state, parentNum);
+    var sender = GroupLib.getUserProperties(state, group, msg.sender);
+    var receiver = GroupLib.getUserProperties(state, group, userAddress);
+    CurrencyLib.transferTokensUserToUser(group, sender, receiver, amount, increase);
   }
 
   function transferTokensToPost(uint256 parentNum, uint256 num, uint256 amount, bool increase) public {
-    CurrencyLib.transferTokensToPost(state, GroupLib.getGroup(state, parentNum), PostLib.getPost(state, num), amount, increase);
+    if (amount == 0) {
+      return;
+    }
+    var group = GroupLib.getGroup(state, parentNum);
+    var sender = GroupLib.getUserProperties(state, group, msg.sender);
+    if (parentNum != num) {
+      var receiver = PostLib.getPost(state, num);
+      CurrencyLib.transferTokensUserToPost(group, sender, receiver, amount, increase);
+    } else {
+      CurrencyLib.transferTokensUserToGroup(group, sender, amount, increase);
+    }
   }
 }
 

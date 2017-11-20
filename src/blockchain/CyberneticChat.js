@@ -17,6 +17,8 @@ const EVENTS = [
 
   'UserJoinDenied',
   'PostCreationDenied',
+
+  'Debug',
 ];
 
 export default class CyberneticChat {
@@ -26,12 +28,9 @@ export default class CyberneticChat {
     this.web3 = web3;
     this.contractInstance = contractInstance;
     this.web3.eth.getBlockNumber((error, currentBlock) => {
-      console.log("CyberneticChat instance started up on block", currentBlock);
       this.startupBlock = currentBlock;
       this.nextBlockListener = Blockchain.registerLatestBlockListener((error, blockid) => {
-        console.log("nextblock:", blockid);
         this.web3.eth.getBlock(blockid, false, (error, result) => {
-          console.log("nextblock actual: ", result);
           if (!error && result.number === (currentBlock + 1)) {
             Blockchain.unregisterLatestBlockListener(this.nextBlockListener);
             EVENTS.forEach((eventName) => {
@@ -48,6 +47,13 @@ export default class CyberneticChat {
       CyberneticChat['register' + eventName + 'EventListener'] = (callback) => {
         return (this.registerEventListener(eventName, callback));
       };
+    });
+    this.registerDebugEventListener((error, response) => {
+      const args = response.args;
+      console.log("CyberneticChat debug event:");
+      Object.keys(args).forEach((key) => {
+        console.log("\n" + key + ":", args[key].toString());
+      });
     });
   }
 

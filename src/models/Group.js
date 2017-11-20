@@ -145,8 +145,11 @@ export default class Group {
       Ipfs.saveContent(content).then((multiHashString) => {
         const multiHashArray = Ipfs.extractMultiHash(multiHashString);
         const creationTime = moment().unix();
+          console.log("debug0");
         Wallet.runTransactionAsync('createPost', 'create this post', this.number, title, contentType, multiHashArray[0], multiHashArray[1], multiHashArray[2], creationTime, userPermissionsFlagsMode).then((transactionId) => {
+          console.log("debug1");
           Blockchain.waitForPendingTransaction(transactionId).then((txid) => {
+          console.log("debug2");
             const post = PostStore.getPost(undefined, txid);
             const userAddress = Wallet.getAccountAddress();
             post.populate({
@@ -160,6 +163,7 @@ export default class Group {
               creationTime,
               transactionId: txid,
             });
+          console.log("debug3");
             this.firePostCreatedListeners(post);
             resolve(post);
           }).catch((error) => {

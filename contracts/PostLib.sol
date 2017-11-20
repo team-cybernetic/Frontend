@@ -23,7 +23,7 @@ library PostLib {
     ContentLib.Content contents;
     GroupLib.Group group;
     uint256 number; //must be > 0 if post exists, unique, immutable
-    uint256 parentNum; //0 == no parent, but only the root should have parentNum == 0
+    uint256 parentNum; //0 == no parent
     uint256 balance; //balance in the parent group
     int256 permissions; //permission level of post in parent group
   }
@@ -52,7 +52,7 @@ library PostLib {
     checksPassed = false;
     creationTime = 0;
     if (state.main.initialized) { //if the contract hasn't been fully deployed yet (I.E. it's being deployed right now, in this call), the original creator won't even have permissions to create the first post, so just skip these checks
-      if (!postExists(state, parentNum))
+      if (!GroupLib.groupExists(state, parentNum))
         return;
       //TODO: ruleset? creating a post (could) auto-join to group
       if (!PermissionLib.createPost(state, GroupLib.getGroup(state, parentNum), content.creator))
@@ -118,9 +118,9 @@ library PostLib {
       GroupLib.joinGroup(state, parent);
     }
 
-    u = GroupLib.getUserProperties(state, parent, msg.sender);
+    var u2 = GroupLib.getUserProperties(state, parent, msg.sender);
 
-    CurrencyLib.awardTokensToUser(parent, u, 8, true); //TODO: ruleset; how much should they get, if anything? also TODO msg.value for money paid in
+    CurrencyLib.awardTokensToUser(parent, u2, 8, true); //TODO: ruleset; how much should they get, if anything? also TODO msg.value for money paid in
 
 
     PostCreated(parentNum, newPost.number, msg.sender);

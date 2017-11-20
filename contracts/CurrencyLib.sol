@@ -26,17 +26,25 @@ library CurrencyLib {
     bool increased
   );
 
+  event Debug(
+    uint256 indexed major,
+    uint256 indexed minor,
+    uint256 indexed micro,
+    string message,
+    uint256 dat1,
+    uint256 dat2
+  );
 
   function equalizeTokens(
     uint256 amount,
     uint256 senderBalance,
     uint256 receiverBalance,
     bool increase
-  ) private pure returns (
+  ) internal pure returns (
     uint256
   ) {
     if (increase) {
-      return (senderBalance > amount ? amount : senderBalance);
+      return (senderBalance >= amount ? amount : senderBalance);
     } else {
       if (senderBalance >= amount) { //have enough to complete
         if (receiverBalance >= amount) { //can take full blow
@@ -58,21 +66,17 @@ library CurrencyLib {
     }
   }
 
-  function transferTokensToUser(
-    StateLib.State storage state,
-//    uint256 parentNum,
+  function transferTokensUserToUser(
     GroupLib.Group storage group,
-    address receiverAddress,
+    UserLib.User storage sender,
+    UserLib.User storage receiver,
     uint256 amount,
     bool increase
-  ) public {
-    if (amount == 0) {
+  ) internal {
+    if (sender.parentNum != receiver.parentNum || sender.parentNum != group.number) {
+      Debug(2, 0, group.number, "transferTokensUserToUser invalid", sender.parentNum, receiver.parentNum);
       return;
     }
-    var sender = GroupLib.getUserProperties(state, group, msg.sender);
-    var receiver = GroupLib.getUserProperties(state, group, receiverAddress);
-    //var parent = PostLib.getPost(state, parentNum);
-    //doing the getUserProperties calls here lets them do their requires() for validation
 
     amount = equalizeTokens(
       amount,
@@ -80,34 +84,27 @@ library CurrencyLib {
       receiver.balance,
       increase
     );
+
+    if (amount == 0)
+      return;
 
     awardTokensToUser(group, sender, amount, false);
     awardTokensToUser(group, receiver, amount, increase);
     //TODO: ruleset taxes, not 1:1 deduction?
   }
 
-  function transferTokensToPost(
-    StateLib.State storage state,
-//    uint256 parentNum,
-//    PostLib.Post storage parent,
+  function transferTokensUserToPost(
     GroupLib.Group storage group,
+    UserLib.User storage sender,
     PostLib.Post storage receiver,
-//    uint256 postNum,
     uint256 amount,
     bool increase
-  ) public {
-    if (amount == 0) {
+  ) internal {
+    if (receiver.parentNum != group.number || sender.parentNum != group.number) {
+      Debug(2, 1, group.number, "transferTokensUserToPost invalid", sender.parentNum, receiver.parentNum);
       return;
     }
 
-//    uint256 parentNum = parent.number;
-//    uint256 postNum = receiver.number;
-    require(GroupLib.isSubpost(state, group, receiver.number));
-
-    var sender = GroupLib.getUserProperties(state, group, msg.sender);
-    //var sender = UserLib.getUser(state, parent.number, msg.sender);
-    //var receiver = PostLib.getPost(state, postNum);
-    //var parent = PostLib.getPost(state, parentNum);
     amount = equalizeTokens(
       amount,
       sender.balance,
@@ -115,73 +112,134 @@ library CurrencyLib {
       increase
     );
 
+    if (amount == 0)
+      return;
+
     awardTokensToUser(group, sender, amount, false);
     awardTokensToPost(group, receiver, amount, increase);
     //TODO: ruleset taxes, not 1:1 deduction?
   }
 
-  function add(uint256 x, uint256 y) pure internal returns (uint256 z) {
-    if ((z = x + y) < x) {
-      return (2**256 - 1);
+  function transferTokensUserToGroup(
+    GroupLib.Group storage group,
+    UserLib.User storage sender,
+    uint256 amount,
+    bool increase
+  ) internal {
+    if (sender.parentNum != group.number) {
+      Debug(2, 2, 0, "transferTokensUserToGroup invalid", sender.parentNum, group.number);
+      return;
+    }
+
+    /*
+    amount = equalizeTokens(
+      amount,
+      sender.balance,
+      group.tokens,
+      increase
+    );
+    */
+    amount = sender.balance >= amount ? amount : sender.balance;
+
+    if (amount == 0)
+      return;
+
+    uint256 senderDelta;
+    (sender.balance, senderDelta) = subtract(sender.balance, amount);
+    UserBalanceChanged(group.number, sender.addr, senderDelta, false);
+    if (!increase) {
+      uint256 groupDelta;
+      (group.tokens, groupDelta) = subtract(group.tokens, senderDelta);
+      PostTokensChanged(group.number, groupDelta, increase);
     }
   }
 
-  function subtract(uint256 x, uint256 y) pure internal returns (uint256 z) {
+  function add(uint256 x, uint256 y) pure internal returns (uint256 z, uint256 d) {
+    if ((z = x + y) < x) {
+      z = 2**256 - 1;
+    }
+    d = z - x;
+  }
+
+  function subtract(uint256 x, uint256 y) pure internal returns (uint256 z, uint256 d) {
     if ((z = x - y) > x) {
-      return (0);
+      z = 0;
+      d = x;
+    } else {
+      d = y;
+    }
+  }
+
+  function awardTokens(
+    uint256 targetBalance,
+    uint256 parentBalance,
+    uint256 amount,
+    bool increase
+  ) internal returns (
+    uint256 newTargetBalance,
+    uint256 newParentBalance,
+    uint256 targetDelta,
+    uint256 parentDelta
+  ) {
+    if (increase) {
+      (newParentBalance, parentDelta) = add(parentBalance, amount);
+
+      //group tokens >= user balance, so if group tokens maxes out at 2^256,
+      // then the user can't get any more tokens
+      (newTargetBalance, targetDelta) = add(targetBalance, parentDelta);
+    } else {
+      (newTargetBalance, targetDelta) = subtract(targetBalance, amount);
+
+      //if the user runs out of tokens part of the way through the transfer,
+      // only subtract the amount the user did have from the group tokens
+      (newParentBalance, parentDelta) = subtract(parentBalance, targetDelta);
     }
   }
 
   function awardTokensToUser(
-//    StateLib.State storage state,
     GroupLib.Group storage group,
-//    PostLib.Post storage parent,
     UserLib.User storage user,
     uint256 amount,
     bool increase
   ) internal {
-    uint256 oldUserBalance = user.balance;
-    uint256 oldParentBalance = group.tokens;
     uint256 userDelta;
     uint256 groupDelta;
-    if (increase) {
-      group.tokens = add(group.tokens, amount);
-      groupDelta = subtract(group.tokens, oldParentBalance);
-      user.balance = add(user.balance, groupDelta); //group tokens >= user balance, so if group tokens maxes out at 2^256, then the user can't get any more tokens
-      userDelta = subtract(user.balance, oldUserBalance);
-    } else {
-      user.balance = subtract(user.balance, amount);
-      userDelta = subtract(oldUserBalance, user.balance);
-      group.tokens = subtract(group.tokens, userDelta); //if the user runs out of tokens part of the way through the transfer, only subtract the amount the user did have from the group tokens
-      groupDelta = subtract(oldParentBalance, group.tokens);
-    }
+    (
+      user.balance,
+      group.tokens,
+      userDelta,
+      groupDelta
+    ) = awardTokens(
+      user.balance,
+      group.tokens,
+      amount,
+      increase
+    );
+
     UserBalanceChanged(group.number, user.addr, userDelta, increase);
     PostTokensChanged(group.number, groupDelta, increase);
   }
 
   function awardTokensToPost(
-//    StateLib.State storage state,
     GroupLib.Group storage group,
-//    PostLib.Post storage parent,
     PostLib.Post storage post,
     uint256 amount,
     bool increase
   ) internal {
-    uint256 oldPostBalance = post.balance;
-    uint256 oldParentBalance = group.tokens;
     uint256 postDelta;
     uint256 groupDelta;
-    if (increase) {
-      group.tokens = add(group.tokens, amount);
-      groupDelta = subtract(group.tokens, oldParentBalance);
-      post.balance = add(post.balance, groupDelta);
-      postDelta = subtract(post.balance, oldPostBalance);
-    } else {
-      post.balance = subtract(post.balance, amount);
-      postDelta = subtract(oldPostBalance, post.balance);
-      group.tokens = subtract(group.tokens, postDelta);
-      groupDelta = subtract(oldParentBalance, group.tokens);
-    }
+    (
+      post.balance,
+      group.tokens,
+      postDelta,
+      groupDelta
+    ) = awardTokens(
+      post.balance,
+      group.tokens,
+      amount,
+      increase
+    );
+
     PostBalanceChanged(group.number, post.number, postDelta, increase);
     PostTokensChanged(group.number, groupDelta, increase);
   }

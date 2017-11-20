@@ -96,8 +96,6 @@ export default class GroupStore {
   }
 
   static getGroup(num) {
-    console.log("getting group:", num);
-    console.log("getting groupstr:", num.toString());
     if (!this.cache[num]) {
       this.cache[num] = new Group(num);
     }

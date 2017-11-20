@@ -20,15 +20,6 @@ class SideBar extends Component {
     };
   }
 
-  updateBalance(group) {
-    group.loadTokens().then((tokens) => {
-      console.log("Sidebar got group tokens:", tokens);
-      this.setState({
-        tokens: tokens.toLocaleString(),
-      });
-    });
-  }
-
   updateUsers(group) {
     group.loadUsers().then((users) => {
       let userInGroup = false;
@@ -63,15 +54,6 @@ class SideBar extends Component {
       if (this.props.isLoaded) {
         return; //went from loaded -> loaded, no update
       }
-
-      this.updateBalance(group);
-
-      if (this.tokensListener) {
-        group.unregisterTokensChangedListener(this.tokensListener);
-      }
-      this.tokensListener = group.registerTokensChangedListener(() => {
-        this.updateBalance(group);
-      });
 
       this.updateUsers(group);
 
@@ -180,6 +162,7 @@ class SideBar extends Component {
         easing="ease-in"
         trigger="Members"
       >
+        {this.state.userCount} Member{this.state.userCount === 1 ? '' : 's'}
         {this.renderUsers()}
       </Collapsible>
     );
@@ -212,22 +195,10 @@ class SideBar extends Component {
     }
   }
 
-  renderStats() {
-    if (!this.state.isLoaded) {
-      return ('');
-    }
-    return (
-      <div style={styles.stats}>
-        {this.state.userCount} Member{this.state.userCount === 1 ? '' : 's'} / {this.state.tokens} Earnings
-      </div>
-    );
-  }
-
   render() {
     return (
       <div style={styles.container}>
         {this.renderPost()}
-        {this.renderStats()}
         {this.renderJoinButton()}
         {this.renderUsersAccordian()}
 
