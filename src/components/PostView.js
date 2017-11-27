@@ -98,6 +98,34 @@ export default class PostView extends Component {
     );
   }
 
+  getType() {
+    if (this.props.post.contentType) {
+      var typeEnd = this.props.post.contentType.substring(this.props.post.contentType.indexOf('/') + 1);
+      return (
+        <span style={this.styles.type}>
+          {typeEnd}
+        </span>
+      );
+    } else {
+      return (
+        <span style={this.styles.type}>
+           Pending...
+        </span>
+      );
+    }
+  }
+
+  renderCreator() {
+    return (
+      <span style={this.styles.creator}>
+        Creator:&nbsp;
+        <span style={this.styles.creatorHash}>
+          {this.props.post.creator}
+        </span>
+      </span>
+    );
+  }
+
   renderId() {
     if (this.props.post.id) {
       return (
@@ -122,6 +150,50 @@ export default class PostView extends Component {
     } else {
       content = 'Loading content...';
       loaded = false;
+    }
+    if(this.props.post.contentType.includes('image')) {
+      return (
+        <div style={this.styles.contentWrapper}>
+          <div style={this.styles.content}>
+            <img src = {content} alt="user image"/>
+          </div>
+        </div>
+      );
+    }
+    else if(this.props.post.contentType.includes('video')) {
+      return (
+        <div style={this.styles.contentWrapper}>
+          <div style={this.styles.content}>
+            <video width = "320" height = "240" controls
+              src = {content} type = {this.props.post.contentType}
+              >
+              Videos not supported in browser
+            </video>
+          </div>
+        </div>
+      );
+    }
+    else if(this.props.post.contentType.includes('audio')) {
+      return (
+        <div style={this.styles.contentWrapper}>
+          <div style={this.styles.content}>
+            <audio controls
+              src = {content} type = {this.props.post.contentType}
+              >
+              Audio not supported in browser
+            </audio>
+          </div>
+        </div>
+      );
+    }
+    else if(this.props.post.contentType.includes('application')) {
+      return (
+        <div style={this.styles.contentWrapper}>
+          <div style={this.styles.content}>
+            <a href={content}>Download Content</a>
+          </div>
+        </div>
+      );
     }
     content = xss(content).replace(/\n/g, '<br />');
     if (content.length) {
@@ -261,6 +333,9 @@ export default class PostView extends Component {
         fontSize: 'x-small',
       },
       number: {
+        fontSize: 'small',
+      },
+      type: {
         fontSize: 'small',
       },
       multiHash: {
