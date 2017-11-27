@@ -3,8 +3,6 @@ import CyberneticChat from '../blockchain/CyberneticChat';
 import Blockchain from '../blockchain/Blockchain';
 import UserStore from '../stores/UserStore';
 import PostStore from '../stores/PostStore';
-import Post from './Post';
-import User from './User';
 import Wallet from '../models/Wallet'
 import moment from 'moment';
 
@@ -29,7 +27,6 @@ export default class Group {
         if (parentNumber === this.number) {
           console.log("Group", this.number, "got a new post notification:", result.args);
           const postNumber = result.args.postNumber.toString();
-          const userAddress = result.args.userAddress;
           const post = PostStore.getPost(postNumber, result.transactionHash);
           this.firePostCreatedListeners(post);
         }

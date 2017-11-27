@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Wallet from '../models/Wallet';
-import cx from 'classnames';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import UpDownVoter from './UpDownVoter';

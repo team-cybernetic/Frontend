@@ -405,8 +405,8 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820cec922578b0340fffa0b6d466c69bd9d377a4585d6ed09e1df181c68ea508c0e0029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820cec922578b0340fffa0b6d466c69bd9d377a4585d6ed09e1df181c68ea508c0e0029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820e4d2e4dd3ef1f98dab4b6e83702c007d959af06bbd2409efc36157ef07b1fc270029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820e4d2e4dd3ef1f98dab4b6e83702c007d959af06bbd2409efc36157ef07b1fc270029",
   "sourceMap": "75:6056:1:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "75:6056:1:-;;;;;",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./UserLib.sol\";\nimport \"./PostLib.sol\";\n\nlibrary CurrencyLib {\n  struct State {\n    uint256 total;\n  }\n\n  event UserBalanceChanged(\n    uint256 indexed parentNumber,\n    address indexed userAddress,\n    uint256 amount,\n    bool increased\n  );\n  event PostBalanceChanged(\n    uint256 indexed parentNumber,\n    uint256 indexed postNumber,\n    uint256 amount,\n    bool increased\n  );\n  event PostTokensChanged(\n    uint256 indexed postNumber,\n    uint256 amount,\n    bool increased\n  );\n\n  event Debug(\n    uint256 indexed major,\n    uint256 indexed minor,\n    uint256 indexed micro,\n    string message,\n    uint256 dat1,\n    uint256 dat2\n  );\n\n  function equalizeTokens(\n    uint256 amount,\n    uint256 senderBalance,\n    uint256 receiverBalance,\n    bool increase\n  ) internal pure returns (\n    uint256\n  ) {\n    if (increase) {\n      return (senderBalance >= amount ? amount : senderBalance);\n    } else {\n      if (senderBalance >= amount) { //have enough to complete\n        if (receiverBalance >= amount) { //can take full blow\n          //Scenario: ideal\n          return (amount);\n        } else { //can't take the full blow\n          //Scenario: smashed\n          return (receiverBalance);\n        }\n      } else { //don't have enough to complete\n        if (receiverBalance >= senderBalance) { //can take all sender has got\n          //Scenario: poor boy\n          return (senderBalance);\n        } else { //can't even take what sender has got\n          //Scenario: poor smasher\n          return (receiverBalance);\n        }\n      }\n    }\n  }\n\n  function transferTokensUserToUser(\n    GroupLib.Group storage group,\n    UserLib.User storage sender,\n    UserLib.User storage receiver,\n    uint256 amount,\n    bool increase\n  ) internal {\n    if (sender.parentNum != receiver.parentNum || sender.parentNum != group.number) {\n      Debug(2, 0, group.number, \"transferTokensUserToUser invalid\", sender.parentNum, receiver.parentNum);\n      return;\n    }\n\n    amount = equalizeTokens(\n      amount,\n      sender.balance,\n      receiver.balance,\n      increase\n    );\n\n    if (amount == 0)\n      return;\n\n    awardTokensToUser(group, sender, amount, false);\n    awardTokensToUser(group, receiver, amount, increase);\n    //TODO: ruleset taxes, not 1:1 deduction?\n  }\n\n  function transferTokensUserToPost(\n    GroupLib.Group storage group,\n    UserLib.User storage sender,\n    PostLib.Post storage receiver,\n    uint256 amount,\n    bool increase\n  ) internal {\n    if (receiver.parentNum != group.number || sender.parentNum != group.number) {\n      Debug(2, 1, group.number, \"transferTokensUserToPost invalid\", sender.parentNum, receiver.parentNum);\n      return;\n    }\n\n    amount = equalizeTokens(\n      amount,\n      sender.balance,\n      receiver.balance,\n      increase\n    );\n\n    if (amount == 0)\n      return;\n\n    awardTokensToUser(group, sender, amount, false);\n    awardTokensToPost(group, receiver, amount, increase);\n    //TODO: ruleset taxes, not 1:1 deduction?\n  }\n\n  function transferTokensUserToGroup(\n    GroupLib.Group storage group,\n    UserLib.User storage sender,\n    uint256 amount,\n    bool increase\n  ) internal {\n    if (sender.parentNum != group.number) {\n      Debug(2, 2, 0, \"transferTokensUserToGroup invalid\", sender.parentNum, group.number);\n      return;\n    }\n\n    /*\n    amount = equalizeTokens(\n      amount,\n      sender.balance,\n      group.tokens,\n      increase\n    );\n    */\n    amount = sender.balance >= amount ? amount : sender.balance;\n\n    if (amount == 0)\n      return;\n\n    uint256 senderDelta;\n    (sender.balance, senderDelta) = subtract(sender.balance, amount);\n    UserBalanceChanged(group.number, sender.addr, senderDelta, false);\n    if (!increase) {\n      uint256 groupDelta;\n      (group.tokens, groupDelta) = subtract(group.tokens, senderDelta);\n      PostTokensChanged(group.number, groupDelta, increase);\n    }\n  }\n\n  function add(uint256 x, uint256 y) pure internal returns (uint256 z, uint256 d) {\n    if ((z = x + y) < x) {\n      z = 2**256 - 1;\n    }\n    d = z - x;\n  }\n\n  function subtract(uint256 x, uint256 y) pure internal returns (uint256 z, uint256 d) {\n    if ((z = x - y) > x) {\n      z = 0;\n      d = x;\n    } else {\n      d = y;\n    }\n  }\n\n  function awardTokens(\n    uint256 targetBalance,\n    uint256 parentBalance,\n    uint256 amount,\n    bool increase\n  ) internal returns (\n    uint256 newTargetBalance,\n    uint256 newParentBalance,\n    uint256 targetDelta,\n    uint256 parentDelta\n  ) {\n    if (increase) {\n      (newParentBalance, parentDelta) = add(parentBalance, amount);\n\n      //group tokens >= user balance, so if group tokens maxes out at 2^256,\n      // then the user can't get any more tokens\n      (newTargetBalance, targetDelta) = add(targetBalance, parentDelta);\n    } else {\n      (newTargetBalance, targetDelta) = subtract(targetBalance, amount);\n\n      //if the user runs out of tokens part of the way through the transfer,\n      // only subtract the amount the user did have from the group tokens\n      (newParentBalance, parentDelta) = subtract(parentBalance, targetDelta);\n    }\n  }\n\n  function awardTokensToUser(\n    GroupLib.Group storage group,\n    UserLib.User storage user,\n    uint256 amount,\n    bool increase\n  ) internal {\n    uint256 userDelta;\n    uint256 groupDelta;\n    (\n      user.balance,\n      group.tokens,\n      userDelta,\n      groupDelta\n    ) = awardTokens(\n      user.balance,\n      group.tokens,\n      amount,\n      increase\n    );\n\n    UserBalanceChanged(group.number, user.addr, userDelta, increase);\n    PostTokensChanged(group.number, groupDelta, increase);\n  }\n\n  function awardTokensToPost(\n    GroupLib.Group storage group,\n    PostLib.Post storage post,\n    uint256 amount,\n    bool increase\n  ) internal {\n    uint256 postDelta;\n    uint256 groupDelta;\n    (\n      post.balance,\n      group.tokens,\n      postDelta,\n      groupDelta\n    ) = awardTokens(\n      post.balance,\n      group.tokens,\n      amount,\n      increase\n    );\n\n    PostBalanceChanged(group.number, post.number, postDelta, increase);\n    PostTokensChanged(group.number, groupDelta, increase);\n  }\n}\n",
@@ -436,7 +436,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2759,
+          "SourceUnit": 2769,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/UserLib.sol",
           "file": "./UserLib.sol",
           "scope": 711,
@@ -451,7 +451,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2553,
+          "SourceUnit": 2563,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/PostLib.sol",
           "file": "./PostLib.sol",
           "scope": 711,
@@ -3611,7 +3611,7 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "UserLib.User",
-                          "referencedDeclaration": 2631,
+                          "referencedDeclaration": 2641,
                           "type": "struct UserLib.User storage pointer"
                         },
                         "id": 244,
@@ -3639,7 +3639,7 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "UserLib.User",
-                          "referencedDeclaration": 2631,
+                          "referencedDeclaration": 2641,
                           "type": "struct UserLib.User storage pointer"
                         },
                         "id": 246,
@@ -3800,7 +3800,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "parentNum",
-                                  "referencedDeclaration": 2618,
+                                  "referencedDeclaration": 2628,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -3831,7 +3831,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "parentNum",
-                                  "referencedDeclaration": 2618,
+                                  "referencedDeclaration": 2628,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -3886,7 +3886,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "parentNum",
-                                  "referencedDeclaration": 2618,
+                                  "referencedDeclaration": 2628,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -4102,7 +4102,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "parentNum",
-                                      "referencedDeclaration": 2618,
+                                      "referencedDeclaration": 2628,
                                       "type": "uint256"
                                     },
                                     "children": [
@@ -4133,7 +4133,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "parentNum",
-                                      "referencedDeclaration": 2618,
+                                      "referencedDeclaration": 2628,
                                       "type": "uint256"
                                     },
                                     "children": [
@@ -4305,7 +4305,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256",
                                   "value": "group",
                                   "isConstant": false,
@@ -4342,7 +4342,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -4617,7 +4617,7 @@
                                   "typeString": "struct GroupLib.Group storage pointer"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$_User_$2631_storage_ptr",
+                                  "typeIdentifier": "t_struct$_User_$2641_storage_ptr",
                                   "typeString": "struct UserLib.User storage pointer"
                                 },
                                 {
@@ -4866,7 +4866,7 @@
                                   "typeString": "struct GroupLib.Group storage pointer"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$_User_$2631_storage_ptr",
+                                  "typeIdentifier": "t_struct$_User_$2641_storage_ptr",
                                   "typeString": "struct UserLib.User storage pointer"
                                 },
                                 {
@@ -5149,7 +5149,7 @@
                           "name": "UserLib.User",
                           "type": "struct UserLib.User storage pointer",
                           "contractScope": null,
-                          "referencedDeclaration": 2631
+                          "referencedDeclaration": 2641
                         },
                         "id": 314,
                         "name": "UserDefinedTypeName",
@@ -5176,7 +5176,7 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "PostLib.Post",
-                          "referencedDeclaration": 2296,
+                          "referencedDeclaration": 2305,
                           "type": "struct PostLib.Post storage pointer"
                         },
                         "id": 316,
@@ -5331,7 +5331,7 @@
                                   "operator": "=",
                                   "type": "uint256",
                                   "member_name": "parentNum",
-                                  "referencedDeclaration": 2291
+                                  "referencedDeclaration": 2300
                                 },
                                 "children": [
                                   {
@@ -5468,7 +5468,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "parentNum",
-                                  "referencedDeclaration": 2618,
+                                  "referencedDeclaration": 2628,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -5763,7 +5763,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "parentNum",
-                                      "referencedDeclaration": 2618,
+                                      "referencedDeclaration": 2628,
                                       "type": "uint256"
                                     },
                                     "children": [
@@ -5794,7 +5794,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "parentNum",
-                                      "referencedDeclaration": 2291,
+                                      "referencedDeclaration": 2300,
                                       "type": "uint256"
                                     },
                                     "children": [
@@ -5945,7 +5945,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -5976,7 +5976,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2293,
+                                  "referencedDeclaration": 2302,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -6123,7 +6123,7 @@
                                   "typeString": "struct GroupLib.Group storage pointer"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$_User_$2631_storage_ptr",
+                                  "typeIdentifier": "t_struct$_User_$2641_storage_ptr",
                                   "typeString": "struct UserLib.User storage pointer"
                                 },
                                 {
@@ -6240,7 +6240,7 @@
                                   "typeString": "struct GroupLib.Group storage pointer"
                                 },
                                 {
-                                  "typeIdentifier": "t_struct$_Post_$2296_storage_ptr",
+                                  "typeIdentifier": "t_struct$_Post_$2305_storage_ptr",
                                   "typeString": "struct PostLib.Post storage pointer"
                                 },
                                 {
@@ -6402,7 +6402,7 @@
                           "name": "UserLib.User",
                           "type": "struct UserLib.User storage pointer",
                           "contractScope": null,
-                          "referencedDeclaration": 2631
+                          "referencedDeclaration": 2641
                         },
                         "id": 384,
                         "name": "UserDefinedTypeName",
@@ -6540,7 +6540,7 @@
                               "lValueRequested": false,
                               "type": "uint256",
                               "member_name": "parentNum",
-                              "referencedDeclaration": 2618
+                              "referencedDeclaration": 2628
                             },
                             "children": [
                               {
@@ -6894,7 +6894,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "parentNum",
-                                      "referencedDeclaration": 2618,
+                                      "referencedDeclaration": 2628,
                                       "type": "uint256"
                                     },
                                     "children": [
@@ -7037,7 +7037,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "balance",
-                                      "referencedDeclaration": 2622,
+                                      "referencedDeclaration": 2632,
                                       "type": "uint256"
                                     },
                                     "children": [
@@ -7101,7 +7101,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -7297,7 +7297,7 @@
                                   "isPure": false,
                                   "lValueRequested": true,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -7382,7 +7382,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -7624,7 +7624,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "addr",
-                              "referencedDeclaration": 2614,
+                              "referencedDeclaration": 2624,
                               "type": "address"
                             },
                             "children": [
@@ -16414,7 +16414,7 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "UserLib.User",
-                          "referencedDeclaration": 2631,
+                          "referencedDeclaration": 2641,
                           "type": "struct UserLib.User storage pointer"
                         },
                         "id": 610,
@@ -16606,7 +16606,7 @@
                                   "isPure": false,
                                   "lValueRequested": true,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -16747,7 +16747,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2622,
+                                  "referencedDeclaration": 2632,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -16931,7 +16931,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "addr",
-                              "referencedDeclaration": 2614,
+                              "referencedDeclaration": 2624,
                               "type": "address"
                             },
                             "children": [
@@ -17177,7 +17177,7 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "PostLib.Post",
-                          "referencedDeclaration": 2296,
+                          "referencedDeclaration": 2305,
                           "type": "struct PostLib.Post storage pointer"
                         },
                         "id": 661,
@@ -17369,7 +17369,7 @@
                                   "isPure": false,
                                   "lValueRequested": true,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2293,
+                                  "referencedDeclaration": 2302,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -17510,7 +17510,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "balance",
-                                  "referencedDeclaration": 2293,
+                                  "referencedDeclaration": 2302,
                                   "type": "uint256"
                                 },
                                 "children": [
@@ -17694,7 +17694,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "number",
-                              "referencedDeclaration": 2289,
+                              "referencedDeclaration": 2298,
                               "type": "uint256"
                             },
                             "children": [
@@ -18926,8 +18926,13 @@
       "events": {},
       "links": {},
       "address": "0xa5a1e71a5142c72d9b6feb6a732bcf12e7212f35"
+    },
+    "1511800690237": {
+      "events": {},
+      "links": {},
+      "address": "0x141f1db0d9200f09962ce394b2dee1d37d5be3f5"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-20T15:04:19.301Z"
+  "updatedAt": "2017-11-27T16:38:37.955Z"
 }

@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import UserView from './UserView';
-import Collapsible from 'react-collapsible';
 import './style.css';
-import cx from 'classnames';
 import moment from 'moment';
 import UserStore from '../stores/UserStore';
 

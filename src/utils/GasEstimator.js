@@ -19,8 +19,10 @@ export default class GasEstimator {
         switch (methodName) {
           case 'leaveGroup':
             safeGas = gas * 2; //normal is 18485, on testrpc required is 36970, but spent is still 18485???
+            break;
           case 'transferTokensToPost':
             safeGas = gas * 3;
+            break;
           default:
             break;
         }

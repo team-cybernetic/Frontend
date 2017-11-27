@@ -89,7 +89,7 @@ export default class PathParser {
       let cleanPath = SEPARATOR + pathNums.join(SEPARATOR) + (isGroup && pathNums.length > 0 ? SEPARATOR : '');
       let cleanGroupPath = SEPARATOR + groupNums.join(SEPARATOR) + (groupNums.length > 0 ? SEPARATOR : '');
       console.log("titleArray:", titleArray);
-      let titleOnlyPath = SEPARATOR + titleArray.map((title) => title.replace(/\d+\-/, '')).join('');
+      let titleOnlyPath = SEPARATOR + titleArray.map((title) => title.replace(/\d+-/, '')).join('');
 
       return new Path({
         path,

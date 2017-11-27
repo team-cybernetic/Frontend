@@ -99,14 +99,14 @@ library GroupLib {
     return (group.userAddresses);
   }
 
-  function joinGroup(StateLib.State storage state, Group storage group) internal {
+  function joinGroup(StateLib.State storage state, Group storage group) internal returns (bool) {
     if (userExists(state, group, msg.sender)) {
-      return;
+      return (true);
     }
 
     if (state.main.initialized) {
       if (!PermissionLib.userJoin(state, group, msg.sender))
-        return;
+        return (false);
         //UserJoinDenied event emitted by permissionlib
     }
 
@@ -132,6 +132,7 @@ library GroupLib {
     }
 
     UserJoined(group.number, msg.sender);
+    return (true);
   }
 
   function removeUser(StateLib.State storage state, Group storage group, address userAddress) internal {

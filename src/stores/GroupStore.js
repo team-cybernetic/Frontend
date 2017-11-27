@@ -1,6 +1,5 @@
 import Group from '../models/Group'
 import PathParser from '../utils/PathParser';
-import Blockchain from '../blockchain/Blockchain';
 import CyberneticChat from '../blockchain/CyberneticChat';
 import PostStore from './PostStore';
 

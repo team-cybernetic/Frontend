@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
-import CyberneticChat from '../blockchain/CyberneticChat';
 import Wallet from '../models/Wallet';
 import UserStore from '../stores/UserStore';
 import xss from 'xss';
 
 class UserProfileView extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   componentWillMount() {
     this.loadProfile(this.userAddress());
@@ -53,7 +49,6 @@ class UserProfileView extends Component {
 
   renderContent() {
     let content;
-    let loaded = true;
     if (this.state.isLoading) {
       content = 'Loading content...';
     } else if (!this.state.user.profile) {

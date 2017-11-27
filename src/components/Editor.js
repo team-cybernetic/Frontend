@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import cx from 'classnames';
 import Wallet from '../models/Wallet';
 import { Type } from '../utils/PathParser';
-import CyberneticChat from '../blockchain/CyberneticChat';
 import UserStore from '../stores/UserStore';
 
 const VALID_CONTENT_REGEX = /^\s*(\S.*)(\n\s*((.*\n?)+)\s*)?/;
@@ -204,40 +203,18 @@ class Editor extends Component {
     return (matches && matches[3]) ? true : false;
   }
 
-  createPost() {
-    const matches = VALID_CONTENT_REGEX.exec(this.state.textAreaValue);
-    const title = matches[1];
-    const content = matches[3] ? matches[3] : '';
-    const contentType = "text/plain";
-    const userPermissionsFlagsMode = true; //TODO: flags or levels mode?
-    this.setState({
-      isPosting: true,
-    });
-    this.props.group.createPost({title: title.trim(), content, contentType, userPermissionsFlagsMode}).then((post) => {
-      console.log("post created:", post);
-      this.setState({
-        textAreaValue: '',
-        isPosting: false,
-      });
-    }).catch((error) => {
-      if (error) {
-        if (!error.cancel) {
-          console.error(error);
-        } else {
-          console.log("User cancelled creating the post!");
-        }
-      }
-      this.setState({
-        isPosting: false,
-      });
-    });
-  }
-
   createPost(file, textContent) {
     const matches = VALID_CONTENT_REGEX.exec(this.state.textAreaValue);
     const title = matches[1];
-    const content = textContent;
-    const contentType = file.type;
+    let content;
+    let contentType;
+    if (file) {
+      content = textContent;
+      contentType = file.type;
+    } else {
+      content = matches[3] ? matches[3] : '';
+      contentType = "text/plain";
+    }
     const userPermissionsFlagsMode = true; //TODO: flags or levels mode?
     this.setState({
       isPosting: true,

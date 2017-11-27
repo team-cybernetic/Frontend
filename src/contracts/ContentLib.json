@@ -1,8 +1,8 @@
 {
   "contractName": "ContentLib",
   "abi": [],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058200e39f7f9363aadd4718c154a2baa2480908d9ed7f50bd3ff1ce5da19034375f30029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058200e39f7f9363aadd4718c154a2baa2480908d9ed7f50bd3ff1ce5da19034375f30029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820672a23d524199a86660c8e1433550dcfe1c91a5fe8b50bcf7e70e147f7718f860029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820672a23d524199a86660c8e1433550dcfe1c91a5fe8b50bcf7e70e147f7718f860029",
   "sourceMap": "52:2312:0:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "52:2312:0:-;;;;;",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./StateLib.sol\";\n\nlibrary ContentLib {\n\n  /*\n     IPFS stores its hashes as a multihash -- the first two bytes represent\n     the hash function used (default SHA256) and the length of the hash,\n     which is typically 0x12 = SHA256 and 0x20 = 32 bytes (256 bits)\n     The hash is typically base58 encoded (like how bitcoin addresses are encoded),\n     but the hash part actually is only 32 bytes long when un-base58 encoded\n   */\n  struct IpfsMultihash {\n    uint8 hashFunction; //first byte of multihash\n    uint8 hashLength; //second byte of multihash\n    bytes hash; //hashLength remaining bytes of multihash\n  }\n\n  struct Content {\n    string title;\n    string mimeType;\n    IpfsMultihash multihash;\n    address creator;\n    uint256 creationTime;\n  }\n\n  function contentCheck(Content content) internal view returns (\n    bool checkPassed,\n    uint256 creationTime\n  ) {\n\n    //        require(ipfsHashLength != 0); //permit content-less posts TODO: ruleset\n    checkPassed = false;\n    creationTime = 0;\n\n    if (bytes(content.title).length > 2048) //arbitrary, but pretty close to the gas limit to store 64, 32 byte string segments at 5000 gas per segment\n      return;\n\n    if (content.multihash.hashLength != content.multihash.hash.length)\n      return;\n\n    //check if ipfs hash length matches expected size for hash function (function 0x12 should always be 0x20 bytes long) TODO: find out the other (multihash, size) tuples\n    if (content.multihash.hashLength != 0) {\n      if (content.multihash.hashFunction == 0x12) {\n        require(content.multihash.hashLength == 0x20);\n      }\n    }\n\n    uint256 ctLen = bytes(content.mimeType).length;\n\n    if (content.multihash.hashLength > 0) { //if there's no content, don't bother checking if there's a content type given\n      if (ctLen == 0)\n        return;\n    }\n\n    //RFC 6838 limits mime types to 127 bytes for each of the major and minor types, plus the separating slash\n    if (ctLen > 255)\n      return;\n\n    if (content.creationTime > block.timestamp || content.creationTime <= (block.timestamp - 1 hours)) { //TODO: moving average across all posts in the last hour?\n      creationTime = block.timestamp; //timestamp was invalid, just get the best time we can from the block\n    } else {\n      creationTime = content.creationTime;\n    }\n    checkPassed = true;\n  }\n}\n",
@@ -32,7 +32,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2586,
+          "SourceUnit": 2596,
           "absolutePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/StateLib.sol",
           "file": "./StateLib.sol",
           "scope": 137,
@@ -1026,7 +1026,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 2773,
+                                              "referencedDeclaration": 2783,
                                               "type": "function (bool) pure",
                                               "value": "require"
                                             },
@@ -1597,7 +1597,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2762,
+                                      "referencedDeclaration": 2772,
                                       "type": "block",
                                       "value": "block"
                                     },
@@ -1705,7 +1705,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 2762,
+                                              "referencedDeclaration": 2772,
                                               "type": "block",
                                               "value": "block"
                                             },
@@ -1802,7 +1802,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2762,
+                                          "referencedDeclaration": 2772,
                                           "type": "block",
                                           "value": "block"
                                         },
@@ -2013,8 +2013,13 @@
       "events": {},
       "links": {},
       "address": "0xedf09e1713bd3dc750ca8aaed16898e008de8eba"
+    },
+    "1511800690237": {
+      "events": {},
+      "links": {},
+      "address": "0x5b9a6f609f3fdfe4b326e3d74fe5ef07fc76726f"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-20T15:04:19.245Z"
+  "updatedAt": "2017-11-27T16:38:37.917Z"
 }

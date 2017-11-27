@@ -103,7 +103,7 @@ export default class SubpostsView extends Component {
       } else if (!post2.id) {
         return 1;
       }
-      return parseInt(post2.id) - parseInt(post1.id);
+      return parseInt(post2.id, 10) - parseInt(post1.id, 10);
     });
   }
 

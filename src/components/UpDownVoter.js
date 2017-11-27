@@ -12,9 +12,9 @@ export default class UpDownVoter extends Component {
 
       <a 
         style={styles.voteArrow}
-        onMouseDown={() => this.upvoteMouseDown()}
-        onMouseUp={() => this.upvoteMouseUp()}
-        onMouseOut={() => this.upvoteMouseOut()}
+        onMouseDown={() => this.voteMouseDown(1)}
+        onMouseUp={() => this.voteMouseUp()}
+        onMouseOut={() => this.voteMouseOut()}
       >
         ▲
       </a>
@@ -39,9 +39,9 @@ export default class UpDownVoter extends Component {
     return (
       <a
         style={styles.voteArrow}
-        onMouseDown={() => this.downvoteMouseDown()}
-        onMouseUp={() => this.downvoteMouseUp()}
-        onMouseOut={() => this.downvoteMouseOut()}
+        onMouseDown={() => this.voteMouseDown(-1)}
+        onMouseUp={() => this.voteMouseUp()}
+        onMouseOut={() => this.voteMouseOut()}
       >
         ▼
       </a>
@@ -57,7 +57,7 @@ export default class UpDownVoter extends Component {
   vote(amount) {
     const isPos = amount >= 0;
     amount = Math.abs(amount);
-    if (window.confirm("This transaction will cost you " + amount + " tokens, continue?") == false) {
+    if (!window.confirm("This transaction will cost you " + amount + " tokens, continue?")) {
         return;
     }
     this.props.send(amount, isPos);
@@ -74,39 +74,26 @@ export default class UpDownVoter extends Component {
     }
   }
 
-  upvoteMouseDown() {
+  voteMouseDown(amount) {
     //mouse down, reset count and begin counting up
+    /*
+    this.setState({
+      count: 0,
+      countActive: true,
+    });
+    */
     this.state.count = 0;
     this.state.countActive = true;
-    this.changeCount(1);
+    this.changeCount(amount);
   }
 
-  upvoteMouseUp() {
+  voteMouseUp() {
     //mouse up over the element, send the tip
-    this.state.countActive = false;
-    this.vote(this.state.count);
+    /*
     this.setState({
-      count: 0,
-    });
-  }
-
-  upvoteMouseOut() {
-    //mouse out, stop counting, reset counter (cancelled)
-    this.setState({
-      count: 0,
       countActive: false,
     });
-  }
-
-  downvoteMouseDown() {
-    //mouse down, reset count and begin counting up
-    this.state.count = 0;
-    this.state.countActive = true;
-    this.changeCount(-1);
-  }
-
-  downvoteMouseUp() {
-    //mouse up over the element, send the tip
+    */
     this.state.countActive = false;
     this.vote(this.state.count);
     this.setState({
@@ -114,7 +101,7 @@ export default class UpDownVoter extends Component {
     });
   }
 
-  downvoteMouseOut() {
+  voteMouseOut() {
     //mouse out, stop counting, reset counter (cancelled)
     this.setState({
       count: 0,

@@ -5,7 +5,7 @@ import Collapsible from 'react-collapsible';
 import Wallet from '../models/Wallet'
 import './style.css';
 import cx from 'classnames';
-import { some, compact } from 'lodash';
+import { compact } from 'lodash';
 
 class SideBar extends Component {
   constructor(props) {

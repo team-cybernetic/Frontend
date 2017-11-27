@@ -107,7 +107,10 @@ library PostLib {
     );
 
     //should the user join the new group?
-    GroupLib.joinGroup(state, newPost.group); //TODO: ruleset? does it make sense to create a group but not be part of it?
+    //TODO: ruleset? does it make sense to create a group but not be part of it?
+    if (!GroupLib.joinGroup(state, newPost.group))
+      return;
+      
 
     var u = GroupLib.getUserProperties(state, newPost.group, msg.sender);
     u.permissions = -1; //TODO: ruleset, permissions of creator

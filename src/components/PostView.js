@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import xss from 'xss';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
-import Blockchain from '../blockchain/Blockchain';
 import UpDownVoter from './UpDownVoter';
 
 export default class PostView extends Component {
@@ -93,7 +92,7 @@ export default class PostView extends Component {
   renderTitle() {
     return (
       <div>
-        <Link to={this.getTargetPath()}>{this.renderId()}</Link>&nbsp;--&nbsp;<Link to={this.getTargetPath() + '/'}>{this.props.post.title}</Link>
+        <Link to={this.getTargetPath()}>{this.renderId()}</Link>&nbsp;-{this.getType()}-&nbsp;<Link to={this.getTargetPath() + '/'}>{this.props.post.title}</Link>
       </div>
     );
   }
@@ -113,17 +112,6 @@ export default class PostView extends Component {
         </span>
       );
     }
-  }
-
-  renderCreator() {
-    return (
-      <span style={this.styles.creator}>
-        Creator:&nbsp;
-        <span style={this.styles.creatorHash}>
-          {this.props.post.creator}
-        </span>
-      </span>
-    );
   }
 
   renderId() {
@@ -151,42 +139,45 @@ export default class PostView extends Component {
       content = 'Loading content...';
       loaded = false;
     }
-    if(this.props.post.contentType.includes('image')) {
+    if (this.props.post.contentType.includes('image')) {
+      let alt = "Loading image...";
       return (
         <div style={this.styles.contentWrapper}>
           <div style={this.styles.content}>
-            <img src = {content} alt="user image"/>
+            <img
+              src={content}
+              alt={alt}
+            />
           </div>
         </div>
       );
-    }
-    else if(this.props.post.contentType.includes('video')) {
+    } else if (this.props.post.contentType.includes('video')) {
       return (
         <div style={this.styles.contentWrapper}>
           <div style={this.styles.content}>
             <video width = "320" height = "240" controls
-              src = {content} type = {this.props.post.contentType}
-              >
-              Videos not supported in browser
+              src={content}
+              type={this.props.post.contentType}
+            >
+              HTML5 video component not supported by your browser!
             </video>
           </div>
         </div>
       );
-    }
-    else if(this.props.post.contentType.includes('audio')) {
+    } else if (this.props.post.contentType.includes('audio')) {
       return (
         <div style={this.styles.contentWrapper}>
           <div style={this.styles.content}>
             <audio controls
-              src = {content} type = {this.props.post.contentType}
-              >
-              Audio not supported in browser
+              src={content}
+              type={this.props.post.contentType}
+            >
+              HTML5 audio component not supported by your browser!
             </audio>
           </div>
         </div>
       );
-    }
-    else if(this.props.post.contentType.includes('application')) {
+    } else if (this.props.post.contentType.includes('application')) {
       return (
         <div style={this.styles.contentWrapper}>
           <div style={this.styles.content}>
