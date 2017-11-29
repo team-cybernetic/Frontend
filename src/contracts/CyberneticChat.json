@@ -13148,12 +13148,12 @@
         }
       },
       "links": {
-        "PermissionLib": "0x9858857a40f182e9ec96dd0f64a9002239a21a99",
-        "GroupLib": "0xec6b5a6bee520ac4b9deae860b0c1af0c9b9f988"
+        "PermissionLib": "0x90987c9fbe433a2135bbda6a16376140ff82d522",
+        "GroupLib": "0xf3a2045a68bffdedd0d7ada7d1b55afe90ca9ec8"
       },
-      "address": "0x3a8bc84066b11a559cd2f7e9b4ffb557a33082fe"
+      "address": "0x97408641e5ab16af4402f1bba934dd4c34562d3e"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-29T16:42:05.673Z"
+  "updatedAt": "2017-11-29T16:53:42.192Z"
 }
