@@ -17,6 +17,7 @@ class Editor extends Component {
     }
     this.userListener = null;
     this.oldUser = null;
+    this.oldGroup = null;
   }
 
   getBalances(isLoaded, group) {
@@ -29,7 +30,7 @@ class Editor extends Component {
       this.userListener = userProperties.registerUpdateListener(() => {
         console.log("Editor got userProperties update:", userProperties);
         this.setState({
-          localBalance: userProperties.getBalance().toLocaleString(),
+          localBalance: userProperties.getBalance(),
           inGroup: userProperties.getJoined(),
         });
       });
@@ -38,13 +39,30 @@ class Editor extends Component {
         console.log("Editor loaded userProperties header:", userProperties);
 
         this.setState({
-          localBalance: userProperties.getBalance().toLocaleString(),
+          localBalance: userProperties.getBalance(),
           inGroup: userProperties.getJoined(),
         });
       }).catch((error) => {
         console.error("Editor failed to load balance of self userProperties", userAddress, ":", error);
       });
       this.oldUser = userProperties;
+
+      group.loadTokens().then((tokens) => {
+        console.log("Editor loaded its own tokens:", tokens);
+        this.setState({
+          groupBalance: tokens,
+        });
+      });
+      if (this.tokensListener) {
+        this.oldGroup.unregisterTokensChangedListener(this.tokensListener);
+      }
+      this.tokensListener = group.registerTokensChangedListener((tokens) => {
+        console.log("Editor got a tokens update:", tokens);
+        this.setState({
+          groupBalance: tokens,
+        });
+      });
+      this.oldGroup = group;
     }
   }
 
@@ -81,7 +99,7 @@ class Editor extends Component {
       <p style={styles.earningsText}>
         Local:
         <span className='is-pulled-right'>
-          {this.getLocalBalance()}
+          {this.getLocalBalance()} / {this.getGroupBalance()}
         </span>
       </p>
     );
@@ -125,7 +143,7 @@ class Editor extends Component {
     if (this.isUserProfile()) {
       return (
         <button
-          style={styles.postButton}
+          style={styles.profileButton}
           className={cx('button', {'is-loading': this.state.isPosting})}
           onClick={() => this.updateProfile()}
           disabled={!this.isValid() || !this.isOwnUserProfile()}
@@ -187,11 +205,15 @@ class Editor extends Component {
   }
 
   getGlobalBalance() {
-    return (Wallet.getCurrentEthBalance().toFixed(6).toLocaleString());
+    return (Wallet.getCurrentEthBalance().toFixed(3).toLocaleString());
   }
 
   getLocalBalance() {
-    return (this.state.localBalance);
+    return (this.state.localBalance.toLocaleString());
+  }
+
+  getGroupBalance() {
+    return (this.state.groupBalance ? this.state.groupBalance.toLocaleString() : "");
   }
 
   isValid() {
@@ -317,6 +339,11 @@ const styles = {
   postButton: {
     height: '50%',
     width: '100%',
+    float: 'right',
+  },
+  profileButton: {
+    height: '100%',
+    width: '10%',
     float: 'right',
   },
   textArea: {

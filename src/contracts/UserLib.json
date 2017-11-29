@@ -2416,14 +2416,19 @@
     "1509747848196": {
       "events": {},
       "links": {},
-      "address": "0x6c1fd3ea4a843946ad14468ad108a30e440074d9"
+      "address": "0xdbdd43277b36fedbdbbd3f02b81c8af2f14a3d6a"
     },
     "1511800690237": {
       "events": {},
       "links": {},
       "address": "0xd26be0ee63a1d28de201aa6cf3aad427d7706d42"
+    },
+    "1511838748428": {
+      "events": {},
+      "links": {},
+      "address": "0x85adce2181e5413845a53e97df6ef443ae4ff073"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-27T16:38:37.914Z"
+  "updatedAt": "2017-11-29T02:26:28.252Z"
 }

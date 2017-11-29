@@ -839,14 +839,19 @@
     "1509747848196": {
       "events": {},
       "links": {},
-      "address": "0x774c008a90d460a8a38ed8112d56c8eeb2c473b2"
+      "address": "0x1cec4119212e0b7c5702141f821da18b06bc56e4"
     },
     "1511800690237": {
       "events": {},
       "links": {},
       "address": "0x0afe575c1f1ce4b189e152e44b75c6682b997186"
+    },
+    "1511838748428": {
+      "events": {},
+      "links": {},
+      "address": "0x00acc0a29ff5e6d0301bb9c9496e22fe31e2c93d"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-27T16:38:37.960Z"
+  "updatedAt": "2017-11-29T02:26:28.293Z"
 }

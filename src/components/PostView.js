@@ -133,6 +133,7 @@ export default class PostView extends Component {
   renderContent() {
     let content;
     let loaded = true;
+    console.log("PostView rendering content: ", this.props.post.multiHashString);
     if (this.props.post.isContentLoaded()) {
       content = this.props.post.content;
     } else {

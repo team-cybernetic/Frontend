@@ -35,5 +35,5 @@ module.exports = function(deployer) {
   deployer.link(PermissionLib, CyberneticChat);
   deployer.link(GroupLib, CyberneticChat);
 
-  deployer.deploy(CyberneticChat, "Cybernetic Chat Root", "text/plain", 18, 32, "0x671a2d8d519c51f1c33d5c05318f1f7bdbda8abd6d9cce2492d09bdebbe04551", 0);
+  deployer.deploy(CyberneticChat, "Cybernetic Chat Root", "text/plain", 18, 32, "0x3e4b46fd1b9b020d87a1737ae6cfac6339e6b586fddd1e760a1d3cb1628b50da", 0);
 };

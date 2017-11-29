@@ -12748,10 +12748,10 @@
         }
       },
       "links": {
-        "PermissionLib": "0xd2313b8637c776c9de8d2d85ba6a55022c4979c6",
-        "GroupLib": "0x6aae05b4506902ed98c722d772ada96313d44b96"
+        "PermissionLib": "0x2d9a6d2a138e3bd963d9762da09129da63a520d4",
+        "GroupLib": "0x0142bfa70c845b3ff5580a984d29194ac5b3e882"
       },
-      "address": "0x946f6594b602b5d5787e64e2131f291d3e28d396"
+      "address": "0x0144b41274dbe8bcb97207ba4b768dfef46669ca"
     },
     "1511800690237": {
       "events": {
@@ -12952,8 +12952,208 @@
         "GroupLib": "0x355bcf6dcaacc8fbca5aaefbcdc0d1e5551949a4"
       },
       "address": "0x8e97875cefbb7a8636452769d056e06aeb701165"
+    },
+    "1511838748428": {
+      "events": {
+        "0x33c90698e3ceaafedcd2a825eb0eff6ffda9746751913fe9997cc40c2822980c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserJoinDenied",
+          "type": "event"
+        },
+        "0xd423976f4855ebe49c0df63012daef410fc4ab8e9ac9cb816d71a5b7783f5b61": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "PostCreationDenied",
+          "type": "event"
+        },
+        "0x6a5f716eff9d9b77c04378575633c0f6784ea8d1a0b7cc011d723b4022decd57": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserJoined",
+          "type": "event"
+        },
+        "0x29b8faa3fcd3114fc2e3197ee983011779d847dd9f2eb40a1b68ee205e981447": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "userAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserLeft",
+          "type": "event"
+        },
+        "0x0bfc0fdd0ffeea0e521135d18175afe397d80a6a4e800fb548c6ed82a633a062": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "kickedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "kickingUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserKicked",
+          "type": "event"
+        },
+        "0xfe553b2e063ab936b88de3b4a73bfe46017e9b2d227ecbcefde730e18e29e94e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "bannedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "banningUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "reason",
+              "type": "string"
+            }
+          ],
+          "name": "UserBanned",
+          "type": "event"
+        },
+        "0xd750f80b9aae0ab3f217b9461dd61457f94d54cb41c3b441099662dd6370aede": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "parentNumber",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "mutedUserAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "mutingUserAddress",
+              "type": "address"
+            }
+          ],
+          "name": "UserMuted",
+          "type": "event"
+        },
+        "0xa67539a6ea3f9168cdf4de4ce75672058fab389cc8a073ff3d60ddd4a9bdb09d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "major",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "minor",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "name": "micro",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "message",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "name": "dat1",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "dat2",
+              "type": "uint256"
+            }
+          ],
+          "name": "Debug",
+          "type": "event"
+        }
+      },
+      "links": {
+        "PermissionLib": "0x99f9cd65de1699470387324fc03b27e185afc157",
+        "GroupLib": "0xd9957eaa1802cfc21f19573143745b827b7a853b"
+      },
+      "address": "0x02d75196c2f2bf429a5b0693f3b5eba9db3f1ebb"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-27T16:38:37.929Z"
+  "updatedAt": "2017-11-29T02:26:28.283Z"
 }
