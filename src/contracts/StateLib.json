@@ -1,11 +1,11 @@
 {
   "contractName": "StateLib",
   "abi": [],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a7230582002ec79955fe4b2f0abb02c63fe7a20c7fd1b697ded3a838055cddf337291f0e10029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a7230582002ec79955fe4b2f0abb02c63fe7a20c7fd1b697ded3a838055cddf337291f0e10029",
-  "sourceMap": "189:360:7:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "189:360:7:-;;;;;",
-  "source": "pragma solidity ^0.4.11;\n\nimport \"./CyberneticChat.sol\";\nimport \"./UserLib.sol\";\nimport \"./PostLib.sol\";\nimport \"./CurrencyLib.sol\";\nimport \"./PermissionLib.sol\";\nimport \"./GroupLib.sol\";\n\nlibrary StateLib {\n\n  struct Main {\n    mapping (uint256 => PostLib.Post) posts;\n    mapping (address => ContentLib.Content) userProfiles;\n    bool initialized;\n  }\n\n  struct State {\n    Main main;\n    PostLib.State postLib;\n    UserLib.State userLib;\n    PermissionLib.State permissionLib;\n    CurrencyLib.State currencyLib;\n    GroupLib.State groupLib;\n  }\n}\n",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820d66ce9f26ad1a0c355929f01013cdef77e5edd81b87e961df3bdce6330e694b40029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820d66ce9f26ad1a0c355929f01013cdef77e5edd81b87e961df3bdce6330e694b40029",
+  "sourceMap": "857:360:7:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "857:360:7:-;;;;;",
+  "source": "/*\nThis file is part of Cybernetic Chat.\n\nCybernetic Chat is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\nCybernetic Chat is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License\nalong with Cybernetic Chat.  If not, see <http://www.gnu.org/licenses/>.\n*/\n\n\npragma solidity ^0.4.11;\n\nimport \"./CyberneticChat.sol\";\nimport \"./UserLib.sol\";\nimport \"./PostLib.sol\";\nimport \"./CurrencyLib.sol\";\nimport \"./PermissionLib.sol\";\nimport \"./GroupLib.sol\";\n\nlibrary StateLib {\n\n  struct Main {\n    mapping (uint256 => PostLib.Post) posts;\n    mapping (address => ContentLib.Content) userProfiles;\n    bool initialized;\n  }\n\n  struct State {\n    Main main;\n    PostLib.State postLib;\n    UserLib.State userLib;\n    PermissionLib.State permissionLib;\n    CurrencyLib.State currencyLib;\n    GroupLib.State groupLib;\n  }\n}\n",
   "sourcePath": "/home/tybrown/Nextcloud/Documents/School/GATech_2017_Fall/CS-3312/CyberneticChat-Frontend/contracts/StateLib.sol",
   "ast": {
     "attributes": {
@@ -28,7 +28,7 @@
         },
         "id": 2564,
         "name": "PragmaDirective",
-        "src": "0:24:7"
+        "src": "668:24:7"
       },
       {
         "attributes": {
@@ -43,7 +43,7 @@
         },
         "id": 2565,
         "name": "ImportDirective",
-        "src": "26:30:7"
+        "src": "694:30:7"
       },
       {
         "attributes": {
@@ -58,7 +58,7 @@
         },
         "id": 2566,
         "name": "ImportDirective",
-        "src": "57:23:7"
+        "src": "725:23:7"
       },
       {
         "attributes": {
@@ -73,7 +73,7 @@
         },
         "id": 2567,
         "name": "ImportDirective",
-        "src": "81:23:7"
+        "src": "749:23:7"
       },
       {
         "attributes": {
@@ -88,7 +88,7 @@
         },
         "id": 2568,
         "name": "ImportDirective",
-        "src": "105:27:7"
+        "src": "773:27:7"
       },
       {
         "attributes": {
@@ -103,7 +103,7 @@
         },
         "id": 2569,
         "name": "ImportDirective",
-        "src": "133:29:7"
+        "src": "801:29:7"
       },
       {
         "attributes": {
@@ -118,7 +118,7 @@
         },
         "id": 2570,
         "name": "ImportDirective",
-        "src": "163:24:7"
+        "src": "831:24:7"
       },
       {
         "attributes": {
@@ -170,7 +170,7 @@
                         },
                         "id": 2571,
                         "name": "ElementaryTypeName",
-                        "src": "238:7:7"
+                        "src": "906:7:7"
                       },
                       {
                         "attributes": {
@@ -181,17 +181,17 @@
                         },
                         "id": 2572,
                         "name": "UserDefinedTypeName",
-                        "src": "249:12:7"
+                        "src": "917:12:7"
                       }
                     ],
                     "id": 2573,
                     "name": "Mapping",
-                    "src": "229:33:7"
+                    "src": "897:33:7"
                   }
                 ],
                 "id": 2574,
                 "name": "VariableDeclaration",
-                "src": "229:39:7"
+                "src": "897:39:7"
               },
               {
                 "attributes": {
@@ -217,7 +217,7 @@
                         },
                         "id": 2575,
                         "name": "ElementaryTypeName",
-                        "src": "283:7:7"
+                        "src": "951:7:7"
                       },
                       {
                         "attributes": {
@@ -228,17 +228,17 @@
                         },
                         "id": 2576,
                         "name": "UserDefinedTypeName",
-                        "src": "294:18:7"
+                        "src": "962:18:7"
                       }
                     ],
                     "id": 2577,
                     "name": "Mapping",
-                    "src": "274:39:7"
+                    "src": "942:39:7"
                   }
                 ],
                 "id": 2578,
                 "name": "VariableDeclaration",
-                "src": "274:52:7"
+                "src": "942:52:7"
               },
               {
                 "attributes": {
@@ -259,17 +259,17 @@
                     },
                     "id": 2579,
                     "name": "ElementaryTypeName",
-                    "src": "332:4:7"
+                    "src": "1000:4:7"
                   }
                 ],
                 "id": 2580,
                 "name": "VariableDeclaration",
-                "src": "332:16:7"
+                "src": "1000:16:7"
               }
             ],
             "id": 2581,
             "name": "StructDefinition",
-            "src": "211:142:7"
+            "src": "879:142:7"
           },
           {
             "attributes": {
@@ -300,12 +300,12 @@
                     },
                     "id": 2582,
                     "name": "UserDefinedTypeName",
-                    "src": "376:4:7"
+                    "src": "1044:4:7"
                   }
                 ],
                 "id": 2583,
                 "name": "VariableDeclaration",
-                "src": "376:9:7"
+                "src": "1044:9:7"
               },
               {
                 "attributes": {
@@ -328,12 +328,12 @@
                     },
                     "id": 2584,
                     "name": "UserDefinedTypeName",
-                    "src": "391:13:7"
+                    "src": "1059:13:7"
                   }
                 ],
                 "id": 2585,
                 "name": "VariableDeclaration",
-                "src": "391:21:7"
+                "src": "1059:21:7"
               },
               {
                 "attributes": {
@@ -356,12 +356,12 @@
                     },
                     "id": 2586,
                     "name": "UserDefinedTypeName",
-                    "src": "418:13:7"
+                    "src": "1086:13:7"
                   }
                 ],
                 "id": 2587,
                 "name": "VariableDeclaration",
-                "src": "418:21:7"
+                "src": "1086:21:7"
               },
               {
                 "attributes": {
@@ -384,12 +384,12 @@
                     },
                     "id": 2588,
                     "name": "UserDefinedTypeName",
-                    "src": "445:19:7"
+                    "src": "1113:19:7"
                   }
                 ],
                 "id": 2589,
                 "name": "VariableDeclaration",
-                "src": "445:33:7"
+                "src": "1113:33:7"
               },
               {
                 "attributes": {
@@ -412,12 +412,12 @@
                     },
                     "id": 2590,
                     "name": "UserDefinedTypeName",
-                    "src": "484:17:7"
+                    "src": "1152:17:7"
                   }
                 ],
                 "id": 2591,
                 "name": "VariableDeclaration",
-                "src": "484:29:7"
+                "src": "1152:29:7"
               },
               {
                 "attributes": {
@@ -440,27 +440,27 @@
                     },
                     "id": 2592,
                     "name": "UserDefinedTypeName",
-                    "src": "519:14:7"
+                    "src": "1187:14:7"
                   }
                 ],
                 "id": 2593,
                 "name": "VariableDeclaration",
-                "src": "519:23:7"
+                "src": "1187:23:7"
               }
             ],
             "id": 2594,
             "name": "StructDefinition",
-            "src": "357:190:7"
+            "src": "1025:190:7"
           }
         ],
         "id": 2595,
         "name": "ContractDefinition",
-        "src": "189:360:7"
+        "src": "857:360:7"
       }
     ],
     "id": 2596,
     "name": "SourceUnit",
-    "src": "0:550:7"
+    "src": "668:550:7"
   },
   "compiler": {
     "name": "solc",
@@ -468,5 +468,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-29T02:24:15.826Z"
+  "updatedAt": "2017-11-29T16:41:57.887Z"
 }
