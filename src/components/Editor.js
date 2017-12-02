@@ -176,7 +176,7 @@ class Editor extends Component {
         >
         <input
          type='file'
-         id='fileSelect' 
+         id='fileSelect'
          onChange={() => this.addFiles()}
          style={styles.fileInput}>
           </input>

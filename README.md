@@ -1,16 +1,73 @@
 # Cybernetic Chat
 
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+Cybernetic Chat is a decentralized, group-based social media platform.
+Like other social networks, users can post content and interact with others.
+It runs as a web application on the React framework and is backed by the Ethereum blockchain.
+It also utilizes IPFS to store posted content such as text, images, or video.
 
-## Setup
+## Release Notes
 
-To install the necessary packages, make sure you have the most recent version of `npm` installed, and run:
+This first version of Cybernetic Chat is the result of two semsters of work and contains the following features:
 
-`npm install`
+* Creating posts/groups (posts = groups)
+* Upvoting/downvoting posts
+* Transferring currency to other users
+* Tracking your current balance
+* Editing/viewing user profiles
 
-## Running
+## Install Guide
 
-`npm start`
+### Pre-requisites
+
+This install guide assumes you're running macOS, Linux, or Windows and have an internet connection.
+Additionally, you need to have the following installed:
+
+* **node**: For information, see [this guide](https://nodejs.org/en/).
+* **yarn**: For information, see [this guide](https://yarnpkg.com/en/docs/install).
+* **truffle**: For information, see [this guide](http://truffleframework.com/).
+* **git**: For information, see [this guide](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+
+### Downloading the source
+
+To run locally, you'll need to download the source code. It is hosted on GitHub (presumably you're there reading this), and can be
+downloaded by executing the following in any terminal that can use git:
+
+`git clone git@github.com:team-cybernetic/Frontend.git`
+
+### Setting up Ethereum
+
+You have two options here.
+
+* You can use the Ethereum testnet hosted by us (ttt222.org). Note: **this is default**
+* You can run your own locally. Note: **we recommend this** (at least initially)
+
+To run your own, install ganache-cli using [the instructions here](https://github.com/trufflesuite/ganache-cli).
+
+Then, simply run the following command:
+
+`ganache-cli`
+
+### Building the project
+
+Because the project is backed by an Ethereum contract, you'll need to ensure the contract is deployed correctly. To do this,
+run the following:
+
+`cd Frontend`
+
+`./build-contracts.sh`
+
+Next you'll need to install the rest of the project's dependencies:
+
+`yarn install`
+
+### Running
+
+Now that you have the pre-requisites, deployed contracts, and project dependencies, it's time to run! It's as easy as executing
+the following command:
+
+`yarn start`
+
+The above command should automatically open the project in your browser, but if it doesn't simply visit: [http://localhost:3000](http://localhost:3000).
 
 ## Troubleshooting
 
@@ -18,18 +75,4 @@ To install the necessary packages, make sure you have the most recent version of
 
 If modules are missing, it probably means you need to run:
 
-`npm install`
-
-### `npm start` doesn’t detect changes
-
-When you save a file while `npm start` is running, the browser should refresh with the updated code.<br>
-If this doesn’t happen, try one of the following workarounds:
-
-* If your project is in a Dropbox folder, try moving it out.
-* If the watcher doesn’t see a file called `index.js` and you’re referencing it by the folder name, you [need to restart the watcher](https://github.com/facebookincubator/create-react-app/issues/1164) due to a Webpack bug.
-* Some editors like Vim and IntelliJ have a “safe write” feature that currently breaks the watcher. You will need to disable it. Follow the instructions in [“Adjusting Your Text Editor”](https://webpack.js.org/guides/development/#adjusting-your-text-editor).
-* If your project path contains parentheses, try moving the project to a path without them. This is caused by a [Webpack watcher bug](https://github.com/webpack/watchpack/issues/42).
-* On Linux and macOS, you might need to [tweak system settings](https://webpack.github.io/docs/troubleshooting.html#not-enough-watchers) to allow more watchers.
-* If the project runs inside a virtual machine such as (a Vagrant provisioned) VirtualBox, create an `.env` file in your project directory if it doesn’t exist, and add `CHOKIDAR_USEPOLLING=true` to it. This ensures that the next time you run `npm start`, the watcher uses the polling mode, as necessary inside a VM.
-
-If none of these solutions help please leave a comment [in this thread](https://github.com/facebookincubator/create-react-app/issues/659).
+`yarn install`

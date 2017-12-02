@@ -28,8 +28,6 @@ class NavigationBar extends Component {
           <span style={styles.groupTitle}>{this.getGroupTitle()}</span>
         </div>
         {this.renderParentButton()}
-        {this.renderIcon('plus')}
-        {this.renderIcon('gear')}
       </div>
     );
   }
