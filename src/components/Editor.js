@@ -86,6 +86,7 @@ class Editor extends Component {
 
   componentWillMount() {
     this.walletListener = Wallet.registerBalanceUpdateListener((oldBalance, newBalance) => {
+      this.getBalances(this.props.isLoaded, this.props.group);
       this.forceUpdate();
     });
     this.getBalances(this.props.isLoaded, this.props.group);

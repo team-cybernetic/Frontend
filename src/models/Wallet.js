@@ -21,13 +21,13 @@ import CyberneticChat from '../blockchain/CyberneticChat';
 import GasEstimator from '../utils/GasEstimator';
 import TransactionConfirmationModal from '../components/TransactionConfirmationModal';
 import BigNumber from 'bignumber.js';
+import UserStore from '../stores/UserStore';
 
 export default class Wallet {
   static web3 = null;
   static blockListener = null;
   static managedWeb3 = false;
   static balance = 0;
-  static balanceEth = 0;
   static etherToUsdConversion = -1;
   static etherToUsdConversionFailures = 0;
   static etherToUsdConversionMaxFailures = 10;
@@ -35,6 +35,8 @@ export default class Wallet {
   static etherConfirmationSpeedsFailures = 0;
   static etherConfirmationSpeedsMaxFailures = 10;
   static defaultGasPrice = 0;
+  static accounts = [];
+  static currentUser = null;
 
   static initialize(web3, managedWeb3) {
     this.web3 = web3;
@@ -44,7 +46,9 @@ export default class Wallet {
       this.defaultGasPrice = price * 1;
     });
     this.web3.eth.getAccounts((error, accounts) => {
+      this.accounts = accounts.map((address) => UserStore.getUser(address));
       this.web3.eth.defaultAccount = accounts[1];
+      this.currentUser = this.accounts[1];
       this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
         this.balance = balance;
         this.fireBalanceUpdateListeners(-1, balance);
@@ -160,6 +164,24 @@ export default class Wallet {
 
   static getAccountAddress() {
     return this.web3.eth.defaultAccount;
+  }
+
+  static getCurrentUser() {
+    return this.currentUser;
+  }
+
+  static switchCurrentUser(user) {
+    if (user.address !== this.web3.eth.defaultAccount) {
+      this.web3.eth.defaultAccount = user.address;
+      this.web3.eth.getBalance(user.address, (error, balance) => {
+        this.balance = balance;
+        this.fireBalanceUpdateListeners(-1, balance);
+        console.log("account balance =", this.weiToEther(this.balance).toLocaleString());
+      });
+      this.currentUser.fireProfileUpdateListeners();
+      user.fireProfileUpdateListeners();
+      this.currentUser = user;
+    }
   }
 
   static getCurrentBalance() {

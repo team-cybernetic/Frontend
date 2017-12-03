@@ -103,6 +103,13 @@ class SideBar extends Component {
 
   componentWillMount() {
     this.setContent(this.props.isLoaded, this.props.group, this.props.post, this.props.pathState);
+    this.balanceUpdateListener = Wallet.registerBalanceUpdateListener(() => {
+      this.updateUsers(this.props.group);
+    });
+  }
+
+  componentWillUnmount() {
+    Wallet.unregisterBalanceUpdateListener(this.balanceUpdateListener);
   }
 
   componentWillReceiveProps(nextProps) {

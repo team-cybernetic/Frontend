@@ -19,8 +19,16 @@ along with Cybernetic Chat.  If not, see <http://www.gnu.org/licenses/>.
 import React, { Component } from 'react';
 import FontAwesome from 'react-fontawesome';
 import { Link } from 'react-router-dom';
+import Wallet from '../models/Wallet';
 
 class NavigationBar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userAccountMenuOpen: false,
+    };
+  }
+
   render() {
     return (
       <div style={styles.outerBar}>
@@ -28,6 +36,8 @@ class NavigationBar extends Component {
           <span style={styles.groupTitle}>{this.getGroupTitle()}</span>
         </div>
         {this.renderParentButton()}
+        {this.renderUserButton()}
+        {this.renderUserAccountMenu()}
       </div>
     );
   }
@@ -46,6 +56,29 @@ class NavigationBar extends Component {
     );
   }
 
+  renderUserButton() {
+    return (
+      <Link to='#' onClick={() => this.toggleUserAccountMenu()}>{this.renderIcon('user')}</Link>
+    );
+  }
+
+  renderUserAccountMenu() {
+    if (this.state.userAccountMenuOpen) {
+      return (
+        <div style={styles.userAccountMenu}>
+          {Wallet.accounts.sort('address').map((user) => {
+            return (
+              <div key={user.address}
+                   onClick={() => this.switchCurrentUser(user)}
+                   style={styles.userAccountItem(user.address === Wallet.getAccountAddress())}>{user.nickname ? user.nickname : user.address}</div>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
+  }
+
   getGroupTitle() {
     if (this.props.isLoaded) {
       return this.props.pathState.titleOnlyPath || this.props.pathState.path;
@@ -58,6 +91,15 @@ class NavigationBar extends Component {
     return (
       <FontAwesome style={styles.icon} name={name} />
     );
+  }
+
+  toggleUserAccountMenu() {
+    this.setState({ userAccountMenuOpen: !this.state.userAccountMenuOpen });
+  }
+
+  switchCurrentUser(user) {
+    this.setState({ userAccountMenuOpen: false });
+    Wallet.switchCurrentUser(user);
   }
 }
 
@@ -85,6 +127,25 @@ const styles = {
     fontWeight: 'bold',
     margin: '4px',
   },
+  userAccountMenu: {
+    position: 'absolute',
+    right: 0,
+    top: '49px',
+    zIndex: 2,
+    border: '1px solid gray',
+    boxShadow: '-1px 2px 1px #888888',
+  },
+  userAccountItem: (highlighted) => {
+    return {
+      width: '200px',
+      fontSize: '16px',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      cursor: 'pointer',
+      padding: '3px 5px',
+      backgroundColor: highlighted ? 'lightyellow' : 'white',
+    }
+  }
 };
 
 export default NavigationBar;

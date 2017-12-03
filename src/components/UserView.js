@@ -26,7 +26,6 @@ export default class UserView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isSelf: undefined,
       inputTip: '1',
     };
   }
@@ -41,13 +40,6 @@ export default class UserView extends Component {
     });
     this.profileListenerHandle = this.props.user.registerProfileUpdateListener(() => {
       this.forceUpdate();
-    });
-    userProperties.load().then(() => {
-      if (this.props.user.getAddress() === Wallet.getAccountAddress()) {
-        this.setState({
-          isSelf: true,
-        });
-      }
     });
   }
 
@@ -152,7 +144,7 @@ export default class UserView extends Component {
           marginRight: '2%',
           marginTop: '1.5%',
           marginBottom: '1.5%',
-          backgroundColor: this.state.isSelf ? 'yellow' : 'white',
+          backgroundColor: this.props.user.getAddress() === Wallet.getAccountAddress() ? 'lightyellow' : 'white',
         } : {
           width: '46%',
           marginLeft: '2%',
