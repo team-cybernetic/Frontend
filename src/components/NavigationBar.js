@@ -66,13 +66,29 @@ class NavigationBar extends Component {
     if (this.state.userAccountMenuOpen) {
       return (
         <div style={styles.userAccountMenu}>
-          {Wallet.accounts.sort('address').map((user) => {
+          <div key='online-accounts'
+               style={styles.userAccountItem(false)}>--- Online Accounts ---</div>
+          {Wallet.accounts.map((user) => {
             return (
               <div key={user.address}
                    onClick={() => this.switchCurrentUser(user)}
                    style={styles.userAccountItem(user.address === Wallet.getAccountAddress())}>{user.nickname ? user.nickname : user.address}</div>
             );
           })}
+          {Wallet.localAccounts.length > 0 ? (
+            <div key='local-accounts'
+                 style={styles.userAccountItem(false)}>--- Local Accounts ---</div>
+          ) : null}
+          {Wallet.localAccounts.map((user) => {
+            return (
+              <div key={user.address}
+                   onClick={() => this.switchCurrentUserLocal(user)}
+                   style={styles.userAccountItem(user.address === Wallet.getAccountAddress())}>{user.nickname ? user.nickname : user.address}</div>
+            );
+          })}
+          <div key='create-account'
+               onClick={() => this.createAccount()}
+               style={styles.userAccountItem(false)}>Create Local Account</div>
         </div>
       );
     }
@@ -100,6 +116,18 @@ class NavigationBar extends Component {
   switchCurrentUser(user) {
     this.setState({ userAccountMenuOpen: false });
     Wallet.switchCurrentUser(user);
+  }
+
+  switchCurrentUserLocal(user) {
+    this.setState({ userAccountMenuOpen: false });
+    Wallet.switchCurrentUserLocal(user);
+  }
+
+  createAccount() {
+    this.setState({ userAccountMenuOpen: false });
+    Wallet.createAccount().then(({ address, seedPhrase }) => {
+      prompt('Save the following information somewhere secure.', `address = '${address}' and seedPhrase = '${seedPhrase}'`);
+    });
   }
 }
 

@@ -22,10 +22,16 @@ import GasEstimator from '../utils/GasEstimator';
 import TransactionConfirmationModal from '../components/TransactionConfirmationModal';
 import BigNumber from 'bignumber.js';
 import UserStore from '../stores/UserStore';
+import SignerProvider from 'ethjs-provider-signer';
+import LightWallet from 'eth-lightwallet';
+
+const VAULT_PASSWORD = 'password';
 
 export default class Wallet {
   static web3 = null;
+  static defaultProvider = null;
   static blockListener = null;
+  static rootContract = null;
   static managedWeb3 = false;
   static balance = 0;
   static etherToUsdConversion = -1;
@@ -40,19 +46,23 @@ export default class Wallet {
 
   static initialize(web3, managedWeb3) {
     this.web3 = web3;
+    this.defaultProvider = web3.currentProvider;
     this.managedWeb3 = managedWeb3;
     this.balanceUpdateListeners = [];
     this.web3.eth.getGasPrice((error, price) => {
       this.defaultGasPrice = price * 1;
     });
-    this.web3.eth.getAccounts((error, accounts) => {
-      this.accounts = accounts.map((address) => UserStore.getUser(address));
-      this.web3.eth.defaultAccount = accounts[1];
-      this.currentUser = this.accounts[1];
-      this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
-        this.balance = balance;
-        this.fireBalanceUpdateListeners(-1, balance);
-        console.log("account balance =", this.weiToEther(this.balance).toLocaleString());
+    this.loadKeystore().then(() => {
+      this.localAccounts = this.getLocalAccounts().map((address) => UserStore.getUser(address));
+      this.web3.eth.getAccounts((error, accounts) => {
+        this.accounts = accounts.map((address) => UserStore.getUser(address));
+        this.web3.eth.defaultAccount = accounts[1];
+        this.currentUser = this.accounts[1];
+        this.web3.eth.getBalance(this.getAccountAddress(), (error, balance) => {
+          this.balance = balance;
+          this.fireBalanceUpdateListeners(-1, balance);
+          console.log("account balance =", this.weiToEther(this.balance).toLocaleString());
+        });
       });
     });
     this.blockListener = Blockchain.registerLatestBlockListener((error, blockid) => {
@@ -76,6 +86,54 @@ export default class Wallet {
       console.log("eth confirmation speeds:", this.ethConfirmationSpeeds);
     }).catch((error) => {
       console.error("Failed to fetch eth confirmation speeds", error);
+    });
+  }
+
+  static loadKeystore() {
+    return new Promise((resolve, reject) => {
+      if (localStorage.getItem('ethereum_keystore')) {
+        this.keystore = LightWallet.keystore.deserialize(localStorage.getItem('ethereum_keystore'));
+        this.keystore.keyFromPassword(VAULT_PASSWORD, (_, pwDerivedKey) => {
+          this.pwDerivedKey = pwDerivedKey;
+        });
+        this.keystore.passwordProvider = (callback) => {
+          callback(null, VAULT_PASSWORD);
+        };
+        resolve(this.keystore);
+      } else {
+        LightWallet.keystore.createVault({
+          password: VAULT_PASSWORD,
+          seedPhrase: LightWallet.keystore.generateRandomSeed(),
+          hdPathString: "m/0'/0'/0'",
+        }, (error, ks) => {
+          localStorage.setItem('ethereum_keystore', ks.serialize());
+          this.keystore = ks;
+          this.keystore.keyFromPassword(VAULT_PASSWORD, (_, pwDerivedKey) => {
+            this.pwDerivedKey = pwDerivedKey;
+          });
+          this.keystore.passwordProvider = (callback) => {
+            callback(null, VAULT_PASSWORD);
+          };
+          resolve(this.keystore);
+        });
+      }
+    });
+  }
+
+  static getLocalAccounts() {
+    return this.keystore.getAddresses();
+  }
+
+  static createAccount() {
+    return new Promise((resolve, reject) => {
+      this.keystore.keyFromPassword(VAULT_PASSWORD, (_, pwDerivedKey) => {
+        this.keystore.generateNewAddress(pwDerivedKey);
+        const address = this.keystore.getAddresses()[this.keystore.getAddresses().length - 1];
+        const seedPhrase = this.keystore.getSeed(pwDerivedKey);
+        localStorage.setItem('ethereum_keystore', this.keystore.serialize());
+        this.localAccounts.push(UserStore.getUser(address));
+        resolve({ address, seedPhrase });
+      });
     });
   }
 
@@ -172,16 +230,41 @@ export default class Wallet {
 
   static switchCurrentUser(user) {
     if (user.address !== this.web3.eth.defaultAccount) {
-      this.web3.eth.defaultAccount = user.address;
-      this.web3.eth.getBalance(user.address, (error, balance) => {
-        this.balance = balance;
-        this.fireBalanceUpdateListeners(-1, balance);
-        console.log("account balance =", this.weiToEther(this.balance).toLocaleString());
-      });
-      this.currentUser.fireProfileUpdateListeners();
-      user.fireProfileUpdateListeners();
-      this.currentUser = user;
+      this.switchUserUsingProvider(user, this.defaultProvider);
     }
+  }
+
+  static switchCurrentUserLocal(user) {
+    if (user.address !== this.web3.eth.defaultAccount) {
+      const provider = new SignerProvider(this.defaultProvider.host, {
+        signTransaction: (transactionData, cb) => {
+          if (!transactionData.gasLimit) {
+            transactionData.gasLimit = 4712388;
+          }
+          const rawTx = LightWallet.txutils.createContractTx(transactionData.from, transactionData).tx;
+          return cb(null, LightWallet.signing.signTx(this.keystore, this.pwDerivedKey, rawTx, user.address, "m/0'/0'/0'"));
+        },
+        accounts: (cb) => cb(null, [user.address]),
+      });
+      this.switchUserUsingProvider(user, provider);
+    }
+  }
+
+  static switchUserUsingProvider(user, provider) {
+    this.web3.setProvider(provider);
+    this.rootContract.setProvider(provider);
+    Wallet.rootContract.deployed().then((newInstance) => {
+      CyberneticChat.contractInstance = newInstance;
+    });
+    this.web3.eth.defaultAccount = user.address;
+    this.web3.eth.getBalance(user.address, (error, balance) => {
+      this.balance = balance;
+      this.fireBalanceUpdateListeners(-1, balance);
+      console.log("account balance =", this.weiToEther(this.balance).toLocaleString());
+    });
+    this.currentUser.fireProfileUpdateListeners();
+    user.fireProfileUpdateListeners();
+    this.currentUser = user;
   }
 
   static getCurrentBalance() {

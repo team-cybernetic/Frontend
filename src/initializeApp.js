@@ -35,13 +35,12 @@ export default function initializeApp() {
     getWeb3().then((results) => {
       const { web3, managedWeb3 } = results;
       console.log("Initializing: got web3, managed by external:", managedWeb3 ? "true" : "false");
-      const rootContract = TruffleContract(CyberneticChatJson);
-      rootContract.setProvider(web3.currentProvider);
-      rootContract.defaults({
+      Wallet.rootContract = TruffleContract(CyberneticChatJson);
+      Wallet.rootContract.setProvider(web3.currentProvider);
+      Wallet.rootContract.defaults({
         gasLimit: 4712388,
       });
-      //rootContract.linked_binary = CyberneticChatJson.networks[web3.version.network].linked_binary;
-      rootContract.deployed().then((rootInstance) => {
+      Wallet.rootContract.deployed().then((rootInstance) => {
         console.log("CyberneticChat root instance deployed at address:", rootInstance.address);
         Wallet.initialize(web3, managedWeb3);
         GasEstimator.initialize(web3);
@@ -49,7 +48,7 @@ export default function initializeApp() {
         CyberneticChat.initialize(web3, rootInstance);
         UserStore.initialize();
         PostStore.initialize();
-        GroupStore.initialize(web3, rootInstance);
+        GroupStore.initialize();
         Ipfs.initialize().then(resolve);
       }).catch((error) => {
         console.error('Error getting deployed instance of root contract: ', error);

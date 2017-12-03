@@ -24,12 +24,7 @@ import PostStore from './PostStore';
 const ROOT_GROUP_NUMBER = 1;
 
 export default class GroupStore {
-  static rootInstance = null;
-  static web3 = null;
-
-  static initialize(web3, rootInstance) {
-    this.web3 = web3;
-    this.rootInstance = rootInstance;
+  static initialize() {
     this.cache = [];
     this.treeRoot = this.getGroup(ROOT_GROUP_NUMBER);
   }
