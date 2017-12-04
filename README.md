@@ -7,6 +7,8 @@ It also utilizes IPFS to store posted content such as text, images, or video.
 
 ## Release Notes
 
+### Latest features
+
 This first version of Cybernetic Chat is the result of two semsters of work and contains the following features:
 
 * Creating posts/groups (posts = groups)
@@ -14,6 +16,20 @@ This first version of Cybernetic Chat is the result of two semsters of work and 
 * Transferring currency to other users
 * Tracking your current balance
 * Editing/viewing user profiles
+
+### Recently fixed bugs
+
+* Fixed errors with tipping a group
+* Fixed errors when tipping a user in a subgroup
+* Added error check for tipping a user which doesn't exist
+
+### Known bugs
+
+* Error handling is shoddy
+* When you try to post in a group, but you're not a member of the group, it silently errors.
+* App resorce usage is way too high due to web3 jsonrpc background calls as a result of web3 filter() methods
+* App crashes after several minutes of sustained usage due to above
+
 
 ## Install Guide
 
